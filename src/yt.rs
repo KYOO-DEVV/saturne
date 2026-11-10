@@ -46,7 +46,7 @@ static BLOCKED_UNTIL: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU6
 const BLOCK_PAUSE_SECS: u64 = 180;
 pub const BLOCKED_MSG: &str = "YouTube limite temporairement les recherches depuis cet ordinateur (trop de requêtes). Patiente quelques minutes puis réessaie.";
 
-fn unix_now() -> u64 {
+pub fn unix_now() -> u64 {
     std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0)
 }
 
@@ -76,7 +76,7 @@ pub fn initial_data(html: &str) -> Result<Value, String> {
     serde_json::from_str(&rest[..end]).map_err(|e| format!("Réponse YouTube illisible ({e})"))
 }
 
-fn walk<'a>(v: &'a Value, f: &mut dyn FnMut(&'a Value)) {
+pub fn walk<'a>(v: &'a Value, f: &mut dyn FnMut(&'a Value)) {
     f(v);
     match v {
         Value::Object(m) => m.values().for_each(|x| walk(x, f)),
@@ -154,9 +154,13 @@ fn is_subs(t: &str) -> bool {
 }
 
 pub fn search_videos(html: &str) -> Result<Vec<Track>, String> {
-    let data = initial_data(html)?;
+    Ok(tracks_in(&initial_data(html)?))
+}
+
+/// Titres (`videoRenderer`) d'une page de résultats ou de la suite d'une liste.
+pub fn tracks_in(data: &Value) -> Vec<Track> {
     let mut out = Vec::new();
-    walk(&data, &mut |o| {
+    walk(data, &mut |o| {
         let Some(v) = o.get("videoRenderer") else { return };
         let (Some(id), Some(len)) = (v.get("videoId").and_then(Value::as_str), v.get("lengthText")) else { return };
         let owner = v.get("ownerText").and_then(|x| x.get("runs")).and_then(|r| r.get(0));
@@ -177,7 +181,7 @@ pub fn search_videos(html: &str) -> Result<Vec<Track>, String> {
             views: parse_views(&text_of(v.get("viewCountText"))),
         });
     });
-    Ok(out)
+    out
 }
 
 pub fn search_channels(html: &str) -> Result<Vec<Artist>, String> {

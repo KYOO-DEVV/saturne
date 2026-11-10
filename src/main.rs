@@ -4,11 +4,15 @@
 //! Une fenêtre native (wry/tao, WebView2) affiche l'interface. `--serve` lance seulement le serveur (pour un navigateur).
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod bundle;
+mod discord;
 mod icon;
+mod native;
 mod public;
 mod store;
 mod update;
 mod yt;
+mod ytmore;
 
 use axum::{
     Json, Router,
@@ -29,7 +33,8 @@ use std::{
 };
 use store::{Store, User};
 
-const INDEX_HTML: &str = include_str!("../web/index.html");
+/// Interface assemblée par `build.rs` à partir de `web/` (voir `bundle.rs`).
+const INDEX_HTML: &str = include_str!(concat!(env!("OUT_DIR"), "/index.html"));
 const FONT_LATIN: &[u8] = include_bytes!("../assets/jakarta-latin.woff2");
 const FONT_LATIN_EXT: &[u8] = include_bytes!("../assets/jakarta-latin-ext.woff2");
 const COOKIE: &str = "saturne_session";
@@ -47,6 +52,9 @@ struct App {
     cache: Arc<Mutex<HashMap<String, (Instant, Value)>>>,
     port: u16,
     dev_html: Option<PathBuf>,
+    warming: Arc<std::sync::atomic::AtomicBool>,
+    presence: Arc<Mutex<Option<std::sync::mpsc::Sender<discord::Msg>>>>,
+    artists: Arc<Mutex<Vec<Option<Value>>>>,
 }
 
 fn err(code: StatusCode, msg: &str) -> Response {
@@ -108,7 +116,8 @@ async fn guard(State(app): State<App>, req: Request<Body>, next: Next) -> Respon
 /* ---------- Pages ---------- */
 async fn index(State(app): State<App>) -> Response {
     let html = match &app.dev_html {
-        Some(p) => std::fs::read_to_string(p).unwrap_or_else(|e| format!("Impossible de lire {}: {e}", p.display())),
+        // Mode développeur : `SATURNE_WEB` désigne le dossier `web/` (assemblé à chaque requête) ou un fichier HTML complet.
+        Some(p) => (if p.is_dir() { bundle::assemble(p) } else { std::fs::read_to_string(p) }).unwrap_or_else(|e| format!("Impossible de lire {}: {e}", p.display())),
         None => INDEX_HTML.to_string(),
     };
     ([(header::CACHE_CONTROL, "no-store")], Html(html)).into_response()
@@ -412,7 +421,7 @@ async fn api_alt(State(app): State<App>, Query(q): Q) -> Response {
         Ok(v) => v,
         Err(e) => return fail(e),
     };
-    for t in list.as_array().into_iter().flatten().filter_map(track_from).take(10) {
+    for t in list["items"].as_array().into_iter().flatten().filter_map(track_from).take(10) {
         if t.id == id || skip.contains(&t.id) {
             continue;
         }
@@ -475,17 +484,27 @@ async fn search_videos(app: &App, q: &str, gl: &str) -> Result<Value, String> {
     let (q, gl) = (q.to_string(), gl.to_string());
     app.cached(format!("sv|{gl}|{q}"), Duration::from_secs(1800), || async {
         // D'abord les vidéos de moins de 4 minutes (surtout des chansons). Si ça ne suffit pas (lo-fi, jazz…), on ajoute toutes les vidéos.
-        let short = match yt::get(&app.http, &results_url(&q, yt::SP_SHORT, &gl)).await {
-            Ok(h) => yt::search_videos(&h)?,
+        let mut page: Option<(ytmore::Cfg, Value)> = None;
+        let mut list = Vec::new();
+        match yt::get(&app.http, &results_url(&q, yt::SP_SHORT, &gl)).await {
+            Ok(h) => {
+                let data = yt::initial_data(&h)?;
+                list = yt::tracks_in(&data);
+                page = ytmore::cfg(&h).map(|c| (c, data));
+            }
             Err(e) if e == yt::BLOCKED_MSG => return Err(e),
-            Err(_) => vec![],
-        };
-        let enough = short.iter().filter(|t| matches!(t.duration, Some(d) if (60..=900).contains(&d))).count() >= 10;
-        let mut list = short;
-        if !enough {
-            list.extend(yt::search_videos(&yt::get(&app.http, &results_url(&q, yt::SP_VIDEO, &gl)).await?)?);
+            Err(_) => {}
         }
-        Ok(json!(yt::songs_or_mixes(list)))
+        let enough = list.iter().filter(|t| matches!(t.duration, Some(d) if (60..=900).contains(&d))).count() >= 10;
+        if !enough {
+            let h = yt::get(&app.http, &results_url(&q, yt::SP_VIDEO, &gl)).await?;
+            let data = yt::initial_data(&h)?;
+            list.extend(yt::tracks_in(&data));
+            page = ytmore::cfg(&h).map(|c| (c, data));
+        }
+        // Jeton de la page suivante (bouton « Afficher plus »).
+        let next = page.and_then(|(c, d)| ytmore::continuation_token(&d).map(|t| json!({"t": t, "k": c.key, "v": c.ver})));
+        Ok(json!({"items": yt::songs_or_mixes(list), "next": next}))
     })
     .await
 }
@@ -500,11 +519,177 @@ async fn api_search(State(app): State<App>, Query(q): Q) -> Response {
     if text.is_empty() {
         return err(StatusCode::BAD_REQUEST, "Recherche vide");
     }
-    let res = if q.get("type").is_some_and(|t| t == "channel") { search_channels(&app, &text).await } else { search_videos(&app, &text, &region(&q)).await };
+    if q.get("type").is_some_and(|t| t == "channel") {
+        return match search_channels(&app, &text).await {
+            Ok(items) => Json(json!({ "items": items })).into_response(),
+            Err(e) => fail(e),
+        };
+    }
+    match search_videos(&app, &text, &region(&q)).await {
+        Ok(v) => Json(v).into_response(),
+        Err(e) => fail(e),
+    }
+}
+
+/// Suite d'une recherche : `/api/more?t=jeton&k=clé&v=version`.
+async fn api_more(State(app): State<App>, Query(q): Q) -> Response {
+    let get = |k: &str| q.get(k).cloned().unwrap_or_default();
+    let (t, k, v) = (get("t"), get("k"), get("v"));
+    if !ytmore::valid_token(&t) || !ytmore::valid_key(&k) || !ytmore::valid_ver(&v) {
+        return err(StatusCode::BAD_REQUEST, "Paramètres invalides");
+    }
+    let cfg = ytmore::Cfg { key: k, ver: v };
+    let data = match ytmore::next_page(&app.http, "search", &cfg, &region(&q), &t).await {
+        Ok(d) => d,
+        Err(e) => return fail(e),
+    };
+    let items: Vec<yt::Track> = yt::tracks_in(&data).into_iter().filter(|t| matches!(t.duration, Some(d) if (60..=900).contains(&d))).collect();
+    let next = ytmore::continuation_token(&data).map(|t| json!({"t": t, "k": cfg.key, "v": cfg.ver}));
+    Json(json!({"items": items, "next": next})).into_response()
+}
+
+/// Importe une playlist YouTube (publique ou non répertoriée) : `/api/playlist?list=ID`.
+async fn api_playlist(State(app): State<App>, Query(q): Q) -> Response {
+    let id = q.get("list").cloned().unwrap_or_default();
+    if !(2..=64).contains(&id.len()) || !id.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-') {
+        return err(StatusCode::BAD_REQUEST, "Identifiant de playlist invalide");
+    }
+    let res = app
+        .cached(format!("pl|{id}"), Duration::from_secs(600), || async {
+            let html = yt::get(&app.http, &format!("https://www.youtube.com/playlist?list={id}&hl=fr")).await.map_err(|e| if e == yt::BLOCKED_MSG { e } else { "Playlist introuvable ou privée".to_string() })?;
+            let data = yt::initial_data(&html).map_err(|_| "Playlist introuvable ou privée".to_string())?;
+            let (title, owner) = (ytmore::playlist_title(&data), ytmore::playlist_owner(&data));
+            let mut tracks = ytmore::playlist_tracks(&data);
+            let (cfg, mut token) = (ytmore::cfg(&html), ytmore::continuation_token(&data));
+            if let Some(cfg) = cfg {
+                for _ in 0..3 {
+                    let Some(t) = token.take() else { break };
+                    match ytmore::next_page(&app.http, "browse", &cfg, "", &t).await {
+                        Ok(d) => {
+                            tracks.extend(ytmore::playlist_tracks(&d));
+                            token = ytmore::continuation_token(&d);
+                        }
+                        Err(_) => break,
+                    }
+                }
+            }
+            let mut seen = HashSet::new();
+            tracks.retain(|t| seen.insert(t.id.clone()));
+            tracks.truncate(300);
+            if tracks.is_empty() {
+                return Err("Cette playlist est vide ou privée".to_string());
+            }
+            Ok(json!({"title": title, "owner": owner, "tracks": tracks}))
+        })
+        .await;
+    match res {
+        Ok(v) => Json(v).into_response(),
+        Err(e) => fail(e),
+    }
+}
+
+/// « Radio » d'un titre : le mix YouTube associé (`list=RD<id>`).
+async fn api_radio(State(app): State<App>, Query(q): Q) -> Response {
+    let id = q.get("id").cloned().unwrap_or_default();
+    if id.len() != 11 || !id.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-') {
+        return err(StatusCode::BAD_REQUEST, "Identifiant de vidéo invalide");
+    }
+    let res = app
+        .cached(format!("rd|{id}"), Duration::from_secs(1800), || async {
+            let html = yt::get(&app.http, &format!("https://www.youtube.com/watch?v={id}&list=RD{id}&hl=fr")).await?;
+            let data = yt::initial_data(&html)?;
+            let mut seen = HashSet::new();
+            let tracks: Vec<yt::Track> = ytmore::radio_tracks(&data).into_iter().filter(|t| t.id != id && seen.insert(t.id.clone())).take(40).collect();
+            if tracks.is_empty() {
+                return Err("Aucune radio disponible pour ce titre".to_string());
+            }
+            Ok(json!(tracks))
+        })
+        .await;
     match res {
         Ok(items) => Json(json!({ "items": items })).into_response(),
         Err(e) => fail(e),
     }
+}
+
+/* ---------- Artistes populaires (chargés en arrière-plan, au rythme de YouTube) ---------- */
+const ARTISTS: [&str; 24] = ["YOASOBI", "Ado", "Official髭男dism", "米津玄師", "King Gnu", "藤井 風", "LiSA", "Aimer", "Vaundy", "Mrs. GREEN APPLE", "Eve", "ずっと真夜中でいいのに。", "back number", "あいみょん", "宇多田ヒカル", "Perfume", "BABYMETAL", "ONE OK ROCK", "RADWIMPS", "Creepy Nuts", "ヨルシカ", "星野源", "優里", "新しい学校のリーダーズ"];
+
+/// Résout les artistes un par un (cache disque de 7 jours) ; lancé à la première ouverture de la page Artists.
+async fn warm_artists(app: App) {
+    let path = app.data_dir.join("artists-cache.json");
+    let disk: Value = std::fs::read_to_string(&path).ok().and_then(|s| serde_json::from_str(&s).ok()).filter(|v: &Value| v["at"].as_u64().is_some_and(|a| yt::unix_now().saturating_sub(a) < 7 * 86400)).unwrap_or(json!({"at": yt::unix_now(), "items": {}}));
+    let mut items = disk["items"].as_object().cloned().unwrap_or_default();
+    for (i, name) in ARTISTS.iter().enumerate() {
+        if let Some(v) = items.get(*name) {
+            app.artists.lock().unwrap()[i] = Some(v.clone());
+        }
+    }
+    for (i, name) in ARTISTS.iter().enumerate() {
+        if items.contains_key(*name) {
+            continue;
+        }
+        match search_channels(&app, name).await {
+            Ok(v) => {
+                if let Some(first) = v.as_array().and_then(|a| a.first()).cloned() {
+                    items.insert(name.to_string(), first.clone());
+                    app.artists.lock().unwrap()[i] = Some(first);
+                }
+            }
+            Err(e) if e == yt::BLOCKED_MSG => break,
+            Err(_) => {}
+        }
+        tokio::time::sleep(Duration::from_millis(1200)).await; // doucement : YouTube limite les rafales
+    }
+    let _ = std::fs::write(&path, json!({"at": disk["at"], "items": items}).to_string());
+}
+
+async fn api_artists(State(app): State<App>) -> Response {
+    let items: Vec<Value> = app.artists.lock().unwrap().iter().flatten().cloned().collect();
+    let pending = items.len() < ARTISTS.len();
+    if pending && !app.warming.swap(true, std::sync::atomic::Ordering::Relaxed) {
+        let a = app.clone();
+        tokio::spawn(async move {
+            warm_artists(a.clone()).await;
+            a.warming.store(false, std::sync::atomic::Ordering::Relaxed);
+        });
+    }
+    Json(json!({"items": items, "pending": pending, "total": ARTISTS.len()})).into_response()
+}
+
+/* ---------- Sauvegardes automatiques ---------- */
+async fn api_backups(State(app): State<App>, h: HeaderMap) -> Response {
+    let Some(user) = app.user(&h) else { return err(StatusCode::UNAUTHORIZED, "Connexion requise") };
+    let items: Vec<Value> = app.store.list_backups(&user.username).into_iter().map(|(ts, size)| json!({"ts": ts, "size": size})).collect();
+    Json(json!({ "items": items })).into_response()
+}
+
+async fn api_backup_restore(State(app): State<App>, h: HeaderMap, Json(body): Json<Value>) -> Response {
+    let Some(user) = app.user(&h) else { return err(StatusCode::UNAUTHORIZED, "Connexion requise") };
+    let Some(ts) = body["ts"].as_u64() else { return err(StatusCode::BAD_REQUEST, "Sauvegarde invalide") };
+    match app.store.restore_backup(&user.username, ts) {
+        Some(_) => Json(json!({ "ok": true })).into_response(),
+        None => err(StatusCode::NOT_FOUND, "Sauvegarde introuvable"),
+    }
+}
+
+/* ---------- Discord (présence « écoute ») ---------- */
+async fn api_presence(State(app): State<App>, h: HeaderMap, Json(body): Json<Value>) -> Response {
+    if app.user(&h).is_none() {
+        return err(StatusCode::UNAUTHORIZED, "Connexion requise");
+    }
+    let tx = app.presence.lock().unwrap().get_or_insert_with(discord::spawn).clone();
+    let app_id = body["appId"].as_str().unwrap_or("").to_string();
+    let msg = if body["playing"].as_bool() == Some(true) && discord::valid_app_id(&app_id) {
+        let now = yt::unix_now();
+        let (dur, pos) = (body["duration"].as_u64().unwrap_or(0), body["position"].as_u64().unwrap_or(0));
+        let start = now.saturating_sub(pos);
+        discord::Msg::Set { app_id, title: body["title"].as_str().unwrap_or("").to_string(), artist: body["artist"].as_str().unwrap_or("").to_string(), start: Some(start), end: (dur > 0).then_some(start + dur) }
+    } else {
+        discord::Msg::Clear
+    };
+    let _ = tx.send(msg);
+    Json(json!({ "ok": true })).into_response()
 }
 
 async fn api_channel(State(app): State<App>, Query(q): Q) -> Response {
@@ -518,7 +703,7 @@ async fn api_channel(State(app): State<App>, Query(q): Q) -> Response {
             let name = page.info["name"].as_str().unwrap_or("").to_string();
             // Les titres les plus pertinents de la chaîne passent devant les derniers envois.
             let top: Vec<yt::Track> = match search_videos(&app, &name, "").await {
-                Ok(v) => serde_json::from_value::<Vec<Value>>(v).unwrap_or_default().into_iter().filter(|t| t["channelId"] == id.as_str()).filter_map(|t| track_from(&t)).collect(),
+                Ok(v) => serde_json::from_value::<Vec<Value>>(v["items"].clone()).unwrap_or_default().into_iter().filter(|t| t["channelId"] == id.as_str()).filter_map(|t| track_from(&t)).collect(),
                 Err(_) => vec![],
             };
             let mut seen = HashSet::new();
@@ -632,6 +817,13 @@ fn router(app: App) -> Router {
         .route("/api/video", get(api_video))
         .route("/api/new", get(api_new))
         .route("/api/alt", get(api_alt))
+        .route("/api/more", get(api_more))
+        .route("/api/playlist", get(api_playlist))
+        .route("/api/radio", get(api_radio))
+        .route("/api/artists", get(api_artists))
+        .route("/api/backups", get(api_backups))
+        .route("/api/backups/restore", post(api_backup_restore))
+        .route("/api/presence", post(api_presence))
         .route("/assets/{name}", get(font))
         .route("/api/public", get(api_public))
         .route("/api/public/playlist", get(api_public_playlist))
@@ -706,7 +898,7 @@ fn main() {
     listener.set_nonblocking(true).unwrap();
     let port = listener.local_addr().unwrap().port();
     let dev_html = std::env::var("SATURNE_WEB").ok().map(PathBuf::from);
-    let app = App { store, http, gh, data_dir: dir.clone(), emb: Arc::new(Mutex::new(HashMap::new())), sem: Arc::new(tokio::sync::Semaphore::new(8)), cache: Arc::new(Mutex::new(HashMap::new())), port, dev_html };
+    let app = App { store, http, gh, data_dir: dir.clone(), emb: Arc::new(Mutex::new(HashMap::new())), sem: Arc::new(tokio::sync::Semaphore::new(8)), cache: Arc::new(Mutex::new(HashMap::new())), port, dev_html, warming: Arc::new(std::sync::atomic::AtomicBool::new(false)), presence: Arc::new(Mutex::new(None)), artists: Arc::new(Mutex::new(vec![None; ARTISTS.len()])) };
 
     let server = std::thread::spawn(move || {
         let rt = tokio::runtime::Builder::new_multi_thread().enable_all().build().expect("runtime");
@@ -726,15 +918,17 @@ fn main() {
 }
 
 fn run_window(url: &str, dir: &std::path::Path) {
+    use native::UserEvent;
     use tao::{
-        dpi::LogicalSize,
+        dpi::{LogicalSize, PhysicalPosition, PhysicalSize},
         event::{Event, WindowEvent},
-        event_loop::{ControlFlow, EventLoop},
+        event_loop::{ControlFlow, EventLoopBuilder},
         window::{Theme, WindowBuilder},
     };
     use wry::{NewWindowResponse, WebContext, WebViewBuilder};
 
-    let event_loop = EventLoop::new();
+    let event_loop = EventLoopBuilder::<UserEvent>::with_user_event().build();
+    let proxy = event_loop.create_proxy();
     let window = WindowBuilder::new()
         .with_title("Saturne")
         .with_theme(Some(Theme::Dark))
@@ -746,11 +940,16 @@ fn run_window(url: &str, dir: &std::path::Path) {
     // Le dossier du navigateur intégré garde la session de connexion d'un lancement à l'autre.
     let mut ctx = WebContext::new(Some(dir.join("webview")));
     let base = url.to_string();
-    let _webview = WebViewBuilder::new_with_web_context(&mut ctx)
+    let ipc_proxy = proxy.clone();
+    let webview = WebViewBuilder::new_with_web_context(&mut ctx)
         .with_url(url)
         // Fond noir dès l'ouverture (pas de flash blanc) ; lecture sans geste préalable, pour que le titre suivant démarre toujours.
         .with_background_color((0, 0, 0, 255))
         .with_autoplay(true)
+        // La page parle à l'application par `window.ipc.postMessage("commande")` (mini-lecteur, icône de notification, touches multimédia).
+        .with_ipc_handler(move |req| {
+            let _ = ipc_proxy.send_event(UserEvent::Cmd(req.body().to_string()));
+        })
         .with_new_window_req_handler(|u, _| {
             open_in_browser(&u);
             NewWindowResponse::Deny
@@ -766,10 +965,78 @@ fn run_window(url: &str, dir: &std::path::Path) {
         .build(&window)
         .expect("navigateur intégré (WebView2)");
 
+    let debug_log = std::env::var("SATURNE_DEBUG").ok().map(|_| dir.join("ipc.log"));
+    let mut keys = native::MediaKeys::new(proxy.clone());
+    let mut tray: Option<tray_icon::TrayIcon> = None;
+    let mut to_tray = false; // la croix réduit la fenêtre dans la zone de notification
+    let mut saved: Option<(PhysicalSize<u32>, PhysicalPosition<i32>)> = None; // taille avant le mini-lecteur
+
     event_loop.run(move |event, _, flow| {
         *flow = ControlFlow::Wait;
-        if let Event::WindowEvent { event: WindowEvent::CloseRequested, .. } = event {
-            *flow = ControlFlow::Exit;
+        match event {
+            Event::WindowEvent { event: WindowEvent::CloseRequested, .. } => {
+                if to_tray && tray.is_some() {
+                    window.set_visible(false);
+                } else {
+                    *flow = ControlFlow::Exit;
+                }
+            }
+            Event::UserEvent(UserEvent::Media(cmd)) => {
+                let _ = webview.evaluate_script(&format!("window.__media&&window.__media('{cmd}')"));
+            }
+            Event::UserEvent(UserEvent::Show) => {
+                window.set_visible(true);
+                window.set_minimized(false);
+                window.set_focus();
+            }
+            Event::UserEvent(UserEvent::Quit) => *flow = ControlFlow::Exit,
+            Event::UserEvent(UserEvent::Cmd(cmd)) => {
+                if let Some(p) = &debug_log {
+                    use std::io::Write;
+                    if let Ok(mut f) = std::fs::OpenOptions::new().create(true).append(true).open(p) {
+                        let _ = writeln!(f, "{cmd}");
+                    }
+                }
+                match cmd.as_str() {
+                    "media:on" | "media:off" => {
+                        if let Some(k) = keys.as_mut() {
+                            k.set(cmd == "media:on");
+                        }
+                    }
+                    "tray:on" => {
+                        if tray.is_none() {
+                            tray = native::tray(proxy.clone(), icon::render(32), 32);
+                        }
+                        to_tray = tray.is_some();
+                    }
+                    "tray:off" => {
+                        to_tray = false;
+                        tray = None;
+                    }
+                    "mini:on" => {
+                        if saved.is_none() {
+                            saved = Some((window.inner_size(), window.outer_position().unwrap_or_default()));
+                        }
+                        window.set_min_inner_size(Some(LogicalSize::new(320.0, 150.0)));
+                        window.set_inner_size(LogicalSize::new(400.0, 170.0));
+                        window.set_always_on_top(true);
+                    }
+                    "mini:off" => {
+                        window.set_always_on_top(false);
+                        window.set_min_inner_size(Some(LogicalSize::new(900.0, 600.0)));
+                        if let Some((size, pos)) = saved.take() {
+                            window.set_inner_size(size);
+                            window.set_outer_position(pos);
+                        }
+                    }
+                    "show" => {
+                        window.set_visible(true);
+                        window.set_focus();
+                    }
+                    _ => {}
+                }
+            }
+            _ => {}
         }
     });
 }

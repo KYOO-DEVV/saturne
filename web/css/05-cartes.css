@@ -1,0 +1,20 @@
+/* ---------- Cartes ---------- */
+.grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:26px 20px}
+.shelf{list-style:none;margin:0;padding:0 0 8px;display:grid;grid-auto-flow:column;grid-auto-columns:204px;gap:20px;overflow-x:auto;scroll-snap-type:x proximity}
+.shelf .card{scroll-snap-align:start}
+.card{position:relative;min-width:0}
+.card .thumb{display:block;width:100%;position:relative;aspect-ratio:16/11;border-radius:12px;overflow:hidden;background:var(--raise)}
+.card .thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+.card:hover .thumb img{transform:scale(1.04)}
+.pb{position:absolute;right:10px;bottom:10px;width:42px;height:42px;border-radius:var(--r-ctl);background:var(--accent);color:#fff;display:grid;place-items:center;opacity:0;transform:translateY(8px);transition:opacity .18s,transform .18s}
+.card:hover .pb,.thumb:focus-visible .pb{opacity:1;transform:none}
+.pb svg{width:22px;height:22px}
+.card .tt{margin-top:11px}
+.cacts{position:absolute;top:8px;right:8px;display:flex;gap:2px;opacity:0;transition:opacity .15s}
+.card:hover .cacts,.cacts:focus-within{opacity:1}
+.cacts .ib{background:rgba(0,0,0,.72);backdrop-filter:blur(6px);color:#fff}
+.card.on .tt{color:var(--accent-hi)}
+.sk{aspect-ratio:16/12;border-radius:16px;background:linear-gradient(100deg,var(--raise) 30%,#1b1b24 50%,var(--raise) 70%);background-size:300% 100%;animation:sh 1.4s linear infinite}
+.sk.round{aspect-ratio:1;border-radius:50%}
+@keyframes sh{from{background-position:100% 0}to{background-position:-100% 0}}
+

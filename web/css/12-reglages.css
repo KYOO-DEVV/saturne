@@ -1,0 +1,24 @@
+/* ---------- Réglages ---------- */
+.setlayout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:34px;align-items:start}
+.setnav{display:flex;flex-direction:column;gap:2px;position:sticky;top:0}
+.setnav button{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--r-btn);font-weight:600;color:var(--mute);white-space:nowrap}
+.setnav button:hover{color:#fff;background:var(--raise)}
+.setnav button.on{color:#fff;background:var(--accent-soft)}
+.setnav button.on svg{color:var(--accent-hi)}
+.setnav svg{width:19px;height:19px}
+.setpane h2{margin:0 0 4px;font-size:24px;font-weight:800;letter-spacing:-.02em}
+.setpane .lead{color:var(--mute);margin:0 0 22px;max-width:60ch}
+.setgroup{display:grid;gap:10px;max-width:740px}
+.setgroup h4{margin:18px 0 2px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.setgroup h4:first-child{margin-top:0}
+.set.danger{border-color:rgba(255,143,168,.35)}
+.swatches{display:flex;gap:10px;flex-wrap:wrap}
+.swatch{width:32px;height:32px;border-radius:var(--r-sm);background:var(--c);border:2px solid transparent;outline:2px solid transparent;outline-offset:2px}
+.swatch.on{outline-color:#fff}
+.kbd{display:inline-block;padding:2px 8px;border:1px solid var(--line2);border-bottom-width:2px;border-radius:6px;font:600 12px var(--font);color:#d8d8e2;background:var(--raise)}
+.kv{display:grid;grid-template-columns:140px 1fr;gap:6px 16px;color:var(--mute);margin:0}
+.kv b{color:#fff;font-weight:600;word-break:break-all}
+.notes{white-space:pre-wrap;color:#c9c9d4;background:var(--raise);border:1px solid var(--line);border-radius:var(--r-ctl);padding:12px 14px;max-height:180px;overflow:auto;margin:10px 0 0;width:100%}
+.upstat{display:flex;align-items:center;gap:10px;color:var(--mute)}
+.upstat .dot{width:8px;height:8px;border-radius:50%;background:var(--mute)}
+.upstat.ok .dot{background:#4ade80}.upstat.new .dot{background:var(--accent-hi)}

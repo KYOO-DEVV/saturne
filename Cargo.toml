@@ -1,18 +1,21 @@
 [package]
 name = "saturne"
-version = "0.5.0"
+version = "0.6.0"
+license = "MIT"
 edition = "2024"
 
 [dependencies]
 argon2 = "0.6.0"
 axum = "0.8.9"
 getrandom = "0.4.3"
+global-hotkey = "0.10.0"
 reqwest = { version = "0.13.5", default-features = false, features = ["native-tls"] }
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"
 sha2 = "0.11.1"
 tao = "0.37.2"
 tokio = { version = "1.54.1", features = ["rt-multi-thread", "macros", "net", "time", "sync"] }
+tray-icon = "0.26.1"
 wry = "0.57.2"
 
 # Les dépendances sont optimisées même en mode debug : le hachage Argon2 y serait sinon très lent.

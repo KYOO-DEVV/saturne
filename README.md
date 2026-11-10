@@ -14,6 +14,13 @@ Application de streaming musical pour Windows, écrite en Rust. Noir OLED, un se
 - **Changelog repliable** (*Expand all* / *Collapse all*), page **Now playing**, menus déroulants, annulation des suppressions, infobulles, pochettes en mosaïque.
 - **Mises à jour automatiques via les releases GitHub**.
 - Pochette et bannière de playlist à déposer par glisser-déposer, file d'attente, genres, artistes, précédent/suivant, barre latérale repliable.
+- **Français / English** : réglage de langue pour toute l'interface (*Settings › General*).
+- **Bureau** : touches multimédia, titre et pochette dans la surcouche multimédia de Windows, icône dans la zone de notification (la croix réduit au lieu de fermer), **mini-lecteur** toujours visible, **minuterie de sommeil** avec fondu.
+- **Importer une playlist YouTube** depuis son lien (collé dans la recherche ou dans *Import*), **radio** à partir d'un titre, **Afficher plus** dans les résultats.
+- **Glisser-déposer** pour réorganiser une playlist et la file d'attente.
+- **Historique** par jour et **statistiques** d'écoute, **Discord Rich Presence** (optionnel).
+- **Import d'un export** (fusionner ou remplacer) et **sauvegardes automatiques** restaurables (*Settings › Data*).
+- Barres de défilement masquées (flèches sur les étagères), accessibilité clavier et lecteur d'écran soignée.
 
 ## Installer (Windows 10/11)
 
@@ -45,7 +52,7 @@ Le dépôt doit être **public** pour que les autres installations puissent lire
 ```bash
 # 1. augmenter "version" dans Cargo.toml
 cargo build --release
-gh release create v0.4.0 target\release\saturne.exe#Saturne.exe install.bat uninstall.bat --title "Saturne 0.4.0" --notes "Ce qui change"
+gh release create v0.6.0 target\release\saturne.exe#Saturne.exe install.bat uninstall.bat --title "Saturne 0.6.0" --notes "Ce qui change"
 ```
 
 Le fichier de la release doit s'appeler exactement `Saturne.exe`. Les notes s'affichent dans *Settings › Updates*.
@@ -61,9 +68,11 @@ Saturne.exe --serve            # http://127.0.0.1:8787
 Saturne.exe --serve --port 9000
 ```
 
+Les fonctions « bureau » (touches multimédia, icône de notification, mini-lecteur) n'existent que dans la fenêtre de l'application.
+
 ## Où sont mes données ?
 
-Dans `%APPDATA%\Saturne` : `accounts.json` (comptes et sessions) et `data\<utilisateur>.json` (playlists, file d'attente, historique, réglages).
+Dans `%APPDATA%\Saturne` : `accounts.json` (comptes et sessions), `data\<utilisateur>.json` (playlists, file d'attente, historique, réglages) et `data\backups\<utilisateur>\` (les 10 dernières sauvegardes automatiques, une par heure au plus). `artists-cache.json` mémorise la liste d'artistes pendant 7 jours.
 Rien ne quitte l'ordinateur, à part les recherches envoyées à YouTube et la vérification des mises à jour auprès de GitHub.
 
 ## Confidentialité des playlists
@@ -80,10 +89,10 @@ Changer de mot de passe, d'identifiant ou supprimer le compte demande le mot de 
 
 ```bash
 cargo test                      # tests unitaires (YouTube, playlists publiques, mises à jour)
-SATURNE_WEB=web/index.html SATURNE_DATA=./data-dev cargo run -- --serve --port 8788
+SATURNE_WEB=web SATURNE_DATA=./data-dev cargo run -- --serve --port 8788
 ```
 
-Avec `SATURNE_WEB`, l'interface est relue depuis le disque à chaque chargement de page : pas besoin de recompiler pour la modifier.
+Avec `SATURNE_WEB=web`, l'interface est ré-assemblée depuis le disque à chaque chargement de page : pas besoin de recompiler pour la modifier. `SATURNE_DEBUG=1` fait écrire les messages de la page vers l'application dans `ipc.log` (test des touches multimédia).
 `SATURNE_UPDATE_API` et `SATURNE_UPDATE_REPO` pointent la mise à jour vers un autre serveur (utile pour tester avec un faux GitHub).
 
 | Fichier | Rôle |
@@ -94,7 +103,13 @@ Avec `SATURNE_WEB`, l'interface est relue depuis le disque à chaque chargement 
 | `src/update.rs` | Mises à jour via les releases GitHub |
 | `src/yt.rs` | Lecture des pages YouTube (recherche, chaînes, nouveautés) |
 | `src/icon.rs`, `build.rs` | Logo dessiné par le code, icône de l'exécutable |
-| `web/index.html` | Toute l'interface (HTML, CSS, JavaScript) |
+| `src/ytmore.rs` | Suite des résultats, playlists et radio YouTube |
+| `src/native.rs` | Touches multimédia et icône de notification (Windows) |
+| `src/discord.rs` | Discord Rich Presence |
+| `src/bundle.rs` | Assemble l'interface à partir de `web/` (appelé par `build.rs`) |
+| `web/index.html` | Squelette de la page ; `/* @css */` et `/* @js */` sont remplacés par les fichiers de `web/css/` et `web/js/` (ordre alphabétique) |
+| `web/css/*.css`, `web/js/*.js` | L'interface, découpée par section |
+| `LICENSE` | MIT |
 | `ci/build.yml` | Workflow GitHub Actions (à déplacer dans `.github/workflows/`) |
 
 ## À savoir
@@ -102,4 +117,6 @@ Avec `SATURNE_WEB`, l'interface est relue depuis le disque à chaque chargement 
 - La recherche lit les pages publiques de YouTube : ce n'est pas une API officielle. Elle peut cesser de fonctionner si YouTube change son site, et YouTube peut limiter temporairement les requêtes (Saturne fait alors une pause de 3 minutes).
 - Le lecteur YouTube est caché (audio seul). Les conditions de YouTube demandent normalement un lecteur visible : à toi de voir si cela te convient.
 - Le serveur n'écoute que sur `127.0.0.1` et refuse les requêtes dont l'en-tête `Host` ou `Origin` ne vient pas de l'application.
-- Projet personnel, utilisation privée. Les contenus appartiennent à leurs ayants droit.
+- `Saturne.exe` n'est **pas signé** (une signature demande un certificat payant) : Windows SmartScreen peut afficher un avertissement au premier lancement.
+- Discord Rich Presence demande l'*Application ID* d'une application que tu crées sur discord.com/developers.
+- Code sous licence MIT. Les contenus musicaux appartiennent à leurs ayants droit.

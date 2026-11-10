@@ -1,4 +1,6 @@
-//! Génère l'icône Windows de Saturne et l'intègre à l'exécutable.
+//! Assemble l'interface (web/index.html + web/css + web/js) et génère l'icône Windows de Saturne.
+#[path = "src/bundle.rs"]
+mod bundle;
 #[path = "src/icon.rs"]
 mod icon;
 
@@ -42,6 +44,10 @@ fn make_ico(sizes: &[u32]) -> Vec<u8> {
 fn main() {
     println!("cargo:rerun-if-changed=src/icon.rs");
     println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed=src/bundle.rs");
+    println!("cargo:rerun-if-changed=web");
+    let html = bundle::assemble(std::path::Path::new("web")).expect("assemblage de l'interface (web/)");
+    fs::write(PathBuf::from(env::var("OUT_DIR").unwrap()).join("index.html"), html).unwrap();
     if env::var("CARGO_CFG_TARGET_OS").as_deref() != Ok("windows") {
         return;
     }

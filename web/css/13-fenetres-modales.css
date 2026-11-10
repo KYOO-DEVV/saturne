@@ -1,0 +1,18 @@
+/* ---------- Fenêtres modales ---------- */
+.mback{position:fixed;inset:0;background:rgba(0,0,0,.74);z-index:120;display:grid;place-items:center;padding:20px}
+.mbox{width:min(470px,100%);max-height:92vh;overflow:auto;background:var(--panel);border:1px solid var(--line2);border-radius:16px;padding:24px}
+.mbox h3{margin:0 0 6px;font-size:20px;letter-spacing:-.01em}
+.mbox p{color:var(--mute);margin:0 0 14px}
+.mbox .fld{margin:0 0 12px}
+.mactions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.merr{color:#ff8fa8;min-height:18px;font-size:13px;margin:2px 0 0}
+.codebox{width:100%;height:130px;resize:none;background:#000;border:1px solid var(--line2);border-radius:var(--r-btn);padding:10px 12px;font:12px/1.4 ui-monospace,Consolas,monospace;color:#d8d8e2;word-break:break-all}
+.codebox:focus{outline:0;border-color:var(--accent)}
+.avatar-edit{display:flex;align-items:center;gap:18px;margin:0 0 16px}
+.avatar-edit .avatar-big{width:84px;height:84px;border-radius:50%;overflow:hidden;background:var(--raise2);display:grid;place-items:center;font-weight:800;font-size:30px;border:1px solid var(--line2);position:relative;flex:none;cursor:pointer}
+.avatar-edit .avatar-big img{width:100%;height:100%;object-fit:cover}
+.avatar-edit .avatar-big::after{content:"Changer";position:absolute;inset:0;background:rgba(0,0,0,.62);display:grid;place-items:center;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:0;transition:opacity .15s}
+.avatar-edit .avatar-big:hover::after,.avatar-edit .avatar-big.over::after{opacity:1}
+.avatar-edit .avatar-big.over{outline:2px dashed var(--accent-hi);outline-offset:3px}
+@media (max-width:900px){.setlayout{grid-template-columns:minmax(0,1fr);gap:18px}.setnav{flex-direction:row;overflow-x:auto;position:static}.kv{grid-template-columns:1fr}}
+

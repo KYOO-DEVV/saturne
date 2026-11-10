@@ -185,6 +185,7 @@ impl Store {
         let mut user = g.disk.users.remove(&old_key).ok_or("Compte introuvable")?;
         if old_key != new_key {
             let (from, to) = (self.data_path(&old_key), self.data_path(&new_key));
+            let _ = fs::rename(self.backup_dir(&old_key), self.backup_dir(&new_key));
             if from.exists() && fs::rename(&from, &to).is_err() {
                 g.disk.users.insert(old_key, user);
                 return Err("Impossible de déplacer les données du compte");
@@ -207,6 +208,7 @@ impl Store {
         g.disk.users.remove(&key);
         g.disk.sessions.retain(|_, s| s.user != key);
         let _ = fs::remove_file(self.data_path(&key));
+        let _ = fs::remove_dir_all(self.backup_dir(&key));
         self.persist(&mut g);
     }
 
@@ -218,6 +220,52 @@ impl Store {
         self.dir.join("data").join(format!("{}.json", username.to_lowercase()))
     }
 
+    fn backup_dir(&self, username: &str) -> PathBuf {
+        self.dir.join("data").join("backups").join(username.to_lowercase())
+    }
+
+    /// Sauvegardes disponibles (horodatage, taille), de la plus récente à la plus ancienne.
+    pub fn list_backups(&self, username: &str) -> Vec<(u64, u64)> {
+        let mut v: Vec<(u64, u64)> = fs::read_dir(self.backup_dir(username))
+            .into_iter()
+            .flatten()
+            .flatten()
+            .filter_map(|e| Some((e.path().file_stem()?.to_str()?.parse::<u64>().ok()?, e.metadata().ok()?.len())))
+            .collect();
+        v.sort_by(|a, b| b.0.cmp(&a.0));
+        v
+    }
+
+    /// Copie les données actuelles dans les sauvegardes (au plus une par heure, sauf `force`) et garde les 10 dernières.
+    fn snapshot(&self, username: &str, force: bool) {
+        let src = self.data_path(username);
+        if !src.exists() {
+            return;
+        }
+        let existing = self.list_backups(username);
+        if !force && existing.first().is_some_and(|(ts, _)| now().saturating_sub(*ts) < 3600) {
+            return;
+        }
+        let dir = self.backup_dir(username);
+        if fs::create_dir_all(&dir).is_err() {
+            return;
+        }
+        let _ = fs::copy(&src, dir.join(format!("{}.json", now())));
+        for (ts, _) in self.list_backups(username).into_iter().skip(10) {
+            let _ = fs::remove_file(dir.join(format!("{ts}.json")));
+        }
+    }
+
+    /// Remplace les données par une sauvegarde (après avoir sauvegardé l'état actuel) et renvoie son contenu.
+    pub fn restore_backup(&self, username: &str, ts: u64) -> Option<String> {
+        let content = fs::read_to_string(self.backup_dir(username).join(format!("{ts}.json"))).ok()?;
+        serde_json::from_str::<serde_json::Value>(&content).ok().filter(|v| v.is_object())?;
+        let _g = self.inner.lock().unwrap();
+        self.snapshot(username, true);
+        write_atomic(&self.data_path(username), content.as_bytes()).ok()?;
+        Some(content)
+    }
+
     pub fn read_data(&self, username: &str) -> String {
         fs::read_to_string(self.data_path(username)).unwrap_or_else(|_| "{}".to_string())
     }
@@ -225,6 +273,30 @@ impl Store {
     pub fn write_data(&self, username: &str, json: &str) -> std::io::Result<()> {
         // Verrou partagé pour éviter deux écritures simultanées sur le même fichier.
         let _g = self.inner.lock().unwrap();
+        self.snapshot(username, false);
         write_atomic(&self.data_path(username), json.as_bytes())
+    }
+}
+
+#[cfg(test)]
+mod backup_tests {
+    use super::*;
+
+    #[test]
+    fn snapshots_and_restore() {
+        let dir = std::env::temp_dir().join(format!("saturne-bk-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&dir);
+        let s = Store::open(dir.clone()).unwrap();
+        s.write_data("zaki", r#"{"v":1}"#).unwrap();
+        assert!(s.list_backups("zaki").is_empty(), "rien à sauvegarder à la première écriture");
+        s.write_data("zaki", r#"{"v":2}"#).unwrap();
+        let b = s.list_backups("zaki");
+        assert_eq!(b.len(), 1, "une sauvegarde de l'état précédent");
+        s.write_data("zaki", r#"{"v":3}"#).unwrap();
+        assert_eq!(s.list_backups("zaki").len(), 1, "au plus une par heure");
+        assert_eq!(s.restore_backup("zaki", b[0].0).as_deref(), Some(r#"{"v":1}"#));
+        assert_eq!(s.read_data("zaki"), r#"{"v":1}"#);
+        assert!(s.restore_backup("zaki", 1).is_none());
+        let _ = fs::remove_dir_all(&dir);
     }
 }

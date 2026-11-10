@@ -1,0 +1,21 @@
+/* ---------- Hero : sorties les plus récentes ---------- */
+.hero{position:relative;height:clamp(270px,32vw,340px);border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#000;margin:0 0 32px}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;pointer-events:none}
+.slide.on{opacity:1;pointer-events:auto}
+.slide .bg{position:absolute;right:0;top:0;width:76%;height:100%;object-fit:cover;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 40%);mask-image:linear-gradient(90deg,transparent 0,#000 40%)}
+.slide::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,#000 24%,rgba(0,0,0,.5) 55%,rgba(0,0,0,0) 100%)}
+.sl-body{position:absolute;z-index:2;left:38px;top:30px;bottom:30px;display:flex;flex-direction:column;justify-content:flex-start;max-width:52%;gap:6px}
+.sl-body .sl-by{margin:auto 0 14px}
+.sl-body .sl-actions{min-height:44px}
+.sl-title{font-weight:800;font-size:clamp(24px,3.1vw,42px);line-height:1.08;letter-spacing:-.03em;margin:6px 0 4px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;text-wrap:balance}
+.sl-by{color:#c9c9d4;font-size:15px;margin:0 0 16px}
+.sl-by .alink{font-weight:700;color:#fff}
+.sl-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.hero-dots{position:absolute;z-index:3;right:24px;bottom:20px;display:flex;gap:8px;align-items:center}
+.hero-dots button{width:8px;height:8px;border-radius:8px;background:rgba(255,255,255,.35);transition:width .25s,background .25s}
+.hero-dots button.on{width:28px;background:#fff}
+.hero-nav{position:absolute;z-index:3;right:22px;top:18px;display:flex;gap:8px}
+.hero-nav button{width:34px;height:34px;border-radius:var(--r-btn);background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.2);display:grid;place-items:center}
+.hero-nav button:hover{background:rgba(255,255,255,.18)}
+.hero-empty{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 38px;gap:8px}
+

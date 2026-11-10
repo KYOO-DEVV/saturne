@@ -1,0 +1,14 @@
+/* ---------- Genres, artistes ---------- */
+.tiles{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.tile{width:100%;aspect-ratio:16/8;border-radius:12px;padding:18px;display:flex;align-items:flex-end;font-weight:700;font-size:18px;letter-spacing:-.01em;background:var(--raise);border:1px solid var(--line);transition:border-color .15s,background .15s}
+.tile:hover{border-color:var(--accent);background:var(--raise2)}
+.artists{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:24px 16px}
+.artist{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;width:100%;padding:14px 8px;border-radius:20px;transition:background .15s}
+.artist:hover{background:var(--raise)}
+.avatar{width:100%;max-width:136px;aspect-ratio:1;border-radius:50%;overflow:hidden;background:var(--raise2);display:grid;place-items:center;font-weight:700;font-size:38px;color:#d8d8e2}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.artist b{font-weight:700;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.artist small{color:var(--mute);display:block}
+.asearch{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 26px}
+.asearch .search{max-width:460px}
+
