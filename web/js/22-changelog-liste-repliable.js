@@ -1,8 +1,10 @@
 /* ---------- Changelog (liste repliable) ---------- */
 const TAGS = {new:'Nouveau', improved:'Amélioré', fixed:'Corrigé'};
 const CHANGELOG = [
+  {v:'0.6.3', date:'Nov 2026', title:'Écran noir corrigé', changes:[
+    ['fixed', 'Les versions 0.6.1 et 0.6.2 pouvaient démarrer sur un écran noir (erreur dans la page).']]},
   {v:'0.6.1', date:'Nov 2026', title:'Le bon morceau', changes:[
-    ['fixed', 'Un titre pouvait être remplacé par un autre morceau de l'artiste quand Saturne cherchait une autre version : elle doit maintenant avoir le même titre.']]},
+    ['fixed', 'Un titre pouvait être remplacé par un autre morceau de l’artiste quand Saturne cherchait une autre version : elle doit maintenant avoir le même titre.']]},
   {v:'0.6.0', date:'Nov 2026', title:'Langue, historique, radio, mini-lecteur et plus', changes:[
     ['new', 'Réglage de langue (Français / English) pour toute l\'interface.'],
     ['new', 'Touches multimédia, titre et pochette dans la surcouche multimédia de Windows, icône dans la zone de notification et mini-lecteur toujours visible.'],
@@ -55,6 +57,7 @@ const CHANGELOG = [
 ];
 const clOpen = new Set([CHANGELOG[0].v]);
 const CL_EN = {
+  '0.6.3': {title:'Black screen fixed', changes:['Versions 0.6.1 and 0.6.2 could start on a black screen (an error in the page).']},
   '0.6.1': {title:'The right song', changes:['A song could be replaced by another track by the artist when Saturne looked for another version: the replacement must now have the same title.']},
   '0.6.0': {title:'Language, history, radio, mini player and more', changes:[
     'Language setting (Français / English) for the whole interface.',
