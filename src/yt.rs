@@ -294,6 +294,20 @@ pub fn clean_title(title: &str) -> String {
     if cleaned.chars().count() < 2 { title.trim().to_string() } else { cleaned }
 }
 
+fn title_tokens(t: &str) -> Vec<String> {
+    const NOISE: [&str; 14] = ["official", "music", "video", "mv", "audio", "lyrics", "lyric", "hd", "ft", "feat", "the", "version", "live", "m"];
+    t.to_lowercase().split(|c: char| !c.is_alphanumeric()).filter(|w| !w.is_empty() && !NOISE.contains(w)).map(str::to_string).collect()
+}
+
+/// Vrai si `cand` semble être le même morceau que `orig` (au moins 60 % des mots du titre d'origine se retrouvent).
+pub fn same_song(orig: &str, cand: &str) -> bool {
+    let (a, b) = (title_tokens(&clean_title(orig)), title_tokens(cand));
+    if a.is_empty() {
+        return true;
+    }
+    a.iter().filter(|w| b.iter().any(|x| x == *w || x.contains(w.as_str()))).count() * 10 >= a.len() * 6
+}
+
 /// Garde les vraies chansons ; si il y en a peu (lo-fi, jazz…), complète avec des mixes jusqu'à 4 h.
 pub fn songs_or_mixes(all: Vec<Track>) -> Vec<Track> {
     let mut seen = HashSet::new();
@@ -350,5 +364,10 @@ mod tests {
     #[test]
     fn avatar_size() {
         assert_eq!(big_avatar("//yt3.ggpht.com/abc=s88-c-k-c0x00ffffff-no-rj"), "https://yt3.ggpht.com/abc=s240-c-k-c0x00ffffff-no-rj");
+    }
+    #[test]
+    fn same_song_check() {
+        assert!(same_song("YOASOBI「UNDEAD」 Official Music Video", "YOASOBI「UNDEAD」Lyrics"));
+        assert!(!same_song("YOASOBI「UNDEAD」 Official Music Video", "YOASOBI「三原色」Official Music Video"));
     }
 }

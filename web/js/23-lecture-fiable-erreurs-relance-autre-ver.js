@@ -1,6 +1,6 @@
 /* ---------- Lecture fiable : erreurs, relance, autre version ---------- */
-const altMap = (() => { try { return JSON.parse(localStorage.getItem('saturne.alt') || '{}'); } catch { return {}; } })();
-const saveAlt = () => { try { localStorage.setItem('saturne.alt', JSON.stringify(Object.fromEntries(Object.entries(altMap).slice(-300)))); } catch {} };
+const altMap = (() => { try { return JSON.parse(localStorage.getItem('saturne.alt2') || '{}'); } catch { return {}; } })();
+const saveAlt = () => { try { localStorage.setItem('saturne.alt2', JSON.stringify(Object.fromEntries(Object.entries(altMap).slice(-300)))); } catch {} };
 const playId = t => altMap[t.id] || t.id;
 const ERR_TEXT = {2:'identifiant invalide', 5:'erreur du lecteur', 100:'vidéo introuvable ou privée', 101:'lecture interdite hors de YouTube', 150:'lecture interdite hors de YouTube'};
 const playerLog = [];

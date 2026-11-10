@@ -1,6 +1,8 @@
 /* ---------- Changelog (liste repliable) ---------- */
 const TAGS = {new:'Nouveau', improved:'Amélioré', fixed:'Corrigé'};
 const CHANGELOG = [
+  {v:'0.6.1', date:'Nov 2026', title:'Le bon morceau', changes:[
+    ['fixed', 'Un titre pouvait être remplacé par un autre morceau de l'artiste quand Saturne cherchait une autre version : elle doit maintenant avoir le même titre.']]},
   {v:'0.6.0', date:'Nov 2026', title:'Langue, historique, radio, mini-lecteur et plus', changes:[
     ['new', 'Réglage de langue (Français / English) pour toute l\'interface.'],
     ['new', 'Touches multimédia, titre et pochette dans la surcouche multimédia de Windows, icône dans la zone de notification et mini-lecteur toujours visible.'],
@@ -53,6 +55,7 @@ const CHANGELOG = [
 ];
 const clOpen = new Set([CHANGELOG[0].v]);
 const CL_EN = {
+  '0.6.1': {title:'The right song', changes:['A song could be replaced by another track by the artist when Saturne looked for another version: the replacement must now have the same title.']},
   '0.6.0': {title:'Language, history, radio, mini player and more', changes:[
     'Language setting (Français / English) for the whole interface.',
     'Media keys, title and cover in the Windows media overlay, a notification area icon and an always-on-top mini player.',

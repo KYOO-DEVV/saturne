@@ -422,7 +422,7 @@ async fn api_alt(State(app): State<App>, Query(q): Q) -> Response {
         Err(e) => return fail(e),
     };
     for t in list["items"].as_array().into_iter().flatten().filter_map(track_from).take(10) {
-        if t.id == id || skip.contains(&t.id) {
+        if t.id == id || skip.contains(&t.id) || !yt::same_song(&title, &t.title) {
             continue;
         }
         if let (true, Some(d)) = (dur > 0, t.duration) {
