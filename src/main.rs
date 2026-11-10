@@ -937,6 +937,7 @@ fn run_window(url: &str, dir: &std::path::Path) {
         .with_min_inner_size(LogicalSize::new(900.0, 600.0))
         .build(&event_loop)
         .expect("fenêtre");
+    native::blend_title_bar(&window);
     // Le dossier du navigateur intégré garde la session de connexion d'un lancement à l'autre.
     let mut ctx = WebContext::new(Some(dir.join("webview")));
     let base = url.to_string();
