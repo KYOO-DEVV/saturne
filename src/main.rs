@@ -7,6 +7,7 @@
 mod icon;
 mod public;
 mod store;
+mod update;
 mod yt;
 
 use axum::{
@@ -35,6 +36,8 @@ const COOKIE: &str = "saturne_session";
 struct App {
     store: Arc<Store>,
     http: reqwest::Client,
+    gh: reqwest::Client,
+    data_dir: PathBuf,
     cache: Arc<Mutex<HashMap<String, (Instant, Value)>>>,
     port: u16,
     dev_html: Option<PathBuf>,
@@ -143,6 +146,129 @@ async fn register(State(app): State<App>, Json(body): Json<Value>) -> Response {
         }
         Err(m) => err(StatusCode::CONFLICT, m),
     }
+}
+
+/// Vérifie un mot de passe (Argon2id, hors du thread asynchrone).
+async fn password_ok(user: &User, password: String) -> bool {
+    let hash = user.hash.clone();
+    tokio::task::spawn_blocking(move || {
+        use argon2::{
+            Argon2,
+            password_hash::{PasswordVerifier, phc::PasswordHash},
+        };
+        PasswordHash::new(&hash).map(|p| Argon2::default().verify_password(password.as_bytes(), &p).is_ok()).unwrap_or(false)
+    })
+    .await
+    .unwrap_or(false)
+}
+
+async fn hash_password(password: String) -> Result<String, ()> {
+    tokio::task::spawn_blocking(move || {
+        use argon2::{Argon2, password_hash::PasswordHasher};
+        Argon2::default().hash_password(password.as_bytes()).map(|h| h.to_string()).map_err(|_| ())
+    })
+    .await
+    .map_err(|_| ())?
+}
+
+/// Contrôle commun aux actions sensibles : session valide, essais limités, mot de passe correct.
+async fn confirm(app: &App, h: &HeaderMap, password: &str) -> Result<User, Response> {
+    let Some(user) = app.user(h) else { return Err(err(StatusCode::UNAUTHORIZED, "Connexion requise")) };
+    if let Some(wait) = app.store.locked_for(&user.username) {
+        return Err(err(StatusCode::TOO_MANY_REQUESTS, &format!("Trop d'essais. Réessaie dans {wait} s.")));
+    }
+    if !password_ok(&user, password.to_string()).await {
+        app.store.note_failure(&user.username);
+        return Err(err(StatusCode::FORBIDDEN, "Mot de passe incorrect"));
+    }
+    app.store.clear_failures(&user.username);
+    Ok(user)
+}
+
+async fn change_password(State(app): State<App>, h: HeaderMap, Json(body): Json<Value>) -> Response {
+    let (current, new) = (body["current"].as_str().unwrap_or(""), body["new"].as_str().unwrap_or("").to_string());
+    if new.chars().count() < 8 || new.len() > 200 {
+        return err(StatusCode::BAD_REQUEST, "Le nouveau mot de passe doit faire au moins 8 caractères");
+    }
+    let user = match confirm(&app, &h, current).await {
+        Ok(u) => u,
+        Err(r) => return r,
+    };
+    let Ok(hash) = hash_password(new).await else { return err(StatusCode::INTERNAL_SERVER_ERROR, "Impossible de protéger le mot de passe") };
+    app.store.set_password(&user.username, hash, &session_token(&h).unwrap_or_default());
+    Json(json!({ "ok": true })).into_response()
+}
+
+async fn change_username(State(app): State<App>, h: HeaderMap, Json(body): Json<Value>) -> Response {
+    let (new, password) = (body["username"].as_str().unwrap_or("").trim().to_string(), body["password"].as_str().unwrap_or(""));
+    let user = match confirm(&app, &h, password).await {
+        Ok(u) => u,
+        Err(r) => return r,
+    };
+    match app.store.rename_user(&user.username, &new) {
+        Ok(u) => Json(json!({ "user": user_json(&u) })).into_response(),
+        Err(m) => err(StatusCode::CONFLICT, m),
+    }
+}
+
+async fn delete_account(State(app): State<App>, h: HeaderMap, Json(body): Json<Value>) -> Response {
+    let user = match confirm(&app, &h, body["password"].as_str().unwrap_or("")).await {
+        Ok(u) => u,
+        Err(r) => return r,
+    };
+    app.store.delete_user(&user.username);
+    ([(header::SET_COOKIE, format!("{COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0"))], Json(json!({ "ok": true }))).into_response()
+}
+
+async fn about(State(app): State<App>, h: HeaderMap) -> Response {
+    if app.user(&h).is_none() {
+        return err(StatusCode::UNAUTHORIZED, "Connexion requise");
+    }
+    let (_, repo) = update::config();
+    Json(json!({ "version": update::CURRENT, "dataDir": app.data_dir.display().to_string(), "repo": repo })).into_response()
+}
+
+/* ---------- Mises à jour ---------- */
+async fn update_check(State(app): State<App>, h: HeaderMap) -> Response {
+    if app.user(&h).is_none() {
+        return err(StatusCode::UNAUTHORIZED, "Connexion requise");
+    }
+    match update::latest(&app.gh).await {
+        Ok(r) => Json(json!({
+            "current": update::CURRENT, "latest": r.version(), "available": update::is_newer(r.version(), update::CURRENT),
+            "notes": r.notes, "url": r.page, "canInstall": r.can_install(), "size": r.asset_size
+        }))
+        .into_response(),
+        Err(e) => err(StatusCode::BAD_GATEWAY, &e),
+    }
+}
+
+async fn update_install(State(app): State<App>, h: HeaderMap) -> Response {
+    if app.user(&h).is_none() {
+        return err(StatusCode::UNAUTHORIZED, "Connexion requise");
+    }
+    let rel = match update::latest(&app.gh).await {
+        Ok(r) => r,
+        Err(e) => return err(StatusCode::BAD_GATEWAY, &e),
+    };
+    if !update::is_newer(rel.version(), update::CURRENT) {
+        return err(StatusCode::CONFLICT, "Saturne est déjà à jour");
+    }
+    let bytes = match update::download(&app.gh, &rel).await {
+        Ok(b) => b,
+        Err(e) => return err(StatusCode::BAD_GATEWAY, &e),
+    };
+    let exe = match tokio::task::spawn_blocking(move || update::apply(&bytes)).await {
+        Ok(Ok(p)) => p,
+        Ok(Err(e)) => return err(StatusCode::INTERNAL_SERVER_ERROR, &e),
+        Err(_) => return err(StatusCode::INTERNAL_SERVER_ERROR, "Mise à jour interrompue"),
+    };
+    // On laisse le temps à la réponse de partir, puis on relance la nouvelle version.
+    std::thread::spawn(move || {
+        std::thread::sleep(Duration::from_millis(700));
+        update::restart(&exe)
+    });
+    Json(json!({ "ok": true, "version": rel.version() })).into_response()
 }
 
 async fn login(State(app): State<App>, Json(body): Json<Value>) -> Response {
@@ -406,6 +532,12 @@ fn router(app: App) -> Router {
         .route("/api/auth/register", post(register))
         .route("/api/auth/login", post(login))
         .route("/api/auth/logout", post(logout))
+        .route("/api/me/password", post(change_password))
+        .route("/api/me/username", post(change_username))
+        .route("/api/me/delete", post(delete_account))
+        .route("/api/about", get(about))
+        .route("/api/update/check", get(update_check))
+        .route("/api/update/install", post(update_install))
         .route("/api/data", get(get_data).put(put_data))
         .route("/api/search", get(api_search))
         .route("/api/channel", get(api_channel))
@@ -447,8 +579,21 @@ fn main() {
     let serve_only = args.iter().any(|a| a == "--serve");
     let want_port: u16 = args.iter().position(|a| a == "--port").and_then(|i| args.get(i + 1)).and_then(|p| p.parse().ok()).unwrap_or(8787);
 
+    // Après une mise à jour, l'ancienne instance a besoin d'un instant pour libérer le port.
+    update::cleanup_old();
+    if std::env::var("SATURNE_RESTART").is_ok() {
+        std::thread::sleep(Duration::from_millis(1500));
+    }
+
     let dir = data_dir();
     let store = Arc::new(Store::open(dir.clone()).expect("impossible de créer le dossier de données"));
+    // Client pour GitHub : redirections limitées à GitHub, téléchargements plus longs que les recherches.
+    let gh = reqwest::Client::builder()
+        .user_agent(format!("Saturne/{}", update::CURRENT))
+        .timeout(Duration::from_secs(180))
+        .redirect(reqwest::redirect::Policy::custom(|a| if a.previous().len() < 5 && update::host_allowed(a.url().as_str()) { a.follow() } else { a.stop() }))
+        .build()
+        .expect("client HTTP GitHub");
     let http = reqwest::Client::builder()
         .user_agent(yt::UA)
         .timeout(Duration::from_secs(15))
@@ -471,7 +616,7 @@ fn main() {
     listener.set_nonblocking(true).unwrap();
     let port = listener.local_addr().unwrap().port();
     let dev_html = std::env::var("SATURNE_WEB").ok().map(PathBuf::from);
-    let app = App { store, http, cache: Arc::new(Mutex::new(HashMap::new())), port, dev_html };
+    let app = App { store, http, gh, data_dir: dir.clone(), cache: Arc::new(Mutex::new(HashMap::new())), port, dev_html };
 
     let server = std::thread::spawn(move || {
         let rt = tokio::runtime::Builder::new_multi_thread().enable_all().build().expect("runtime");

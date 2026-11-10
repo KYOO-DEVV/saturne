@@ -16,7 +16,11 @@
   --font:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --sw:248px; --barh:84px;
   --r-btn:10px; --r-ctl:12px; --r-sm:8px;
+  --bookmark:#fbbf24; --accent-glow:rgba(139,92,246,.2);
 }
+html[data-radius="square"]{--r-btn:5px;--r-ctl:7px;--r-sm:4px}
+html[data-radius="round"]{--r-btn:999px;--r-ctl:16px;--r-sm:10px}
+html.no-motion *{transition:none!important;animation:none!important}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--fg);font:14px/1.45 var(--font);overflow:hidden}
@@ -50,19 +54,22 @@ svg{width:20px;height:20px;fill:currentColor;display:block;flex:none}
 /* ---------- Application ---------- */
 .app{height:100dvh;display:grid;grid-template-columns:var(--sw) minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;grid-template-areas:"side main" "bar bar";transition:grid-template-columns .25s cubic-bezier(.2,.8,.2,1)}
 .side{grid-area:side;background:#000;border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden}
-.sidehead{display:flex;align-items:center;justify-content:space-between;padding:22px 14px 16px 20px}
-.brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:14px;letter-spacing:.3em}
-.brand svg{width:30px;height:30px}
+.sidehead{display:flex;align-items:center;height:72px;padding:0 14px 0 25px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:14px;letter-spacing:.3em;white-space:nowrap}
+.brand svg{flex:none}
+.lbl,.pli b,.pli .lk,.account .who,.account>svg,.pl-head .ib{transition:opacity .22s ease,max-width .34s cubic-bezier(.4,0,.2,1)}
+.lbl{display:inline-block;max-width:190px;overflow:hidden;white-space:nowrap}
 .nav{display:flex;flex-direction:column;gap:2px;padding:0 12px}
-.nav button{display:flex;align-items:center;gap:16px;padding:11px 14px;border-radius:var(--r-btn);font-weight:600;font-size:14.5px;color:var(--mute);transition:background .15s,color .15s}
-.nav button:hover{color:#fff;background:var(--raise)}
+.nav button,.navlike{display:flex;align-items:center;gap:16px;width:100%;padding:11px 17px;border-radius:var(--r-btn);font-weight:600;font-size:14.5px;color:var(--mute);white-space:nowrap;transition:background .15s,color .15s}
+.nav button:hover,.navlike:hover{color:#fff;background:var(--raise)}
 .nav button.on{color:#fff;background:var(--accent-soft)}
 .nav button.on svg{color:var(--accent-hi)}
-.nav button svg{width:21px;height:21px}
+.nav button svg,.navlike svg{width:21px;height:21px}
+.navlike svg{transition:transform .34s cubic-bezier(.4,0,.2,1)}
 .sep{height:1px;background:var(--line);margin:14px 18px 8px}
-.pl-head{display:flex;align-items:center;justify-content:space-between;padding:6px 16px 6px 22px;font-weight:700;font-size:13px;color:#fff}
-.scroll{overflow-y:auto;min-height:0;flex:1;display:flex;flex-direction:column;gap:2px;padding:0 12px}
-.pli{display:flex;align-items:center;gap:12px;padding:7px 10px;border-radius:12px;min-width:0;color:#c9c9d4;font-weight:500}
+.pl-head{display:flex;align-items:center;justify-content:space-between;height:36px;padding:0 16px 0 29px;font-weight:700;font-size:13px;color:#fff;white-space:nowrap}
+.scroll{overflow-y:auto;overflow-x:hidden;min-height:0;flex:1;display:flex;flex-direction:column;gap:2px;padding:0 12px}
+.pli{display:flex;align-items:center;gap:12px;padding:7px 10px;border-radius:var(--r-ctl);min-width:0;color:#c9c9d4;font-weight:500;white-space:nowrap}
 .pli:hover,.pli.over{background:var(--raise);color:#fff}
 .pli.on{background:var(--accent-soft);color:#fff}
 .pli.over{outline:2px dashed var(--accent-hi);outline-offset:-2px}
@@ -70,18 +77,21 @@ svg{width:20px;height:20px;fill:currentColor;display:block;flex:none}
 .pthumb img{width:100%;height:100%;object-fit:cover}
 .pthumb svg{width:18px;height:18px}
 .pli.on .pthumb{color:var(--accent-hi)}
-.pli b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
-.pli .lk{width:14px;height:14px;color:var(--mute)}
+.pli[data-pl="favs"] .pthumb,.libcard[data-pl="favs"] .cov,.pfp.fav{color:var(--bookmark)}
+.pli b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;max-width:190px}
+.pli .lk{width:14px;height:14px;color:var(--mute);max-width:14px}
 .pli.create{color:var(--mute)}
 .pli.create .pthumb{background:transparent;border:1.5px dashed var(--line2);color:var(--mute)}
-.account{margin:10px 12px 14px;padding:10px 12px;border-radius:var(--r-ctl);border:1px solid var(--line);background:var(--panel);display:flex;align-items:center;gap:12px;min-width:0;width:calc(100% - 24px)}
+.updbanner{margin:6px 12px 0;padding:10px 12px;border:1px solid var(--accent);border-radius:var(--r-ctl);background:var(--accent-soft);display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px}
+.updbanner .btn{padding:6px 12px;font-size:12.5px}
+.updbanner b{display:block}
+.account{margin:8px 12px 14px;padding:10px;border-radius:var(--r-ctl);border:1px solid var(--line);background:var(--panel);display:flex;align-items:center;gap:12px;min-width:0;width:calc(100% - 24px);white-space:nowrap;overflow:hidden}
 .account:hover{border-color:var(--line2)}
 .avatar-s{width:36px;height:36px;border-radius:50%;overflow:hidden;flex:none;background:var(--raise2);display:grid;place-items:center;font-weight:700}
 .avatar-s img{width:100%;height:100%;object-fit:cover}
-.account .who{min-width:0;flex:1}
+.account .who{min-width:0;flex:1;max-width:150px;overflow:hidden;text-align:left}
 .account .who b{display:block;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .account .who small{color:var(--mute);font-size:12px}
-
 /* ---------- Contenu ---------- */
 main{grid-area:main;min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden;background:#000}
 .topbar{padding:16px 28px;display:flex;gap:12px;align-items:center}
@@ -100,7 +110,7 @@ main{grid-area:main;min-width:0;min-height:0;display:flex;flex-direction:column;
 .menubtn{display:none}
 #view{flex:1;overflow-y:auto;padding:6px 28px calc(var(--barh) + 28px);min-height:0}
 .btn{background:var(--accent);color:#fff;font-weight:700;border-radius:var(--r-btn);padding:11px 22px;white-space:nowrap;display:inline-flex;align-items:center;gap:10px;transition:background .15s,transform .12s}
-.btn:hover{background:#9b72f8;transform:translateY(-1px)}
+.btn:hover{filter:brightness(1.12);transform:translateY(-1px)}
 .btn svg{width:18px;height:18px}
 .btn.alt{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)}
 .btn.alt:hover{background:rgba(255,255,255,.14)}
@@ -127,7 +137,9 @@ h2.sh{font-weight:800;font-size:21px;letter-spacing:-.02em;margin:0}
 .slide.on{opacity:1;pointer-events:auto}
 .slide .bg{position:absolute;right:0;top:0;width:76%;height:100%;object-fit:cover;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 40%);mask-image:linear-gradient(90deg,transparent 0,#000 40%)}
 .slide::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,#000 24%,rgba(0,0,0,.5) 55%,rgba(0,0,0,0) 100%)}
-.sl-body{position:absolute;z-index:2;left:38px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;max-width:52%;gap:6px}
+.sl-body{position:absolute;z-index:2;left:38px;top:30px;bottom:30px;display:flex;flex-direction:column;justify-content:flex-start;max-width:52%;gap:6px}
+.sl-body .sl-by{margin:auto 0 14px}
+.sl-body .sl-actions{min-height:44px}
 .sl-title{font-weight:800;font-size:clamp(24px,3.1vw,42px);line-height:1.08;letter-spacing:-.03em;margin:6px 0 4px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;text-wrap:balance}
 .sl-by{color:#c9c9d4;font-size:15px;margin:0 0 16px}
 .sl-by .alink{font-weight:700;color:#fff}
@@ -184,8 +196,8 @@ h2.sh{font-weight:800;font-size:21px;letter-spacing:-.02em;margin:0}
 /* ---------- Bookmark animé ---------- */
 .bm{overflow:visible}
 .bm-out{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linejoin:round}
-.bm-fill{fill:var(--accent);transform:translateY(100%);transition:transform .5s cubic-bezier(.22,1,.36,1)}
-.bmk.on{color:var(--accent)}
+.bm-fill{fill:var(--bookmark);transform:translateY(100%);transition:transform .5s cubic-bezier(.22,1,.36,1)}
+.bmk.on{color:var(--bookmark)}
 .bmk.on .bm-fill{transform:translateY(0)}
 .bmk.pop .bm{animation:bmpop .5s cubic-bezier(.34,1.56,.64,1)}
 @keyframes bmpop{0%{transform:scale(1)}40%{transform:scale(1.3)}100%{transform:scale(1)}}
@@ -205,7 +217,7 @@ h2.sh{font-weight:800;font-size:21px;letter-spacing:-.02em;margin:0}
 .asearch .search{max-width:460px}
 
 /* ---------- Page Playlists ---------- */
-.plhero{position:relative;border-radius:16px;border:1px solid var(--line);padding:38px 34px 34px;margin:4px 0 24px;overflow:hidden;background:radial-gradient(60% 120% at 92% 0%,rgba(139,92,246,.2),transparent 70%),#000}
+.plhero{position:relative;border-radius:16px;border:1px solid var(--line);padding:38px 34px 34px;margin:4px 0 24px;overflow:hidden;background:radial-gradient(60% 120% at 92% 0%,var(--accent-glow),transparent 70%),#000}
 .plhero h1{margin:0 0 6px;font-size:clamp(34px,5vw,58px)}
 .plhero .sub{margin:0 0 22px}
 .toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 20px}
@@ -296,12 +308,56 @@ h2.sh{font-weight:800;font-size:21px;letter-spacing:-.02em;margin:0}
 .switch[aria-checked=true]{background:var(--accent)}
 .switch[aria-checked=true]::after{transform:translateX(18px)}
 .profile{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.profile .who2 b{display:block;font-size:17px}
+.profile .who2 small{color:var(--mute)}
 .profile .avatar-big{width:76px;height:76px;border-radius:50%;overflow:hidden;background:var(--raise2);display:grid;place-items:center;font-weight:800;font-size:28px;border:1px solid var(--line2);cursor:pointer;position:relative}
 .profile .avatar-big img{width:100%;height:100%;object-fit:cover}
 .profile .avatar-big:hover::after{content:"Changer";position:absolute;inset:0;background:rgba(0,0,0,.65);display:grid;place-items:center;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 .empty{color:var(--mute);padding:22px 0}
 .err{color:#ff8fa8}
 .errbox{background:var(--raise);border:1px solid var(--line2);border-radius:16px;padding:16px 18px;max-width:640px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+
+/* ---------- Réglages ---------- */
+.setlayout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:34px;align-items:start}
+.setnav{display:flex;flex-direction:column;gap:2px;position:sticky;top:0}
+.setnav button{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--r-btn);font-weight:600;color:var(--mute);white-space:nowrap}
+.setnav button:hover{color:#fff;background:var(--raise)}
+.setnav button.on{color:#fff;background:var(--accent-soft)}
+.setnav button.on svg{color:var(--accent-hi)}
+.setnav svg{width:19px;height:19px}
+.setpane h2{margin:0 0 4px;font-size:24px;font-weight:800;letter-spacing:-.02em}
+.setpane .lead{color:var(--mute);margin:0 0 22px;max-width:60ch}
+.setgroup{display:grid;gap:10px;max-width:740px}
+.setgroup h4{margin:18px 0 2px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.setgroup h4:first-child{margin-top:0}
+.set.danger{border-color:rgba(255,143,168,.35)}
+.swatches{display:flex;gap:10px;flex-wrap:wrap}
+.swatch{width:32px;height:32px;border-radius:var(--r-sm);background:var(--c);border:2px solid transparent;outline:2px solid transparent;outline-offset:2px}
+.swatch.on{outline-color:#fff}
+.kbd{display:inline-block;padding:2px 8px;border:1px solid var(--line2);border-bottom-width:2px;border-radius:6px;font:600 12px var(--font);color:#d8d8e2;background:var(--raise)}
+.kv{display:grid;grid-template-columns:140px 1fr;gap:6px 16px;color:var(--mute);margin:0}
+.kv b{color:#fff;font-weight:600;word-break:break-all}
+.notes{white-space:pre-wrap;color:#c9c9d4;background:var(--raise);border:1px solid var(--line);border-radius:var(--r-ctl);padding:12px 14px;max-height:180px;overflow:auto;margin:10px 0 0;width:100%}
+.upstat{display:flex;align-items:center;gap:10px;color:var(--mute)}
+.upstat .dot{width:8px;height:8px;border-radius:50%;background:var(--mute)}
+.upstat.ok .dot{background:#4ade80}.upstat.new .dot{background:var(--accent-hi)}
+/* ---------- Fenêtres modales ---------- */
+.mback{position:fixed;inset:0;background:rgba(0,0,0,.74);z-index:120;display:grid;place-items:center;padding:20px}
+.mbox{width:min(470px,100%);max-height:92vh;overflow:auto;background:var(--panel);border:1px solid var(--line2);border-radius:16px;padding:24px}
+.mbox h3{margin:0 0 6px;font-size:20px;letter-spacing:-.01em}
+.mbox p{color:var(--mute);margin:0 0 14px}
+.mbox .fld{margin:0 0 12px}
+.mactions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.merr{color:#ff8fa8;min-height:18px;font-size:13px;margin:2px 0 0}
+.codebox{width:100%;height:130px;resize:none;background:#000;border:1px solid var(--line2);border-radius:var(--r-btn);padding:10px 12px;font:12px/1.4 ui-monospace,Consolas,monospace;color:#d8d8e2;word-break:break-all}
+.codebox:focus{outline:0;border-color:var(--accent)}
+.avatar-edit{display:flex;align-items:center;gap:18px;margin:0 0 16px}
+.avatar-edit .avatar-big{width:84px;height:84px;border-radius:50%;overflow:hidden;background:var(--raise2);display:grid;place-items:center;font-weight:800;font-size:30px;border:1px solid var(--line2);position:relative;flex:none;cursor:pointer}
+.avatar-edit .avatar-big img{width:100%;height:100%;object-fit:cover}
+.avatar-edit .avatar-big::after{content:"Changer";position:absolute;inset:0;background:rgba(0,0,0,.62);display:grid;place-items:center;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:0;transition:opacity .15s}
+.avatar-edit .avatar-big:hover::after,.avatar-edit .avatar-big.over::after{opacity:1}
+.avatar-edit .avatar-big.over{outline:2px dashed var(--accent-hi);outline-offset:3px}
+@media (max-width:900px){.setlayout{grid-template-columns:minmax(0,1fr);gap:18px}.setnav{flex-direction:row;overflow-x:auto;position:static}.kv{grid-template-columns:1fr}}
 
 /* ---------- File d'attente (tiroir) ---------- */
 .qdrawer{position:fixed;top:0;right:0;bottom:var(--barh);width:min(380px,100vw);background:#000;border-left:1px solid var(--line);z-index:40;display:flex;flex-direction:column;padding:20px 16px 12px;transform:translateX(102%);transition:transform .3s cubic-bezier(.2,.8,.2,1);box-shadow:-20px 0 60px rgba(0,0,0,.7)}
@@ -335,7 +391,7 @@ h2.sh{font-weight:800;font-size:21px;letter-spacing:-.02em;margin:0}
 .seekbox span{color:var(--mute);font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
 .ctrls{display:flex;align-items:center;gap:6px}
 .playbtn{width:44px;height:44px;border-radius:var(--r-ctl);background:var(--accent);color:#fff;display:grid;place-items:center;transition:background .15s,transform .12s}
-.playbtn:hover{background:#9b72f8;transform:scale(1.06)}
+.playbtn:hover{filter:brightness(1.12);transform:scale(1.06)}
 .playbtn svg{width:24px;height:24px}
 .volume{display:flex;align-items:center;gap:6px;min-width:0}
 input[type=range]{-webkit-appearance:none;appearance:none;flex:1;min-width:0;height:16px;background:none;cursor:pointer;--p:0%}
@@ -364,14 +420,9 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border:0;border-radiu
 /* ---------- Barre latérale repliée ---------- */
 @media (min-width:901px){
   .app.collapsed{--sw:80px}
-  .app.collapsed .lbl,.app.collapsed .pli b,.app.collapsed .pli .lk,.app.collapsed .who,.app.collapsed .account>svg{display:none}
-  .app.collapsed .sidehead{flex-direction:column;gap:12px;padding:20px 0 12px}
-  .app.collapsed .nav button{justify-content:center;padding:12px 0}
-  .app.collapsed .pl-head{justify-content:center;padding:6px 0}
-  .app.collapsed .pli{justify-content:center;padding:6px}
-  .app.collapsed .account{justify-content:center;padding:8px;width:calc(100% - 20px);margin:10px}
-  .app.collapsed .nav,.app.collapsed .scroll{padding:0 10px}
-  .app.collapsed #collapse svg{transform:rotate(180deg)}
+  .app.collapsed .lbl,.app.collapsed .pli b,.app.collapsed .pli .lk,.app.collapsed .account .who,.app.collapsed .account>svg,.app.collapsed .pl-head .ib{opacity:0;max-width:0;pointer-events:none}
+  .app.collapsed .navlike svg{transform:rotate(180deg)}
+  .app.collapsed .updbanner{display:none}
 }
 @media (max-width:1180px){ .libwrap{grid-template-columns:minmax(0,1fr)} .libside{display:none} }
 @media (max-width:1000px){ .bar{grid-template-columns:minmax(0,1fr) auto auto} .seekbox{grid-column:1 / -1;order:5} .volume #vol{display:none} }
@@ -431,7 +482,6 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border:0;border-radiu
   <aside class="side" id="side">
     <div class="sidehead">
       <div class="brand"><span id="brandLogo"></span><span class="lbl">SATURNE</span></div>
-      <button class="ib" id="collapse" data-ic="left" aria-label="Réduire la barre latérale" title="Réduire la barre latérale"></button>
     </div>
     <nav class="nav" id="nav" aria-label="Navigation">
       <button data-nav="home" data-ic="home" title="Home"><span class="lbl">Home</span></button>
@@ -443,6 +493,8 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border:0;border-radiu
     <div class="sep"></div>
     <div class="pl-head"><span class="lbl">Playlists</span><button class="ib sm" id="newPl" data-ic="plus" aria-label="Créer une playlist" title="Créer une playlist"></button></div>
     <div class="scroll" id="plList"></div>
+    <div class="updbanner" id="updBanner" hidden></div>
+    <div class="nav" style="margin-top:6px"><button class="navlike" id="collapse" data-ic="left" aria-label="Réduire la barre latérale" title="Réduire la barre latérale"><span class="lbl">Collapse</span></button></div>
     <button class="account" id="accountBtn" aria-label="Compte"><span class="avatar-s" id="accAvatar"></span><span class="who"><b id="accName"></b><small id="accUser"></small></span><span data-ic="right" style="color:var(--mute)"></span></button>
   </aside>
 
@@ -484,6 +536,7 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border:0;border-radiu
   </footer>
 </div>
 
+<div class="mback" id="modal" hidden><div class="mbox" id="mbox" role="dialog" aria-modal="true"></div></div>
 <div class="ytbox" aria-hidden="true"><div id="yt"></div></div>
 <div class="menu" id="menu" hidden></div>
 <div class="toast" id="toast" hidden role="status"></div>
@@ -518,6 +571,15 @@ const ICONS = {
   globe:'M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95a15.65 15.65 0 00-1.38-3.56A8.03 8.03 0 0118.92 8zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56A7.987 7.987 0 015.08 16zm2.95-8H5.08a7.987 7.987 0 014.33-3.56A15.65 15.65 0 008.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 01-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z',
   sidebar:'M3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2zm6 14H5V5h4v14z',
   logout:'M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z',
+  edit:'M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 000-1.41l-2.34-2.34a.996.996 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z',
+  share:'M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z',
+  download:'M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z',
+  upload:'M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z',
+  info:'M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z',
+  shield:'M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z',
+  tune:'M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z',
+  palette:'M12 3a9 9 0 000 18c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z',
+  storage:'M2 20h20v-4H2v4zm2-3h2v2H4v-2zM2 4v4h20V4H2zm4 3H4V5h2v2zm-4 7h20v-4H2v4zm2-3h2v2H4v-2z',
   lock:'M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z',
   more:'M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z',
   copy:'M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z',
@@ -555,6 +617,8 @@ const CHIPS = [['all','All'], ['bookmarks','Bookmarks'], ['mine','Created by You
 /* ---------- État ---------- */
 const S = {
   user:null, playlists:[], queue:[], cur:-1, shuffle:false, repeat:'off', volume:80, muted:false, history:[], cc:'JP', collapsed:false, defaultPrivacy:'private',
+  settings:{autoplay:true, remember:true, toasts:true, accent:'violet', radius:'soft', heroAuto:true, reduceMotion:false, autoUpdate:true}, setTab:'account',
+  update:{checking:false, info:null, error:'', installing:false}, about:null,
   view:{type:'home'}, hist:[{type:'home'}], hpos:0, qopen:false,
   home:{main:{tracks:[], loading:false, error:''}, fresh:{tracks:[], loading:false, error:''}, shelves:{}}, heroIdx:0,
   list:{title:'', eyebrow:'', tracks:[], loading:false, error:'', q:'', cc:''},
@@ -572,7 +636,7 @@ const isPublic = p => p.visibility === 'public' && !p.system;
 const slim = t => ({id:t.id, title:t.title, channel:t.channel, channelId:t.channelId || '', thumb:t.thumb || `https://i.ytimg.com/vi/${t.id}/mqdefault.jpg`, duration:t.duration || null});
 
 let toastTimer;
-function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, 3000); }
+function toast(msg){ if (S.settings && S.settings.toasts === false && !/impossible|erreur|expir|invalide|incorrect|échou|refus|trop/i.test(msg)) return; const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, 3000); }
 
 /* ---------- Réseau ---------- */
 async function http(url, opt){
@@ -588,7 +652,7 @@ const errText = e => e.offline ? 'Le serveur de Saturne ne répond pas. Relance 
 
 /* ---------- Sauvegarde dans le compte ---------- */
 let saveTimer = 0, saveWarned = false;
-const payload = () => ({v:2, playlists:S.playlists, queue:S.queue, cur:S.cur, shuffle:S.shuffle, repeat:S.repeat, volume:S.volume, history:S.history, cc:S.cc, collapsed:S.collapsed, defaultPrivacy:S.defaultPrivacy});
+const payload = () => ({v:2, playlists:S.playlists, queue:S.queue, cur:S.cur, shuffle:S.shuffle, repeat:S.repeat, volume:S.volume, history:S.history, cc:S.cc, collapsed:S.collapsed, defaultPrivacy:S.defaultPrivacy, settings:S.settings});
 function save(){
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
@@ -603,6 +667,9 @@ function applyData(d){
   S.shuffle = !!d.shuffle; S.repeat = ['off','all','one'].includes(d.repeat) ? d.repeat : 'off'; S.volume = Number.isFinite(d.volume) ? d.volume : 80;
   S.history = Array.isArray(d.history) ? d.history.slice(0, 24) : []; S.cc = COUNTRIES[d.cc] ? d.cc : 'JP'; S.collapsed = !!d.collapsed;
   S.defaultPrivacy = d.defaultPrivacy === 'public' ? 'public' : 'private';
+  S.settings = {...DEFAULT_SETTINGS, ...(d.settings && typeof d.settings === 'object' ? d.settings : {})};
+  if (!S.settings.remember) { S.queue = []; S.cur = -1; }
+  applyTheme();
   let f = S.playlists.find(p => p.id === 'favs');
   if (!f) { f = {id:'favs', tracks:[], created:Date.now()}; S.playlists.unshift(f); }
   f.name = 'Bookmarks'; f.system = true; f.visibility = 'private';
@@ -643,6 +710,7 @@ async function enter(user){
   S.community = {items:[], loading:false, error:'', loaded:false};
   $('#auth').hidden = true; $('#app').hidden = false;
   vol.value = S.volume; fill(vol); rebuildOrder(); render(); loadHome(); loadYT();
+  S.update = {checking:false, info:null, error:'', installing:false}; renderUpdateBanner(); if (S.settings.autoUpdate) setTimeout(() => checkUpdate(true), 4000);
 }
 async function logout(){ try { await send('/api/auth/logout', {}); } catch {} location.reload(); }
 
@@ -670,7 +738,7 @@ function onStateChange(e){
       if (lastLogged !== t.id) { lastLogged = t.id; S.history = [slim(t), ...S.history.filter(x => x.id !== t.id)].slice(0, 24); save(); if (S.view.type === 'home' || S.view.type === 'library') renderView(); }
     }
   }
-  if (e.data === 0) next(true);
+  if (e.data === 0) { if (S.settings.autoplay || S.repeat === 'one') next(true); else playing = false; }
   renderBar();
 }
 function onError(){
@@ -924,7 +992,7 @@ function heroGo(i){
   document.querySelectorAll('.slide').forEach((s, k) => s.classList.toggle('on', k === S.heroIdx));
   document.querySelectorAll('.hero-dots button').forEach((b, k) => b.classList.toggle('on', k === S.heroIdx));
 }
-setInterval(() => { const h = $('#hero'); if (h && S.view.type === 'home' && !h.matches(':hover') && !document.hidden) heroGo(S.heroIdx + 1); }, 7000);
+setInterval(() => { const h = $('#hero'); if (h && S.view.type === 'home' && !h.matches(':hover') && !document.hidden && S.settings.heroAuto) heroGo(S.heroIdx + 1); }, 7000);
 
 /* Page « Playlists » */
 function libPlaylists(){
@@ -936,7 +1004,7 @@ function libPlaylists(){
 }
 function libHtml(){
   const L = S.lib, c = L.chip, community = c === 'community';
-  let h = `<div class="plhero"><h1>Playlists</h1><p class="sub">Your favourite playlists, all in one place.</p><button class="btn" data-act="newpl">${ic('plus')}Create Playlist</button></div>
+  let h = `<div class="plhero"><h1>Playlists</h1><p class="sub">Your favourite playlists, all in one place.</p><div class="head-actions"><button class="btn" data-act="newpl">${ic('plus')}Create Playlist</button><button class="ghost" data-act="importpl">${ic('upload')}Import</button></div></div>
     <div class="toolbar"><div class="chips">${CHIPS.map(([k, n]) => `<button class="chip ${L.chip===k?'on':''}" data-chip="${k}">${n}</button>`).join('')}</div>
     ${community ? '' : `<label class="sortbox">Sort by <select class="select" id="sortSel" aria-label="Trier">${[['added','Recently Added'],['played','Recently Played'],['name','Name'],['size','Most songs']].map(([k, n]) => `<option value="${k}" ${L.sort===k?'selected':''}>${n}</option>`).join('')}</select></label>`}</div>`;
   let main = '';
@@ -962,7 +1030,7 @@ function banner({p, owner, readonly}){
   const own = !readonly;
   return `<div class="banner ${p.banner?'has':''}" id="banner" ${own ? 'data-drop="banner"' : ''}>
       ${own ? `<div class="bhint">Dépose l'image de la bannière</div><div class="btools"><button data-act="banner-pick">${ic('image')}Bannière</button>${p.banner ? `<button data-act="banner-clear" aria-label="Retirer la bannière">${ic('close')}</button>` : ''}</div>` : ''}
-      <div class="pfp ${own ? '' : 'static'}" ${own ? 'id="pfp" data-drop="pfp" data-act="pfp-pick" role="button" tabindex="0" aria-label="Changer l\'image de la playlist"' : ''}>
+      <div class="pfp ${own ? '' : 'static'} ${p.id === 'favs' ? 'fav' : ''}" ${own ? 'id="pfp" data-drop="pfp" data-act="pfp-pick" role="button" tabindex="0" aria-label="Changer l\'image de la playlist"' : ''}>
         ${p.cover ? `<img src="${esc(p.cover)}" alt="">` : (p.id === 'favs' ? ic('plusc').replace(/<path[^>]*>/, `<path d="${BM_PATH}"/>`) : esc(initial(p.name)))}
         ${own ? `<span class="pov">${ic('image')}Dépose une image</span>` : ''}</div>
       <div class="bmeta"><p class="eyebrow" style="color:#fff;opacity:.85">Playlist${p.id !== 'favs' && !readonly ? `<span class="badge">${privIcon(p)}${isPublic(p) ? 'Public' : 'Private'}</span>` : readonly ? '<span class="badge">' + ic('globe') + 'Public</span>' : ''}</p>
@@ -1026,30 +1094,19 @@ function renderView(){
     if (P.loading) h += skeleton(6, 'grid');
     else if (P.error) h += `<div class="errbox"><span class="err">${esc(P.error)}</span></div>`;
     else if (d) h += banner({p:{...d, tracks:d.tracks}, owner:d.ownerDisplay, readonly:true}) +
-      `<div class="head-actions" style="margin-bottom:20px">${d.tracks.length ? playActions() : ''}<button class="ghost" data-act="savepub">${ic('copy')}Save to library</button></div>` +
+      `<div class="head-actions" style="margin-bottom:20px">${d.tracks.length ? playActions() : ''}<button class="ghost" data-act="savepub">${ic('copy')}Save to library</button><button class="ghost" data-act="sharepub">${ic('share')}Share</button></div>` +
       (d.tracks.length ? rows(d.tracks, 'pub') : '<p class="empty">Cette playlist est vide.</p>');
   } else if (v.type === 'playlist') {
     const p = curPl(); if (!p) { S.view = {type:'library'}; return render(); }
     const l = p.tracks;
     h = `<button class="more back" data-go="library">${ic('left')}Playlists</button>` + banner({p, owner:S.user.display, readonly:false}) +
-      `<div class="head-actions" style="margin-bottom:6px">${l.length ? playActions() : ''}
+      `<div class="head-actions" style="margin-bottom:6px">${l.length ? playActions() : ''}<button class="ghost" data-act="share">${ic('share')}Share</button>
         ${p.system ? '' : `<div class="seg" role="group" aria-label="Confidentialité"><button data-act="setpriv" data-v="private" class="${!isPublic(p)?'on':''}">${ic('lock')}Private</button><button data-act="setpriv" data-v="public" class="${isPublic(p)?'on':''}">${ic('globe')}Public</button></div>`}
         ${p.cover ? `<button class="ghost" data-act="pfp-clear">${ic('close')}Retirer la pochette</button>` : ''}${p.system ? '' : `<button class="ghost ${v.confirm?'warn':''}" data-act="delpl">${ic('trash')}${v.confirm ? 'Confirmer la suppression' : 'Supprimer'}</button>`}</div>
       <p class="privacy-note">${p.system ? ic('lock') + 'Tes bookmarks sont toujours privés.' : isPublic(p) ? ic('globe') + 'Public : les autres comptes de cet ordinateur peuvent voir et écouter cette playlist (onglet Community).' : ic('lock') + 'Private : toi seul peux voir cette playlist.'}</p>
       ${l.length ? rows(l, 'pl') : '<p class="empty">Cette playlist est vide. Glisse un titre sur elle dans la barre latérale, ou utilise le bouton « + ».</p>'}`;
   } else if (v.type === 'settings') {
-    const u = S.user;
-    h = `<div class="pagehead"><p class="eyebrow">Settings</p><h1>Settings</h1></div><div class="setgrid">
-      <div class="set"><div class="profile grow"><button class="avatar-big" id="avatarPick" aria-label="Changer la photo de profil">${avatarHtml(u)}</button>
-        <div style="flex:1;min-width:180px"><h3 style="margin-bottom:8px">Profil</h3><div style="display:flex;gap:8px;flex-wrap:wrap"><input class="input" id="dispInput" value="${esc(u.display)}" maxlength="40" aria-label="Nom affiché" style="flex:1;min-width:140px"><button class="ghost" data-act="savedisp">Enregistrer</button></div><p style="margin-top:8px">Connecté en tant que @${esc(u.username)}</p></div></div></div>
-      <div class="set"><div><h3>Confidentialité par défaut</h3><p>Visibilité des nouvelles playlists. Tu peux la changer pour chaque playlist.</p></div>
-        <div class="seg" role="group" aria-label="Confidentialité par défaut"><button data-act="defpriv" data-v="private" class="${S.defaultPrivacy==='private'?'on':''}">${ic('lock')}Private</button><button data-act="defpriv" data-v="public" class="${S.defaultPrivacy==='public'?'on':''}">${ic('globe')}Public</button></div></div>
-      <div class="set"><div><h3>Région de recherche</h3><p>Change la région des résultats de la barre de recherche et des genres.</p></div>
-        <select class="select" id="ccSel" aria-label="Région de recherche">${Object.entries(COUNTRIES).map(([k, n]) => `<option value="${k}" ${k===S.cc?'selected':''}>${n}</option>`).join('')}</select></div>
-      <div class="set"><div><h3>Barre latérale réduite</h3><p>Garde seulement les icônes pour laisser plus de place à la musique.</p></div>
-        <button class="switch" role="switch" id="swCollapse" aria-checked="${S.collapsed}" aria-label="Barre latérale réduite"></button></div>
-      <div class="set"><div><h3>Historique</h3><p>Efface la liste « Recently Played » de ton compte.</p></div><button class="ghost" data-act="clearhist">Effacer</button></div>
-      <div class="set"><div><h3>Session</h3><p>Tu seras déconnecté de cet appareil.</p></div><button class="ghost" data-act="logout">${ic('logout')}Se déconnecter</button></div></div>`;
+    h = settingsHtml();
   }
   el.innerHTML = h;
   if (v.type === 'playlist') { const p = curPl(), b = $('#banner'); if (p && p.banner) { b.style.backgroundImage = `url("${p.banner.replace(/"/g, '%22')}")`; b.style.backgroundPosition = `50% ${p.bannerY ?? 50}%`; } }
@@ -1065,7 +1122,7 @@ function renderTop(){
 function renderSide(){
   const v = S.view, u = S.user; if (!u) return;
   $('#app').classList.toggle('collapsed', S.collapsed);
-  const cb = $('#collapse'); cb.innerHTML = ic('left');
+  const cb = $('#collapse');
   cb.setAttribute('aria-label', S.collapsed ? 'Agrandir la barre latérale' : 'Réduire la barre latérale'); cb.title = cb.getAttribute('aria-label');
   const navOn = v.type === 'artist' ? 'artists' : (v.type === 'list' || v.type === 'search') ? 'search' : (v.type === 'playlist' || v.type === 'pubpl') ? 'library' : v.type;
   document.querySelectorAll('#nav button').forEach(b => { b.classList.toggle('on', b.dataset.nav === navOn); if (!b.querySelector('svg')) b.insertAdjacentHTML('afterbegin', ic(b.dataset.ic)); });
@@ -1120,13 +1177,13 @@ function openMenu(btn, t){
 }
 function openPlMenu(btn, p){
   menuTrack = null; const m = $('#menu');
-  m.innerHTML = `<div class="label">${esc(p.name)}</div><button data-plact="play" data-pid="${p.id}">${ic('play')}Play</button>` +
+  m.innerHTML = `<div class="label">${esc(p.name)}</div><button data-plact="play" data-pid="${p.id}">${ic('play')}Play</button><button data-plact="share" data-pid="${p.id}">${ic('share')}Share</button>` +
     (p.system ? '' : `<button data-plact="toggle" data-pid="${p.id}">${isPublic(p) ? ic('lock') + 'Make private' : ic('globe') + 'Make public'}</button><button class="danger" data-plact="delete" data-pid="${p.id}">${ic('trash')}Delete</button>`);
   placeMenu(btn);
 }
 function openAccountMenu(btn){
   menuTrack = null; const m = $('#menu');
-  m.innerHTML = `<div class="label">@${esc(S.user.username)}</div><button data-menu="settings">${ic('settings')}Settings</button><button data-menu="logout">${ic('logout')}Se déconnecter</button>`;
+  m.innerHTML = `<div class="label">@${esc(S.user.username)}</div><button data-menu="profile">${ic('person')}Edit profile</button><button data-menu="settings">${ic('settings')}Settings</button><button data-menu="logout">${ic('logout')}Se déconnecter</button>`;
   placeMenu(btn);
 }
 const closeMenu = () => { $('#menu').hidden = true; menuTrack = null; };
@@ -1168,11 +1225,7 @@ let pickKind = 'cover';
 function pickImage(kind){ pickKind = kind; $('#filePick').value = ''; $('#filePick').click(); }
 $('#filePick').addEventListener('change', async e => {
   const f = e.target.files[0]; if (!f) return;
-  if (pickKind === 'avatar') {
-    try { const data = await toDataURL(URL.createObjectURL(f), 192, 192, true); const j = await send('/api/me', {avatar:data}, 'PUT'); S.user = j.user; render(); toast('Photo de profil mise à jour'); }
-    catch (err) { toast(err.message || 'Impossible de lire cette image'); }
-    return;
-  }
+  if (pickKind === 'avatar') { await uploadAvatar(f); return; }
   const p = curPl(); if (p) setImage(p, pickKind, f);
 });
 function dropSource(dt){
@@ -1203,6 +1256,7 @@ document.addEventListener('drop', e => {
   }
   if (hasImageDrag(e)) {
     e.preventDefault();
+    if (t && t.dataset.drop === 'avatar') { const f = dropSource(e.dataTransfer); if (f instanceof Blob) uploadAvatar(f); else toast('Dépose un fichier image'); return; }
     const p = curPl(); if (!p || !t || !t.dataset.drop) return;
     const src = dropSource(e.dataTransfer); if (!src) return toast('Dépose un fichier image');
     setImage(p, t.dataset.drop === 'pfp' ? 'cover' : 'banner', src);
@@ -1240,7 +1294,7 @@ $('#menuBtn').addEventListener('click', () => $('#app').classList.add('open'));
 $('#scrim').addEventListener('click', closeDrawer);
 $('#backBtn').addEventListener('click', () => step(-1));
 $('#fwdBtn').addEventListener('click', () => step(1));
-$('#collapse').addEventListener('click', () => { S.collapsed = !S.collapsed; save(); renderSide(); if (S.view.type === 'settings') renderView(); });
+$('#collapse').addEventListener('click', () => setCollapsed(!S.collapsed));
 $('#nav').addEventListener('click', e => {
   const b = e.target.closest('[data-nav]'); if (!b) return;
   if (b.dataset.nav === 'search') { $('#q').value = ''; go({type:'search', q:''}); $('#q').focus(); } else go({type:b.dataset.nav});
@@ -1266,9 +1320,10 @@ $('#view').addEventListener('click', e => {
   if (g) { const x = GENRES[+g.dataset.genre]; return go({type:'list', q:x.q, title:x.n, cc:x.cc, eyebrow:'Genre'}); }
   const mo = e.target.closest('[data-more]');
   if (mo) { if (mo.dataset.more === '__new__') return go({type:'list', q:'__new__', title:'New Releases', eyebrow:'Latest'}); const s = SHELVES.find(x => x.key === mo.dataset.more); return go({type:'list', q:s.q, title:s.title, cc:s.cc, eyebrow:'Home'}); }
-  const sw = e.target.closest('#swCollapse');
-  if (sw) { S.collapsed = !S.collapsed; save(); renderSide(); sw.setAttribute('aria-checked', S.collapsed); return; }
-  if (e.target.closest('#avatarPick')) return pickImage('avatar');
+  const st = e.target.closest('[data-settab]'); if (st) { S.setTab = st.dataset.settab; renderView(); if (['updates', 'about', 'data'].includes(S.setTab)) loadAbout(); return; }
+  const sw = e.target.closest('[data-set]'); if (sw) return toggleSetting(sw.dataset.set);
+  const sa = e.target.closest('[data-accent]'); if (sa) { S.settings.accent = sa.dataset.accent; applyTheme(); save(); return renderView(); }
+  const sr = e.target.closest('[data-radiusset]'); if (sr) { S.settings.radius = sr.dataset.radiusset; applyTheme(); save(); return renderView(); }
   const b = e.target.closest('[data-act]'); if (!b) return;
   const act = b.dataset.act, holder = b.closest('[data-src]'), src = holder ? holder.dataset.src : defaultSrc(), l = tracksOf(src);
   const li = b.closest('[data-i]'), i = li ? +li.dataset.i : -1, t = l[i], p = curPl();
@@ -1310,7 +1365,16 @@ $('#view').addEventListener('click', e => {
     if (!S.view.confirm) { S.view.confirm = true; render(); }
     else { S.playlists = S.playlists.filter(x => x.id !== p.id); save(); toast('Playlist « ' + p.name + ' » supprimée'); go({type:'library'}); }
   }
-  else if (act === 'savedisp') { const d = $('#dispInput').value.trim(); if (!d) return toast('Le nom affiché ne peut pas être vide'); send('/api/me', {display:d}, 'PUT').then(j => { S.user = j.user; render(); toast('Nom mis à jour'); }, er => toast(er.message)); }
+  else if (act === 'editprofile') profileModal();
+  else if (act === 'changeusername') usernameModal();
+  else if (act === 'changepass') passwordModal();
+  else if (act === 'deleteacct') deleteModal();
+  else if (act === 'exportdata') exportData();
+  else if (act === 'checkupdate') checkUpdate(false);
+  else if (act === 'installupdate') installUpdate();
+  else if (act === 'share') shareModal(p || S.playlists.find(x => x.id === S.view.id));
+  else if (act === 'sharepub') shareModal(S.pub.data);
+  else if (act === 'importpl') importModal();
   else if (act === 'clearhist') { S.history = []; save(); toast('Historique effacé'); }
   else if (act === 'logout') logout();
 });
@@ -1333,11 +1397,12 @@ $('#view').addEventListener('change', e => {
 
 $('#menu').addEventListener('click', e => {
   const m = e.target.closest('[data-menu]');
-  if (m) { closeMenu(); return m.dataset.menu === 'logout' ? logout() : go({type:'settings'}); }
+  if (m) { closeMenu(); const k = m.dataset.menu; return k === 'logout' ? logout() : k === 'profile' ? profileModal() : go({type:'settings'}); }
   const pa = e.target.closest('[data-plact]');
   if (pa) {
     const p = S.playlists.find(x => x.id === pa.dataset.pid); closeMenu(); if (!p) return;
     if (pa.dataset.plact === 'play') { if (!p.tracks.length) return toast('Cette playlist est vide'); S.shuffle = false; p.lastPlayed = Date.now(); playList(p.tracks, 0); }
+    else if (pa.dataset.plact === 'share') shareModal(p);
     else if (pa.dataset.plact === 'toggle') setPrivacy(p, isPublic(p) ? 'private' : 'public');
     else if (pa.dataset.plact === 'delete') { S.playlists = S.playlists.filter(x => x.id !== p.id); save(); render(); toast('Playlist « ' + p.name + ' » supprimée'); }
     return;
@@ -1371,7 +1436,7 @@ setInterval(() => {
 }, 500);
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeMenu(); closeDrawer(); setQueueOpen(false); }
+  if (e.key === 'Escape') { closeMenu(); closeDrawer(); setQueueOpen(false); closeModal(); }
   if (!S.user || e.target.closest('input, textarea, select')) return;
   if (e.code === 'Space' && !e.target.closest('button,[role=button]')) { e.preventDefault(); togglePlay(); }
   else if (e.key === 'ArrowRight') { if (e.shiftKey) next(false); else if (ready && current()) player.seekTo(player.getCurrentTime() + 5, true); }
@@ -1379,7 +1444,236 @@ document.addEventListener('keydown', e => {
 });
 new ResizeObserver(() => document.documentElement.style.setProperty('--barh', ($('#bar').offsetHeight || 84) + 'px')).observe($('#bar'));
 
+/* ---------- Thème et réglages ---------- */
+const ACCENTS = {
+  violet:['#8b5cf6','#a78bfa','rgba(139,92,246,.15)','rgba(139,92,246,.2)'],
+  blue:['#3b82f6','#60a5fa','rgba(59,130,246,.15)','rgba(59,130,246,.2)'],
+  green:['#16a34a','#4ade80','rgba(34,197,94,.15)','rgba(34,197,94,.18)'],
+  pink:['#db2777','#f472b6','rgba(236,72,153,.15)','rgba(236,72,153,.2)'],
+  orange:['#ea580c','#fb923c','rgba(249,115,22,.15)','rgba(249,115,22,.2)']
+};
+const ACCENT_NAMES = {violet:'Violet', blue:'Bleu', green:'Vert', pink:'Rose', orange:'Orange'};
+const DEFAULT_SETTINGS = {autoplay:true, remember:true, toasts:true, accent:'violet', radius:'soft', heroAuto:true, reduceMotion:false, autoUpdate:true};
+function applyTheme(){
+  const a = ACCENTS[S.settings.accent] || ACCENTS.violet, st = document.documentElement.style;
+  st.setProperty('--accent', a[0]); st.setProperty('--accent-hi', a[1]); st.setProperty('--accent-soft', a[2]); st.setProperty('--accent-glow', a[3]);
+  document.documentElement.dataset.radius = ['square', 'soft', 'round'].includes(S.settings.radius) ? S.settings.radius : 'soft';
+  document.documentElement.classList.toggle('no-motion', !!S.settings.reduceMotion);
+}
+function setCollapsed(v){
+  S.collapsed = v; $('#app').classList.toggle('collapsed', v); // pas de re-rendu : la transition CSS fait l'animation
+  const cb = $('#collapse'); cb.setAttribute('aria-label', v ? 'Agrandir la barre latérale' : 'Réduire la barre latérale'); cb.title = cb.getAttribute('aria-label');
+  save(); if (S.view.type === 'settings') renderView();
+}
+function toggleSetting(k){
+  if (k === 'collapsed') return setCollapsed(!S.collapsed);
+  S.settings[k] = !S.settings[k];
+  if (k === 'reduceMotion') applyTheme();
+  save(); renderView();
+}
+const SET_TABS = [['account','Account','person'], ['general','General','settings'], ['playback','Playback','tune'], ['appearance','Appearance','palette'], ['privacy','Privacy','shield'], ['data','Data','storage'], ['updates','Updates','download'], ['about','About','info']];
+const swc = (key, on, label) => `<button class="switch" role="switch" data-set="${key}" aria-checked="${on}" aria-label="${esc(label)}"></button>`;
+const setRow = (title, desc, ctl, cls = '') => `<div class="set ${cls}"><div style="min-width:0"><h3>${title}</h3>${desc ? `<p>${desc}</p>` : ''}</div>${ctl}</div>`;
+const segBtn = (attr, val, cur, icon, label) => `<button ${attr}="${val}" class="${cur === val ? 'on' : ''}">${icon ? ic(icon) : ''}${label}</button>`;
+function settingsHtml(){
+  const u = S.user, T = S.settings, tab = S.setTab;
+  const nav = SET_TABS.map(([k, n, i]) => `<button data-settab="${k}" class="${tab === k ? 'on' : ''}">${ic(i)}${n}</button>`).join('');
+  let b = '';
+  if (tab === 'account') b = `<h2>Account</h2><p class="lead">Ton profil et la sécurité de ton compte.</p><div class="setgroup">
+      <div class="set"><div class="profile"><button class="avatar-big" data-act="editprofile" aria-label="Modifier le profil">${avatarHtml(u)}</button><div class="who2"><b>${esc(u.display)}</b><small>@${esc(u.username)}</small></div></div><button class="ghost" data-act="editprofile">${ic('edit')}Edit profile</button></div>
+      <h4>Sécurité</h4>
+      ${setRow('Identifiant', `@${esc(u.username)} : sert à te connecter.`, '<button class="ghost" data-act="changeusername">Changer</button>')}
+      ${setRow('Mot de passe', 'Au moins 8 caractères. Tes autres sessions seront fermées.', '<button class="ghost" data-act="changepass">Changer</button>')}
+      <h4>Session</h4>
+      ${setRow('Se déconnecter', 'Tu seras déconnecté de cet appareil.', `<button class="ghost" data-act="logout">${ic('logout')}Log out</button>`)}
+      ${setRow('Supprimer le compte', 'Supprime définitivement ton compte, tes playlists et ton historique.', `<button class="ghost warn" data-act="deleteacct">${ic('trash')}Delete</button>`, 'danger')}</div>`;
+  else if (tab === 'general') b = `<h2>General</h2><p class="lead">Région, barre latérale et notifications.</p><div class="setgroup">
+      ${setRow('Région de recherche', 'Change la région des résultats de la recherche et des genres.', `<select class="select" id="ccSel" aria-label="Région de recherche">${Object.entries(COUNTRIES).map(([k, n]) => `<option value="${k}" ${k === S.cc ? 'selected' : ''}>${n}</option>`).join('')}</select>`)}
+      ${setRow('Barre latérale réduite', 'Garde seulement les icônes pour laisser plus de place à la musique.', swc('collapsed', S.collapsed, 'Barre latérale réduite'))}
+      ${setRow('Notifications', 'Affiche de petits messages quand tu ajoutes un titre, changes un réglage, etc. Les erreurs restent toujours visibles.', swc('toasts', T.toasts, 'Notifications'))}</div>`;
+  else if (tab === 'playback') b = `<h2>Playback</h2><p class="lead">Comment la musique se lance et s'enchaîne.</p><div class="setgroup">
+      ${setRow('Lecture automatique', 'Passe au titre suivant quand un titre se termine. Désactivé, la lecture s\'arrête à la fin du titre.', swc('autoplay', T.autoplay, 'Lecture automatique'))}
+      ${setRow('Reprendre la file d\'attente', 'Garde la file et le dernier titre au prochain lancement.', swc('remember', T.remember, 'Reprendre la file d\'attente'))}
+      <h4>Raccourcis clavier</h4>
+      <div class="set"><p class="kv" style="width:100%"><span><span class="kbd">Espace</span></span><b>Lecture / pause</b><span><span class="kbd">←</span> <span class="kbd">→</span></span><b>Reculer / avancer de 5 secondes</b><span><span class="kbd">Maj</span> + <span class="kbd">←</span> <span class="kbd">→</span></span><b>Titre précédent / suivant</b><span><span class="kbd">Échap</span></span><b>Fermer un menu ou la file d'attente</b></p></div></div>`;
+  else if (tab === 'appearance') b = `<h2>Appearance</h2><p class="lead">Couleur, arrondis et animations.</p><div class="setgroup">
+      ${setRow('Couleur d\'accent', 'Boutons, sélection et barre de progression.', `<div class="swatches" role="group" aria-label="Couleur d'accent">${Object.entries(ACCENTS).map(([k, c]) => `<button class="swatch ${T.accent === k ? 'on' : ''}" data-accent="${k}" style="--c:${c[0]}" title="${ACCENT_NAMES[k]}" aria-label="${ACCENT_NAMES[k]}" aria-pressed="${T.accent === k}"></button>`).join('')}</div>`)}
+      ${setRow('Style des coins', 'Carrés pour un rendu plus sobre, arrondis pour plus de douceur.', `<div class="seg" role="group" aria-label="Style des coins">${segBtn('data-radiusset', 'square', T.radius, '', 'Square')}${segBtn('data-radiusset', 'soft', T.radius, '', 'Soft')}${segBtn('data-radiusset', 'round', T.radius, '', 'Round')}</div>`)}
+      ${setRow('Bannière d\'accueil automatique', 'Fait défiler les nouvelles sorties toutes les 7 secondes.', swc('heroAuto', T.heroAuto, 'Bannière automatique'))}
+      ${setRow('Réduire les animations', 'Désactive les transitions (utile sur un ordinateur lent).', swc('reduceMotion', T.reduceMotion, 'Réduire les animations'))}</div>`;
+  else if (tab === 'privacy') { const pub = S.playlists.filter(isPublic).length; b = `<h2>Privacy</h2><p class="lead">Qui peut voir tes playlists sur cet ordinateur.</p><div class="setgroup">
+      ${setRow('Confidentialité par défaut', 'Visibilité des nouvelles playlists. Tu peux la changer pour chacune.', `<div class="seg" role="group" aria-label="Confidentialité par défaut">${segBtn('data-act="defpriv" data-v', 'private', S.defaultPrivacy, 'lock', 'Private')}${segBtn('data-act="defpriv" data-v', 'public', S.defaultPrivacy, 'globe', 'Public')}</div>`)}
+      ${setRow('Tes playlists publiques', pub ? `${plural(pub, 'playlist')} visible${pub > 1 ? 's' : ''} par les autres comptes (onglet Community).` : 'Aucune pour le moment. Tout est privé.', '<button class="ghost" data-go="library">Voir mes playlists</button>')}
+      ${setRow('Bookmarks', 'Toujours privés, même si tu changes la confidentialité par défaut.', `<span class="kbd">${ic('lock').replace('<svg', '<svg style="width:14px;height:14px;display:inline"')} Private</span>`)}
+      ${setRow('Historique d\'écoute', 'Efface la liste « Recently Played » de ton compte.', '<button class="ghost" data-act="clearhist">Effacer</button>')}</div>`; }
+  else if (tab === 'data') { const n = S.playlists.length, t = S.playlists.reduce((a, p) => a + p.tracks.length, 0); b = `<h2>Data</h2><p class="lead">Ce que Saturne garde pour ton compte.</p><div class="setgroup">
+      ${setRow('Ta bibliothèque', `${plural(n, 'playlist')}, ${plural(t, 'titre')}, ${plural(S.history.length, 'titre')} dans l'historique.`, '')}
+      ${setRow('Exporter mes données', 'Télécharge un fichier JSON avec tes playlists, ta file et tes réglages.', `<button class="ghost" data-act="exportdata">${ic('download')}Export</button>`)}
+      ${setRow('Dossier des données', S.about ? `<span style="word-break:break-all">${esc(S.about.dataDir)}</span>` : 'Chargement…', '')}</div>`; }
+  else if (tab === 'updates') {
+    const U = S.update, i = U.info, cur = (S.about && S.about.version) || (i && i.current) || '…';
+    const stat = U.checking ? ['', 'Vérification…'] : U.error ? ['', esc(U.error)] : i ? (i.available ? ['new', `Version ${esc(i.latest)} disponible`] : ['ok', 'Saturne est à jour']) : ['', 'Pas encore vérifié'];
+    b = `<h2>Updates</h2><p class="lead">Saturne se met à jour depuis les releases GitHub du projet.</p><div class="setgroup">
+      ${setRow('Version installée', `<span class="upstat ${stat[0]}"><span class="dot"></span>${stat[1]}</span>`, `<div style="display:flex;gap:10px;align-items:center"><b>v${esc(cur)}</b><button class="ghost" data-act="checkupdate" ${U.checking ? 'disabled' : ''}>${ic('refresh')}Check now</button></div>`)}
+      ${i && i.available ? `<div class="set" style="display:block"><div style="display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap"><div><h3>Saturne ${esc(i.latest)}</h3><p>${i.size ? Math.round(i.size / 1048576 * 10) / 10 + ' Mo' : ''}${i.canInstall ? '' : ' · installation manuelle requise (pas d\'empreinte de sécurité)'}</p></div><button class="btn" data-act="installupdate" ${U.installing ? 'disabled' : ''}>${ic('download')}Update now</button></div>${i.notes ? `<pre class="notes">${esc(i.notes)}</pre>` : ''}</div>` : ''}
+      ${setRow('Vérifier au lancement', 'Cherche une nouvelle version quelques secondes après l\'ouverture de Saturne.', swc('autoUpdate', T.autoUpdate, 'Vérifier au lancement'))}
+      <p class="lead" style="margin:6px 0 0;font-size:13px">L'installation télécharge <b>Saturne.exe</b> depuis la release, vérifie son empreinte SHA-256, remplace l'application puis la relance. Tes comptes et playlists ne sont pas touchés.</p></div>`;
+  } else if (tab === 'about') b = `<h2>About</h2><p class="lead">Saturne, une application de streaming musical écrite en Rust.</p><div class="setgroup"><div class="set"><p class="kv" style="width:100%"><span>Version</span><b>${S.about ? esc(S.about.version) : '…'}</b><span>Projet</span><b>${S.about ? `<a href="https://github.com/${esc(S.about.repo)}" target="_blank" rel="noopener" style="color:var(--accent-hi)">github.com/${esc(S.about.repo)}</a>` : '…'}</b><span>Données</span><b>${S.about ? esc(S.about.dataDir) : '…'}</b><span>Compte</span><b>@${esc(u.username)}</b><span>Musique</span><b>YouTube (lecteur caché, audio seul)</b></p></div></div>`;
+  return `<div class="pagehead"><p class="eyebrow">Settings</p><h1>Settings</h1></div><div class="setlayout"><nav class="setnav" aria-label="Catégories de réglages">${nav}</nav><div class="setpane"><div class="setgroup" style="display:block">${b}</div></div></div>`;
+}
+async function loadAbout(){
+  if (S.about) return;
+  try { S.about = await http('/api/about'); } catch {}
+  if (S.view.type === 'settings') renderView();
+}
+
+/* ---------- Fenêtres modales ---------- */
+function openModal(html, mount){
+  const m = $('#mbox'); m.innerHTML = html; injectIcons(m); $('#modal').hidden = false;
+  const f = m.querySelector('input,textarea'); if (f) setTimeout(() => f.focus(), 30);
+  if (mount) mount(m);
+}
+function closeModal(){ $('#modal').hidden = true; $('#mbox').innerHTML = ''; }
+$('#modal').addEventListener('mousedown', e => { if (e.target.id === 'modal') closeModal(); });
+$('#mbox').addEventListener('click', e => { if (e.target.closest('[data-mclose]')) closeModal(); });
+/* Formulaire modal : champs, bouton d'envoi, erreur affichée sous le formulaire. */
+function formModal({title, lead, fields, submit, danger, run}){
+  openModal(`<h3>${title}</h3><p>${lead || ''}</p><form id="mf" autocomplete="off">${fields.map(f => `<div class="fld"><label for="${f.id}">${f.label}</label><input class="input" id="${f.id}" type="${f.type || 'text'}" ${f.max ? `maxlength="${f.max}"` : ''} placeholder="${f.ph || ''}" ${f.ac ? `autocomplete="${f.ac}"` : ''} value="${esc(f.value || '')}"></div>`).join('')}
+    <div class="merr" id="mErr" role="alert"></div><div class="mactions"><button type="button" class="ghost" data-mclose>Annuler</button><button class="btn" ${danger ? 'style="background:#e11d48"' : ''}>${submit}</button></div></form>`,
+  m => m.querySelector('#mf').addEventListener('submit', async e => {
+    e.preventDefault(); const btn = m.querySelector('.btn'); btn.disabled = true; $('#mErr').textContent = '';
+    try { await run(Object.fromEntries(fields.map(f => [f.id, $('#' + f.id).value]))); }
+    catch (err) { $('#mErr').textContent = err.message || 'Erreur'; btn.disabled = false; }
+  }));
+}
+function profileModal(draft){
+  const u = S.user;
+  openModal(`<h3>Edit profile</h3><p>Change ta photo et ton nom affiché. Tu peux aussi déposer une image sur la photo.</p>
+    <form id="pf"><div class="avatar-edit"><button type="button" class="avatar-big" id="pfAvatar" data-drop="avatar" aria-label="Changer la photo">${avatarHtml(u)}</button>
+      <div style="display:grid;gap:8px"><button type="button" class="ghost" id="pfPick">${ic('image')}Choisir une photo</button>${u.avatar ? '<button type="button" class="ghost" id="pfRemove">Retirer la photo</button>' : ''}</div></div>
+      <div class="fld"><label for="pfName">NOM AFFICHÉ</label><input class="input" id="pfName" value="${esc(draft ?? u.display)}" maxlength="40"></div>
+      <div class="merr" id="pfErr" role="alert"></div>
+      <div class="mactions"><button type="button" class="ghost" data-mclose>Fermer</button><button class="btn">Enregistrer</button></div></form>`,
+  m => {
+    m.querySelector('#pfAvatar').addEventListener('click', () => pickImage('avatar'));
+    m.querySelector('#pfPick').addEventListener('click', () => pickImage('avatar'));
+    const rm = m.querySelector('#pfRemove');
+    if (rm) rm.addEventListener('click', async () => { try { S.user = (await send('/api/me', {avatar:''}, 'PUT')).user; render(); profileModal($('#pfName').value); toast('Photo retirée'); } catch (e) { $('#pfErr').textContent = e.message; } });
+    m.querySelector('#pf').addEventListener('submit', async e => {
+      e.preventDefault(); const d = $('#pfName').value.trim(); if (!d) return $('#pfErr').textContent = 'Le nom affiché ne peut pas être vide';
+      try { S.user = (await send('/api/me', {display:d}, 'PUT')).user; render(); closeModal(); toast('Profil mis à jour'); } catch (err) { $('#pfErr').textContent = err.message; }
+    });
+  });
+}
+async function uploadAvatar(f){
+  try {
+    const url = URL.createObjectURL(f), data = await toDataURL(url, 192, 192, true); URL.revokeObjectURL(url);
+    S.user = (await send('/api/me', {avatar:data}, 'PUT')).user; render(); toast('Photo de profil mise à jour');
+    if (!$('#modal').hidden && $('#pfAvatar')) profileModal($('#pfName') ? $('#pfName').value : undefined);
+  } catch (e) { toast(e.message === 'image' ? 'Impossible de lire cette image' : e.message); }
+}
+const usernameModal = () => formModal({title:'Changer l\'identifiant', lead:'Ton identifiant sert à te connecter. Tes playlists et ton historique sont conservés.', submit:'Changer',
+  fields:[{id:'muName', label:'NOUVEL IDENTIFIANT', max:24, ph:S.user.username, ac:'username'}, {id:'muPass', label:'MOT DE PASSE ACTUEL', type:'password', ac:'current-password'}],
+  run: async v => { S.user = (await send('/api/me/username', {username:v.muName, password:v.muPass})).user; render(); closeModal(); toast('Identifiant changé : @' + S.user.username); }});
+const passwordModal = () => formModal({title:'Changer le mot de passe', lead:'Au moins 8 caractères. Tes autres sessions seront fermées.', submit:'Changer',
+  fields:[{id:'mpOld', label:'MOT DE PASSE ACTUEL', type:'password', ac:'current-password'}, {id:'mpNew', label:'NOUVEAU MOT DE PASSE', type:'password', ac:'new-password', max:200}, {id:'mpNew2', label:'CONFIRMER', type:'password', ac:'new-password', max:200}],
+  run: async v => { if (v.mpNew !== v.mpNew2) throw new Error('Les deux mots de passe sont différents'); await send('/api/me/password', {current:v.mpOld, new:v.mpNew}); closeModal(); toast('Mot de passe changé'); }});
+const deleteModal = () => formModal({title:'Supprimer le compte', lead:'Cette action est définitive : ton compte, tes playlists et ton historique seront supprimés de cet ordinateur.', submit:'Supprimer', danger:true,
+  fields:[{id:'mdPass', label:'MOT DE PASSE', type:'password', ac:'current-password'}],
+  run: async v => { await send('/api/me/delete', {password:v.mdPass}); location.reload(); }});
+
+/* ---------- Partage de playlists (code à copier) ---------- */
+const b64url = bytes => { let s = ''; bytes.forEach(b => s += String.fromCharCode(b)); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
+const unb64url = t => Uint8Array.from(atob(t.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - t.length % 4) % 4)), c => c.charCodeAt(0));
+async function encodeShare(p){
+  const data = JSON.stringify({v:1, n:p.name, d:p.description || '', t:p.tracks.slice(0, 300).map(t => [t.id, t.title, t.channel, t.duration || 0])});
+  const zipped = new Response(new Blob([data]).stream().pipeThrough(new CompressionStream('gzip')));
+  return 'SATURNE1.' + b64url(new Uint8Array(await zipped.arrayBuffer()));
+}
+async function decodeShare(code){
+  const m = /^SATURNE1\.([A-Za-z0-9_-]+)$/.exec(String(code).replace(/\s+/g, ''));
+  if (!m || m[1].length > 400000) throw new Error('Ce code n\'est pas valide');
+  let text = '';
+  try {
+    const reader = new Blob([unb64url(m[1])]).stream().pipeThrough(new DecompressionStream('gzip')).getReader(), dec = new TextDecoder();
+    for (;;) { const {done, value} = await reader.read(); if (done) break; text += dec.decode(value, {stream:true}); if (text.length > 3e6) throw new Error('trop gros'); }
+  } catch { throw new Error('Ce code est abîmé ou incomplet'); }
+  let j; try { j = JSON.parse(text); } catch { throw new Error('Ce code est abîmé ou incomplet'); }
+  const clip = (s, n) => String(s ?? '').slice(0, n);
+  const tracks = (Array.isArray(j.t) ? j.t : []).slice(0, 300).filter(r => Array.isArray(r) && /^[\w-]{11}$/.test(r[0])).map(r => ({id:r[0], title:clip(r[1], 200) || 'Titre', channel:clip(r[2], 100), channelId:'', thumb:`https://i.ytimg.com/vi/${r[0]}/mqdefault.jpg`, duration:Number(r[3]) > 0 ? Math.round(Number(r[3])) : null}));
+  if (!tracks.length) throw new Error('Ce code ne contient aucun titre');
+  return {name:clip(j.n, 60) || 'Playlist importée', description:clip(j.d, 160), tracks};
+}
+function shareModal(p){
+  openModal(`<h3>Share « ${esc(p.name)} »</h3><p>Envoie ce code à quelqu'un : dans Saturne, il va dans <b>Your Library › Import</b> et le colle pour récupérer la playlist (${plural(Math.min(p.tracks.length, 300), 'titre')}).</p>
+    <textarea class="codebox" id="shCode" readonly aria-label="Code de partage">Génération du code…</textarea>
+    <div class="mactions"><button class="ghost" data-mclose>Fermer</button><button class="btn" id="shCopy" disabled>${ic('copy')}Copy code</button></div>`,
+  async m => {
+    const box = m.querySelector('#shCode'), btn = m.querySelector('#shCopy');
+    try { box.value = await encodeShare(p); btn.disabled = false; } catch { box.value = 'Impossible de générer le code.'; return; }
+    box.addEventListener('focus', () => box.select());
+    btn.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(box.value); } catch { box.select(); try { document.execCommand('copy'); } catch {} }
+      toast('Code copié');
+    });
+  });
+}
+function importModal(){
+  openModal(`<h3>Import a playlist</h3><p>Colle ici un code de partage <b>SATURNE1…</b> reçu d'un ami. La playlist sera ajoutée à ta bibliothèque, en privé.</p>
+    <form id="imf"><textarea class="codebox" id="imCode" placeholder="SATURNE1.…" aria-label="Code de partage"></textarea><div class="merr" id="imErr" role="alert"></div>
+    <div class="mactions"><button type="button" class="ghost" data-mclose>Annuler</button><button class="btn">${ic('upload')}Import</button></div></form>`,
+  m => m.querySelector('#imf').addEventListener('submit', async e => {
+    e.preventDefault();
+    try {
+      const d = await decodeShare($('#imCode').value);
+      const p = {id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name:d.name, description:d.description, tracks:d.tracks, visibility:'private', created:Date.now()};
+      S.playlists.push(p); save(); closeModal(); go({type:'playlist', id:p.id}); toast(`Playlist importée : ${plural(p.tracks.length, 'titre')}`);
+    } catch (err) { $('#imErr').textContent = err.message; }
+  }));
+}
+
+/* ---------- Mises à jour (GitHub) ---------- */
+async function checkUpdate(silent){
+  if (S.update.checking) return;
+  S.update.checking = true; S.update.error = ''; if (S.view.type === 'settings') renderView();
+  try { S.update.info = await http('/api/update/check'); if (!silent && !S.update.info.available) toast('Saturne est à jour'); }
+  catch (e) { S.update.error = e.message; if (!silent) toast(e.message); }
+  S.update.checking = false; renderUpdateBanner(); if (S.view.type === 'settings') renderView();
+}
+function renderUpdateBanner(){
+  const b = $('#updBanner'), i = S.update.info;
+  if (i && i.available) { b.hidden = false; b.innerHTML = `<span><b>Saturne ${esc(i.latest)}</b>disponible</span><button class="btn" data-act="installupdate">Update</button>`; }
+  else { b.hidden = true; b.innerHTML = ''; }
+}
+$('#updBanner').addEventListener('click', e => { if (e.target.closest('[data-act="installupdate"]')) installUpdate(); });
+async function installUpdate(){
+  const i = S.update.info; if (!i || !i.available || S.update.installing) return;
+  if (!i.canInstall) {
+    const link = /^https:\/\/github\.com\//.test(i.url || '') ? `<a href="${esc(i.url)}" target="_blank" rel="noopener" style="color:var(--accent-hi)">Ouvrir la page de la release</a>` : '';
+    return openModal(`<h3>Installation manuelle</h3><p>La release ${esc(i.latest)} n'a pas d'empreinte de sécurité (SHA-256) : Saturne refuse de l'installer automatiquement. Télécharge-la depuis GitHub.</p><p>${link}</p><div class="mactions"><button class="btn" data-mclose>OK</button></div>`);
+  }
+  S.update.installing = true;
+  openModal(`<h3>Mise à jour vers ${esc(i.latest)}</h3><p id="upMsg">Téléchargement et vérification…</p>`);
+  try { await send('/api/update/install', {}); $('#upMsg').textContent = 'Saturne redémarre…'; await waitForRestart(); }
+  catch (e) { S.update.installing = false; closeModal(); toast(e.message); }
+}
+async function waitForRestart(){
+  let down = false;
+  for (let n = 0; n < 75; n++) {
+    await new Promise(r => setTimeout(r, 800));
+    try { await fetch('/api/me'); if (down || n > 8) return location.reload(); } catch { down = true; }
+  }
+  location.reload();
+}
+function exportData(){
+  try {
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(payload(), null, 2)], {type:'application/json'})); a.download = 'saturne-data.json';
+    document.body.appendChild(a); a.click(); a.remove(); toast('Export lancé');
+  } catch (e) { toast('Export impossible : ' + e.message); }
+}
+
 /* ---------- Démarrage ---------- */
+applyTheme();
 (async function boot(){
   try {
     const j = await http('/api/me');

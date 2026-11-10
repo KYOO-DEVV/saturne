@@ -161,6 +161,55 @@ impl Store {
         Some(out)
     }
 
+    /// Change le mot de passe et ferme toutes les autres sessions de ce compte (sauf `keep`).
+    pub fn set_password(&self, username: &str, hash: String, keep: &str) -> bool {
+        let key = username.to_lowercase();
+        let mut g = self.inner.lock().unwrap();
+        let Some(u) = g.disk.users.get_mut(&key) else { return false };
+        u.hash = hash;
+        g.disk.sessions.retain(|t, s| s.user != key || t == keep);
+        self.persist(&mut g);
+        true
+    }
+
+    /// Change l'identifiant : déplace le fichier de données, le compte et ses sessions.
+    pub fn rename_user(&self, old: &str, new: &str) -> Result<User, &'static str> {
+        if !valid_username(new) {
+            return Err("Identifiant : 3 à 24 caractères (lettres, chiffres, _ . -)");
+        }
+        let (old_key, new_key) = (old.to_lowercase(), new.to_lowercase());
+        let mut g = self.inner.lock().unwrap();
+        if old_key != new_key && g.disk.users.contains_key(&new_key) {
+            return Err("Cet identifiant est déjà pris");
+        }
+        let mut user = g.disk.users.remove(&old_key).ok_or("Compte introuvable")?;
+        if old_key != new_key {
+            let (from, to) = (self.data_path(&old_key), self.data_path(&new_key));
+            if from.exists() && fs::rename(&from, &to).is_err() {
+                g.disk.users.insert(old_key, user);
+                return Err("Impossible de déplacer les données du compte");
+            }
+        }
+        user.username = new.to_string();
+        g.disk.users.insert(new_key.clone(), user.clone());
+        for s in g.disk.sessions.values_mut().filter(|s| s.user == old_key) {
+            s.user = new_key.clone();
+        }
+        g.fails.remove(&old_key);
+        self.persist(&mut g);
+        Ok(user)
+    }
+
+    /// Supprime le compte, ses sessions et ses données.
+    pub fn delete_user(&self, username: &str) {
+        let key = username.to_lowercase();
+        let mut g = self.inner.lock().unwrap();
+        g.disk.users.remove(&key);
+        g.disk.sessions.retain(|_, s| s.user != key);
+        let _ = fs::remove_file(self.data_path(&key));
+        self.persist(&mut g);
+    }
+
     pub fn all_users(&self) -> Vec<User> {
         self.inner.lock().unwrap().disk.users.values().cloned().collect()
     }
