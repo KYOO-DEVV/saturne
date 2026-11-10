@@ -8,7 +8,8 @@ Application de streaming musical pour Windows, écrite en Rust. Noir OLED, un se
 - **Comptes** : inscription, connexion, données séparées pour chaque utilisateur (mots de passe hachés avec Argon2id).
 - **Playlists privées ou publiques**, onglet *Community*, *Save to library*, et **partage par code** (*Share* / *Import*).
 - **Bookmarks** jaunes avec une animation de remplissage fluide.
-- **Réglages par catégories** : compte, général, lecture, apparence (couleur, coins), confidentialité, données, mises à jour, à propos.
+- **Réglages par catégories** : compte, général, lecture, apparence (couleur, coins), confidentialité, données, mises à jour, changelog, à propos.
+- **Changelog repliable** (*Expand all* / *Collapse all*), page **Now playing**, menus déroulants, annulation des suppressions, infobulles, pochettes en mosaïque.
 - **Mises à jour automatiques via les releases GitHub**.
 - Pochette et bannière de playlist à déposer par glisser-déposer, file d'attente, genres, artistes, précédent/suivant, barre latérale repliable.
 
