@@ -9,6 +9,8 @@ Application de streaming musical pour Windows, écrite en Rust. Noir OLED, un se
 - **Playlists privées ou publiques**, onglet *Community*, *Save to library*, et **partage par code** (*Share* / *Import*).
 - **Bookmarks** jaunes avec une animation de remplissage fluide.
 - **Réglages par catégories** : compte, général, lecture, apparence (couleur, coins), confidentialité, données, mises à jour, changelog, à propos.
+- **Lecture fiable** : si un titre ne se lance pas (lecture interdite hors de YouTube, blocage…), Saturne relance puis cherche automatiquement une autre version du même morceau. *Settings › Playback* peut afficher le lecteur et liste les dernières erreurs.
+- **Clic droit** sur un titre, **raccourcis clavier** (touche ?), densité Compact, police embarquée, barre de titre sombre.
 - **Changelog repliable** (*Expand all* / *Collapse all*), page **Now playing**, menus déroulants, annulation des suppressions, infobulles, pochettes en mosaïque.
 - **Mises à jour automatiques via les releases GitHub**.
 - Pochette et bannière de playlist à déposer par glisser-déposer, file d'attente, genres, artistes, précédent/suivant, barre latérale repliable.

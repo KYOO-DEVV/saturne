@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Saturne</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%230a0a0e'/%3E%3Ccircle cx='12' cy='12' r='4.6' fill='%23f5f5fa'/%3E%3Cellipse cx='12' cy='12' rx='9.4' ry='3.1' transform='rotate(-22 12 12)' fill='none' stroke='%238b5cf6' stroke-width='1.6'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
 <style>
+@font-face{font-family:"Plus Jakarta Sans";font-style:normal;font-weight:400 800;font-display:swap;src:url(/assets/jakarta-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Plus Jakarta Sans";font-style:normal;font-weight:400 800;font-display:swap;src:url(/assets/jakarta-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 /* Design : noir OLED, texte blanc/gris, un seul accent violet. Rail gauche, contenu, barre de lecture en bas, file d'attente en tiroir. */
 :root{
   color-scheme:dark;
   --bg:#000; --panel:#08080b; --raise:#101015; --raise2:#18181f; --line:#1c1c24; --line2:#2a2a35;
-  --fg:#f5f5f8; --mute:#8b8b99; --accent:#8b5cf6; --accent-hi:#a78bfa; --accent-soft:rgba(139,92,246,.15);
+  --fg:#f5f5f8; --mute:#8b8b99; --accent:#7c3aed; --accent-hi:#a78bfa; --accent-soft:rgba(139,92,246,.15);
   --font:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --sw:248px; --barh:84px;
   --r-btn:10px; --r-ctl:12px; --r-sm:8px;
@@ -428,6 +428,40 @@ input[type=range]:hover::-webkit-slider-thumb{margin-top:-3.5px}
 .toast-act{color:var(--accent);font-weight:800;white-space:nowrap}
 .toast-act:hover{text-decoration:underline}
 
+/* ---------- Polish 0.5 ---------- */
+/* Images : apparition en fondu, barres noires recadrées */
+img{opacity:0;transition:opacity .35s ease}
+img.loaded{opacity:1}
+.thumb img,.cover img,.pthumb img,.mosaic img,.np-art img{transform:scale(var(--z,1))}
+.card:hover .thumb img{transform:scale(calc(var(--z,1) * 1.04))}
+/* Retour au clic et état actif des boutons de lecture */
+.ib,.circ,.chip,.ghost,.dd-btn{transition:background .12s,color .12s,transform .1s,border-color .15s}
+.btn:active,.ghost:active,.chip:active,.dd-btn:active,.playbtn:active,.circ:active:not(:disabled){transform:scale(.96)}
+.ib:active{transform:scale(.9)}
+.nav button:active,.pli:active,.row:active{transform:scale(.985)}
+.ib{position:relative}
+.ib.act::after{content:"";position:absolute;bottom:2px;left:50%;width:4px;height:4px;border-radius:50%;background:var(--accent-hi);transform:translateX(-50%)}
+/* Écrans larges : le contenu garde une largeur confortable */
+#view>*{max-width:1560px;margin-left:auto;margin-right:auto}
+/* États vides : icône et texte centrés */
+.empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:44px 16px;max-width:46ch;margin:0 auto;color:var(--mute)}
+.empty::before{content:"";flex:none;width:64px;height:64px;border-radius:50%;border:1px dashed var(--line2);background:center/28px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b8b99' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18V6l10-2v12'/%3E%3Ccircle cx='6.5' cy='18' r='2.5'/%3E%3Ccircle cx='16.5' cy='16' r='2.5'/%3E%3C/svg%3E")}
+.hint{text-align:center;padding:26px 10px}
+/* Densité compacte */
+html[data-density="compact"] .row{padding-top:4px;padding-bottom:4px}
+html[data-density="compact"] .cover{width:72px}
+html[data-density="compact"] .grid{grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:18px 14px}
+html[data-density="compact"] .shelf{grid-auto-columns:176px;gap:14px}
+html[data-density="compact"] .libgrid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:18px 14px}
+html[data-density="compact"] .block{margin-bottom:24px}
+html[data-density="compact"] .nav button{padding-top:8px;padding-bottom:8px}
+html[data-density="compact"] .pli{padding-top:4px;padding-bottom:4px}
+html[data-density="compact"] .card .tt{min-height:2.55em}
+/* Lecteur YouTube : visible à la demande (diagnostic) */
+.ytbox iframe,.ytbox #yt{width:100%!important;height:100%!important}
+.ytbox.show{opacity:1;pointer-events:auto;z-index:45;width:320px;height:180px;right:16px;bottom:calc(var(--barh) + 16px);border-radius:12px;border:1px solid var(--line2);box-shadow:0 18px 50px rgba(0,0,0,.8)}
+.plog{display:grid;gap:6px;width:100%;margin:0;padding:0;list-style:none;color:var(--mute);font-size:13px}
+.plog b{color:#e6e6ee;font-weight:600}
 /* ---------- File d'attente (tiroir) ---------- */
 .qdrawer{position:fixed;top:0;right:0;bottom:var(--barh);width:min(380px,100vw);background:#000;border-left:1px solid var(--line);z-index:40;display:flex;flex-direction:column;padding:20px 16px 12px;transform:translateX(102%);transition:transform .3s cubic-bezier(.2,.8,.2,1);box-shadow:-20px 0 60px rgba(0,0,0,.7)}
 .qdrawer.open{transform:none}
@@ -804,16 +838,18 @@ function loadYT(){
   window.onYouTubeIframeAPIReady = () => { player = new YT.Player('yt', {width:'200', height:'200', playerVars:{playsinline:1, rel:0, controls:0, disablekb:1}, events:{onReady, onStateChange, onError}}); };
   const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api';
   s.onerror = () => toast('Le lecteur n\'a pas pu se charger. Vérifie ta connexion puis relance Saturne.');
+  setTimeout(() => { if (!ready) toast('Le lecteur met du temps à démarrer… vérifie ta connexion internet.'); }, 12000);
   document.head.appendChild(s);
 }
 function onReady(){
   ready = true; player.setVolume(S.volume);
   const t = current();
-  if (t) { if (pendingLoad) player.loadVideoById(t.id); else player.cueVideoById(t.id); }
+  if (t) { if (pendingLoad) { player.loadVideoById(playId(t)); armWatchdog(); } else player.cueVideoById(playId(t)); }
   pendingLoad = false;
 }
 function onStateChange(e){
   playing = e.data === 1 || e.data === 3;
+  if (e.data === 1 || e.data === 0) clearTimeout(wd);
   if (e.data === 1) {
     errStreak = 0; const t = current();
     if (t) {
@@ -824,14 +860,13 @@ function onStateChange(e){
   if (e.data === 0) { if (S.settings.autoplay || S.repeat === 'one') next(true); else playing = false; }
   renderBar();
 }
-function onError(){
-  errStreak++;
-  if (errStreak < Math.min(5, S.queue.length)) { toast('Ce titre ne peut pas être lu, je passe au suivant'); next(false); }
-  else toast('Ce titre ne peut pas être lu');
+function onError(e){
+  const code = e && e.data, why = ERR_TEXT[code] || ('erreur ' + code), t = current();
+  logPlayer(t, why); recover(t, why);
 }
 function loadCurrent(){
   const t = current(); if (!t) return;
-  if (ready) player.loadVideoById(t.id); else pendingLoad = true;
+  if (ready) { player.loadVideoById(playId(t)); armWatchdog(); } else pendingLoad = true;
   save(); render();
 }
 function rebuildOrder(){
@@ -1127,7 +1162,7 @@ function banner({p, owner, readonly}){
 }
 
 let lastViewSig = '', enterTimer = 0;
-function render(){ renderSide(); renderTop(); renderView(); renderBar(); }
+function render(){ renderSide(); renderTop(); renderView(); renderBar(); settleImages(); }
 function renderView(){
   const v = S.view, el = $('#view'); let h = '';
   const keepScroll = el.scrollTop;
@@ -1206,6 +1241,7 @@ function renderView(){
   if (keepScroll && (v.type === 'home' || v.type === 'library')) el.scrollTop = keepScroll;
   const busy = v.type === 'list' ? S.list.loading : v.type === 'search' ? S.search.loading : v.type === 'artist' ? S.artist.loading : v.type === 'artists' ? S.artists.loading && !S.artists.items.filter(Boolean).length : v.type === 'pubpl' ? S.pub.loading : false;
   const sig = [v.type, v.id || v.q || v.owner || '', busy ? 'L' : 'D', v.type === 'library' ? S.lib.chip : '', v.type === 'settings' ? S.setTab : ''].join('|');
+  settleImages();
   if (sig !== lastViewSig) { lastViewSig = sig; el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter'); clearTimeout(enterTimer); enterTimer = setTimeout(() => el.classList.remove('enter'), 800); }
 }
 function renderTop(){
@@ -1418,6 +1454,7 @@ $('#view').addEventListener('click', e => {
   const ca = e.target.closest('[data-clall]'); if (ca) return setAllCl(ca.dataset.clall === 'open');
   const st = e.target.closest('[data-settab]'); if (st) { S.setTab = st.dataset.settab; renderView(); if (['updates', 'about', 'data', 'changelog'].includes(S.setTab)) loadAbout(); return; }
   const sw = e.target.closest('[data-set]'); if (sw) return toggleSetting(sw.dataset.set);
+  const sd = e.target.closest('[data-densityset]'); if (sd) { S.settings.density = sd.dataset.densityset; applyTheme(); save(); return renderView(); }
   const sa = e.target.closest('[data-accent]'); if (sa) { S.settings.accent = sa.dataset.accent; applyTheme(); save(); return renderView(); }
   const sr = e.target.closest('[data-radiusset]'); if (sr) { S.settings.radius = sr.dataset.radiusset; applyTheme(); save(); return renderView(); }
   const b = e.target.closest('[data-act]'); if (!b) return;
@@ -1544,19 +1581,21 @@ new ResizeObserver(() => document.documentElement.style.setProperty('--barh', ($
 
 /* ---------- Thème et réglages ---------- */
 const ACCENTS = {
-  violet:['#8b5cf6','#a78bfa','rgba(139,92,246,.15)','rgba(139,92,246,.2)'],
-  blue:['#3b82f6','#60a5fa','rgba(59,130,246,.15)','rgba(59,130,246,.2)'],
-  green:['#16a34a','#4ade80','rgba(34,197,94,.15)','rgba(34,197,94,.18)'],
-  pink:['#db2777','#f472b6','rgba(236,72,153,.15)','rgba(236,72,153,.2)'],
-  orange:['#ea580c','#fb923c','rgba(249,115,22,.15)','rgba(249,115,22,.2)']
+  violet:['#7c3aed','#a78bfa','rgba(139,92,246,.15)','rgba(139,92,246,.2)'],
+  blue:['#2563eb','#60a5fa','rgba(59,130,246,.15)','rgba(59,130,246,.2)'],
+  green:['#15803d','#4ade80','rgba(34,197,94,.15)','rgba(34,197,94,.18)'],
+  pink:['#be185d','#f472b6','rgba(236,72,153,.15)','rgba(236,72,153,.2)'],
+  orange:['#c2410c','#fb923c','rgba(249,115,22,.15)','rgba(249,115,22,.2)']
 };
 const ACCENT_NAMES = {violet:'Violet', blue:'Bleu', green:'Vert', pink:'Rose', orange:'Orange'};
-const DEFAULT_SETTINGS = {seen:'', autoplay:true, remember:true, toasts:true, accent:'violet', radius:'soft', heroAuto:true, reduceMotion:false, autoUpdate:true};
+const DEFAULT_SETTINGS = {seen:'', density:'comfortable', showPlayer:false, autoplay:true, remember:true, toasts:true, accent:'violet', radius:'soft', heroAuto:true, reduceMotion:false, autoUpdate:true};
 function applyTheme(){
   const a = ACCENTS[S.settings.accent] || ACCENTS.violet, st = document.documentElement.style;
   st.setProperty('--accent', a[0]); st.setProperty('--accent-hi', a[1]); st.setProperty('--accent-soft', a[2]); st.setProperty('--accent-glow', a[3]);
   document.documentElement.dataset.radius = ['square', 'soft', 'round'].includes(S.settings.radius) ? S.settings.radius : 'soft';
   document.documentElement.classList.toggle('no-motion', !!S.settings.reduceMotion);
+  document.documentElement.dataset.density = S.settings.density === 'compact' ? 'compact' : 'comfortable';
+  const yb = document.querySelector('.ytbox'); if (yb) yb.classList.toggle('show', !!S.settings.showPlayer);
 }
 function setCollapsed(v){
   S.collapsed = v; $('#app').classList.toggle('collapsed', v); // pas de re-rendu : la transition CSS fait l'animation
@@ -1591,13 +1630,16 @@ function settingsHtml(){
       ${setRow('Notifications', 'Affiche de petits messages quand tu ajoutes un titre, changes un réglage, etc. Les erreurs restent toujours visibles.', swc('toasts', T.toasts, 'Notifications'))}</div>`;
   else if (tab === 'playback') b = `<h2>Playback</h2><p class="lead">Comment la musique se lance et s'enchaîne.</p><div class="setgroup">
       ${setRow('Lecture automatique', 'Passe au titre suivant quand un titre se termine. Désactivé, la lecture s\'arrête à la fin du titre.', swc('autoplay', T.autoplay, 'Lecture automatique'))}
-      ${setRow('Reprendre la file d\'attente', 'Garde la file et le dernier titre au prochain lancement.', swc('remember', T.remember, 'Reprendre la file d\'attente'))}
+      ${setRow('Reprendre la file d\'attente', 'Garde la file et le dernier titre au prochain lancement.', swc('remember', T.remember, 'Reprendre la file'))}
+      ${setRow('Afficher le lecteur vidéo', 'Montre le lecteur YouTube dans un coin. Utile pour voir pourquoi un titre ne se lance pas (message de YouTube, âge, consentement…).', swc('showPlayer', T.showPlayer, 'Afficher le lecteur vidéo'))}
+      ${playerLogHtml()}
       <h4>Raccourcis clavier</h4>
-      <div class="set"><p class="kv" style="width:100%"><span><span class="kbd">Espace</span></span><b>Lecture / pause</b><span><span class="kbd">←</span> <span class="kbd">→</span></span><b>Reculer / avancer de 5 secondes</b><span><span class="kbd">Maj</span> + <span class="kbd">←</span> <span class="kbd">→</span></span><b>Titre précédent / suivant</b><span><span class="kbd">Échap</span></span><b>Fermer un menu ou la file d'attente</b></p></div></div>`;
+      <div class="set"><p class="kv" style="width:100%">${shortcutsKv()}</p></div></div>`;
   else if (tab === 'appearance') b = `<h2>Appearance</h2><p class="lead">Couleur, arrondis et animations.</p><div class="setgroup">
       ${setRow('Couleur d\'accent', 'Boutons, sélection et barre de progression.', `<div class="swatches" role="group" aria-label="Couleur d'accent">${Object.entries(ACCENTS).map(([k, c]) => `<button class="swatch ${T.accent === k ? 'on' : ''}" data-accent="${k}" style="--c:${c[0]}" title="${ACCENT_NAMES[k]}" aria-label="${ACCENT_NAMES[k]}" aria-pressed="${T.accent === k}"></button>`).join('')}</div>`)}
       ${setRow('Style des coins', 'Carrés pour un rendu plus sobre, arrondis pour plus de douceur.', `<div class="seg" role="group" aria-label="Style des coins">${segBtn('data-radiusset', 'square', T.radius, '', 'Square')}${segBtn('data-radiusset', 'soft', T.radius, '', 'Soft')}${segBtn('data-radiusset', 'round', T.radius, '', 'Round')}</div>`)}
       ${setRow('Bannière d\'accueil automatique', 'Fait défiler les nouvelles sorties toutes les 7 secondes.', swc('heroAuto', T.heroAuto, 'Bannière automatique'))}
+      ${setRow('Densité', 'Compact réduit les marges et la taille des cartes pour voir plus de titres.', `<div class="seg" role="group" aria-label="Densité">${segBtn('data-densityset', 'comfortable', T.density, '', 'Comfortable')}${segBtn('data-densityset', 'compact', T.density, '', 'Compact')}</div>`)}
       ${setRow('Réduire les animations', 'Désactive les transitions (utile sur un ordinateur lent).', swc('reduceMotion', T.reduceMotion, 'Réduire les animations'))}</div>`;
   else if (tab === 'privacy') { const pub = S.playlists.filter(isPublic).length; b = `<h2>Privacy</h2><p class="lead">Qui peut voir tes playlists sur cet ordinateur.</p><div class="setgroup">
       ${setRow('Confidentialité par défaut', 'Visibilité des nouvelles playlists. Tu peux la changer pour chacune.', `<div class="seg" role="group" aria-label="Confidentialité par défaut">${segBtn('data-act="defpriv" data-v', 'private', S.defaultPrivacy, 'lock', 'Private')}${segBtn('data-act="defpriv" data-v', 'public', S.defaultPrivacy, 'globe', 'Public')}</div>`)}
@@ -1858,6 +1900,15 @@ $('#nowTitle').addEventListener('click', () => { if (current()) go({type:'now'})
 /* ---------- Changelog (liste repliable) ---------- */
 const TAGS = {new:'Nouveau', improved:'Amélioré', fixed:'Corrigé'};
 const CHANGELOG = [
+  {v:'0.5.0', date:'Nov 2026', title:'Lecture fiable, fenêtre soignée, clic droit', changes:[
+    ['fixed', 'Les titres qui ne se lançaient pas : Saturne relance la lecture, puis cherche automatiquement une autre version du même morceau.'],
+    ['new', 'Réglage « Afficher le lecteur vidéo » et journal des erreurs du lecteur (Settings › Playback) pour comprendre un échec.'],
+    ['new', 'Menu clic droit sur un titre : Play, Play next, Add to queue, Add to playlist, Bookmark, Go to artist, Copy link.'],
+    ['new', 'Raccourcis clavier : / (recherche), M (muet), B (bookmark), Q (file), ? (aide).'],
+    ['new', 'Densité Compact, et largeur maximale du contenu sur les grands écrans.'],
+    ['improved', 'Barre de titre sombre, fond noir dès l\'ouverture (plus de flash blanc), police embarquée dans l\'application.'],
+    ['improved', 'Miniatures en fondu, barres noires des vidéos recadrées automatiquement, retour visuel au clic, états vides illustrés, contrastes des couleurs d\'accent.'],
+    ['improved', 'Les nouveautés et les pages d\'artistes ne proposent plus de titres interdits à la lecture hors de YouTube.']]},
   {v:'0.4.0', date:'Nov 2026', title:'Finitions du design, menus et changelog', changes:[
     ['new', 'Page « Now playing » : clique sur la pochette en bas pour l\'ouvrir.'],
     ['new', 'Menus déroulants modernes (tri des playlists, région de recherche), utilisables au clavier.'],
@@ -1910,6 +1961,147 @@ async function announceVersion(){
     }
   } catch {}
 }
+
+/* ---------- Lecture fiable : erreurs, relance, autre version ---------- */
+const altMap = (() => { try { return JSON.parse(localStorage.getItem('saturne.alt') || '{}'); } catch { return {}; } })();
+const saveAlt = () => { try { localStorage.setItem('saturne.alt', JSON.stringify(Object.fromEntries(Object.entries(altMap).slice(-300)))); } catch {} };
+const playId = t => altMap[t.id] || t.id;
+const ERR_TEXT = {2:'identifiant invalide', 5:'erreur du lecteur', 100:'vidéo introuvable ou privée', 101:'lecture interdite hors de YouTube', 150:'lecture interdite hors de YouTube'};
+const playerLog = [];
+const logPlayer = (t, msg) => { playerLog.unshift({at:Date.now(), title:t ? t.title : '?', msg}); playerLog.length = Math.min(playerLog.length, 8); if (S.view.type === 'settings' && S.setTab === 'playback') renderView(); };
+const triedAlt = new Map();
+let wd = 0, wdStage = 0, recovering = '';
+function armWatchdog(){
+  clearTimeout(wd); wdStage = 0;
+  const id = current() && current().id;
+  const tick = () => {
+    const t = current(); if (!t || t.id !== id || !ready) return;
+    let st; try { st = player.getPlayerState(); } catch { st = -1; }
+    if (st === 1 || st === 0 || st === 2) return; // lecture, fin ou pause voulue
+    wdStage++;
+    if (wdStage === 1) { try { player.playVideo(); } catch {} wd = setTimeout(tick, 5000); }
+    else { logPlayer(t, st === 3 ? 'bloqué en chargement' : 'ne démarre pas'); recover(t, st === 3 ? 'chargement bloqué' : 'ne démarre pas'); }
+  };
+  wd = setTimeout(tick, 7000);
+}
+function giveUp(t, why){
+  const name = '« ' + t.title.slice(0, 40) + ' »';
+  if (S.queue.length > 1 && S.pos + 1 < S.order.length) { toast('Impossible de lire ' + name + ', je passe au suivant'); next(false); }
+  else toast('Impossible de lire ' + name + ' (' + why + ')');
+}
+async function recover(t, why){
+  if (!t || recovering === t.id) return;
+  clearTimeout(wd);
+  const tried = triedAlt.get(t.id) || [];
+  if (tried.length >= 2) return giveUp(t, why);
+  recovering = t.id; toast('« ' + t.title.slice(0, 40) + ' » ne se lance pas (' + why + '). Je cherche une autre version…');
+  try {
+    const j = await api('alt', {id:t.id, title:t.title, channel:t.channel, dur:t.duration || 0, skip:[playId(t), ...tried].join(',')});
+    tried.push(j.id); triedAlt.set(t.id, tried); altMap[t.id] = j.id; saveAlt();
+    recovering = '';
+    if (current() && current().id === t.id) { loadCurrent(); toast('Autre version trouvée'); }
+  } catch { recovering = ''; giveUp(t, why); }
+}
+const playerLogHtml = () => setRow('Dernières erreurs du lecteur', playerLog.length ? `<ul class="plog">${playerLog.map(l => `<li><b>${esc(l.title.slice(0, 46))}</b> : ${esc(l.msg)} <span style="color:var(--faint)">(${new Date(l.at).toLocaleTimeString()})</span></li>`).join('')}</ul>` : 'Aucune erreur pour le moment.', '');
+
+/* ---------- Images : apparition en fondu et recadrage des barres noires ---------- */
+const zoomMap = new Map(), zoomBusy = new Set();
+function analyzeBars(url){
+  return new Promise(res => {
+    const im = new Image(); im.crossOrigin = 'anonymous';
+    im.onload = () => {
+      try {
+        const W = 48, H = 27, c = document.createElement('canvas'); c.width = W; c.height = H;
+        const x = c.getContext('2d', {willReadFrequently:true}); x.drawImage(im, 0, 0, W, H);
+        const d = x.getImageData(0, 0, W, H).data;
+        const dark = r => { let max = 0, sum = 0; for (let i = 0; i < W; i++) { const o = (r * W + i) * 4, l = Math.max(d[o], d[o + 1], d[o + 2]); if (l > max) max = l; sum += l; } return max < 34 && sum / W < 14; };
+        let top = 0, bot = 0; while (top < H / 3 && dark(top)) top++; while (bot < H / 3 && dark(H - 1 - bot)) bot++;
+        const bar = Math.min(top, bot) / H;
+        res(bar >= 0.06 ? Math.min(1.5, +(1 / (1 - 2 * bar)).toFixed(2)) : 1);
+      } catch { res(1); }
+    };
+    im.onerror = () => res(1); im.src = url;
+  });
+}
+async function fixBars(img){
+  const src = img.currentSrc || img.src;
+  if (!/i\.ytimg\.com\/vi\/[\w-]{11}\/(mq|hq|sd)default\.jpg/.test(src)) return;
+  let z = zoomMap.get(src);
+  if (z === undefined) { if (zoomBusy.has(src)) return; zoomBusy.add(src); z = await analyzeBars(src); zoomMap.set(src, z); zoomBusy.delete(src); }
+  if (z > 1) document.querySelectorAll('img').forEach(i => { if ((i.currentSrc || i.src) === src) i.style.setProperty('--z', z); });
+}
+function settleImages(){
+  document.querySelectorAll('img').forEach(i => {
+    if (!i.classList.contains('loaded') && i.complete && i.naturalWidth) i.classList.add('loaded'); // déjà en cache : pas de fondu
+    const z = zoomMap.get(i.currentSrc || i.src); if (z > 1) i.style.setProperty('--z', z);
+  });
+}
+document.addEventListener('load', e => { const t = e.target; if (t && t.tagName === 'IMG') { t.classList.add('loaded'); fixBars(t); } }, true);
+document.addEventListener('error', e => { const t = e.target; if (t && t.tagName === 'IMG' && (t.dataset.f || !t.hasAttribute('onerror'))) t.classList.add('loaded'); }, true);
+
+/* ---------- Clic droit sur un titre ---------- */
+let ctx = null;
+function trackFromEl(el){
+  const li = el.closest('[data-i],[data-qi]'); if (!li) return null;
+  if (li.dataset.qi !== undefined) { const i = +li.dataset.qi; return S.queue[i] ? {t:S.queue[i], src:'queue', i} : null; }
+  const h = li.closest('[data-src]'), src = h ? h.dataset.src : defaultSrc(), i = +li.dataset.i, t = tracksOf(src)[i];
+  return t ? {t, src, i} : null;
+}
+function placeMenuAt(x, y){
+  const m = $('#menu'); m.hidden = false;
+  m.style.left = Math.max(8, Math.min(x, innerWidth - m.offsetWidth - 8)) + 'px';
+  m.style.top = Math.max(8, Math.min(y, innerHeight - m.offsetHeight - 8)) + 'px';
+}
+document.addEventListener('contextmenu', e => {
+  if (e.target.closest('input,textarea') || !S.user) return;
+  const hit = trackFromEl(e.target); if (!hit) return;
+  e.preventDefault(); closeDD(); ctx = hit; menuTrack = null;
+  const t = hit.t, fav = isFav(t.id);
+  $('#menu').innerHTML = `<div class="label">${esc(t.title.slice(0, 34))}</div><button data-cx="play">${ic('play')}Play</button><button data-cx="next">${ic('queue')}Play next</button><button data-cx="queue">${ic('addq')}Add to queue</button><button data-cx="playlist">${ic('plus')}Add to playlist…</button><button data-cx="bookmark">${ic('bookmarkf')}${fav ? 'Remove bookmark' : 'Bookmark'}</button>${t.channelId ? `<button data-cx="artist">${ic('person')}Go to artist</button>` : ''}<button data-cx="link">${ic('copy')}Copy YouTube link</button>`;
+  placeMenuAt(e.clientX, e.clientY);
+});
+async function copyText(text){
+  try { await navigator.clipboard.writeText(text); toast('Lien copié'); }
+  catch { const a = document.createElement('textarea'); a.value = text; document.body.appendChild(a); a.select(); try { document.execCommand('copy'); toast('Lien copié'); } catch {} a.remove(); }
+}
+function playNext(t){
+  if (!current()) return addToQueue(t);
+  const at = S.cur + 1; S.queue.splice(at, 0, slim(t));
+  S.order = S.order.map(i => i >= at ? i + 1 : i); S.order.splice(S.pos + 1, 0, at);
+  save(); render(); toast('Sera lu ensuite');
+}
+$('#menu').addEventListener('click', e => {
+  const b = e.target.closest('[data-cx]'); if (!b || !ctx) return;
+  const {t, src, i} = ctx, k = b.dataset.cx;
+  if (k === 'playlist') {
+    menuTrack = t; const m = $('#menu'), x = parseFloat(m.style.left), y = parseFloat(m.style.top);
+    m.innerHTML = `<div class="label">Ajouter à</div>` + S.playlists.map(p => `<button data-pid="${p.id}">${esc(p.name)}</button>`).join('') +
+      `<form id="menuNew"><input class="input" id="menuNewName" placeholder="Nouvelle playlist" aria-label="Nom de la nouvelle playlist" maxlength="60"><button class="ib" aria-label="Créer et ajouter">${ic('plus')}</button></form>`;
+    placeMenuAt(x, y); return;
+  }
+  closeMenu();
+  if (k === 'play') { if (src === 'queue') jump(i); else playList(tracksOf(src), i); }
+  else if (k === 'next') playNext(t);
+  else if (k === 'queue') addToQueue(t);
+  else if (k === 'bookmark') toggleFav(t);
+  else if (k === 'artist') go({type:'artist', id:t.channelId});
+  else if (k === 'link') copyText('https://www.youtube.com/watch?v=' + t.id);
+});
+
+/* ---------- Raccourcis clavier ---------- */
+const SHORTCUTS = [['Espace', 'Lecture / pause'], ['← →', 'Reculer / avancer de 5 secondes'], ['Maj + ← →', 'Titre précédent / suivant'], ['/', 'Aller à la recherche'], ['M', 'Couper / rétablir le son'], ['B', 'Mettre le titre en cours en bookmark'], ['Q', 'Ouvrir / fermer la file d\'attente'], ['?', 'Afficher cette aide'], ['Échap', 'Fermer un menu ou une fenêtre']];
+const kbdHtml = k => k.split(' ').map(x => x === '+' ? '+' : `<span class="kbd">${esc(x)}</span>`).join(' ');
+const shortcutsKv = () => SHORTCUTS.map(([k, d]) => `<span>${kbdHtml(k)}</span><b>${esc(d)}</b>`).join('');
+function helpModal(){ openModal(`<h3>Raccourcis clavier</h3><p>Ils fonctionnent partout dans Saturne, sauf pendant la saisie de texte.</p><p class="kv" style="margin:0">${shortcutsKv()}</p><div class="mactions"><button class="btn" data-mclose>OK</button></div>`); }
+document.addEventListener('keydown', e => {
+  if (!S.user || e.ctrlKey || e.metaKey || e.altKey || e.target.closest('input,textarea,select') || !$('#modal').hidden) return;
+  const k = e.key;
+  if (k === '?') { e.preventDefault(); helpModal(); }
+  else if (k === '/') { e.preventDefault(); $('#q').focus(); }
+  else if (k === 'm' || k === 'M') $('#volBtn').click();
+  else if (k === 'q' || k === 'Q') setQueueOpen(!S.qopen);
+  else if ((k === 'b' || k === 'B') && current()) toggleFav(current());
+});
 
 /* ---------- Démarrage ---------- */
 applyTheme();

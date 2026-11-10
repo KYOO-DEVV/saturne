@@ -274,6 +274,22 @@ pub fn has_japanese(s: &str) -> bool {
     s.chars().any(|c| matches!(c as u32, 0x3040..=0x30FF | 0x4E00..=0x9FFF | 0xFF66..=0xFF9F))
 }
 
+/// Retire les parties entre parenthèses ou crochets (« Official Video », « 【MV】 »…) pour chercher une autre version du même titre.
+pub fn clean_title(title: &str) -> String {
+    let mut out = String::new();
+    let mut depth = 0u32;
+    for c in title.chars() {
+        match c {
+            '(' | '[' | '【' | '（' | '［' => depth += 1,
+            ')' | ']' | '】' | '）' | '］' => depth = depth.saturating_sub(1),
+            _ if depth == 0 => out.push(c),
+            _ => {}
+        }
+    }
+    let cleaned = out.split_whitespace().collect::<Vec<_>>().join(" ");
+    if cleaned.chars().count() < 2 { title.trim().to_string() } else { cleaned }
+}
+
 /// Garde les vraies chansons ; si il y en a peu (lo-fi, jazz…), complète avec des mixes jusqu'à 4 h.
 pub fn songs_or_mixes(all: Vec<Track>) -> Vec<Track> {
     let mut seen = HashSet::new();
@@ -317,6 +333,14 @@ mod tests {
         assert!(has_japanese("ラヴ・モンスター -MV-"));
         assert!(has_japanese("ヨルシカ - あぶく"));
         assert!(!has_japanese("PLAVE 'Star Trace' M/V"));
+    }
+
+    #[test]
+    fn cleaning_titles() {
+        assert_eq!(clean_title("【Ado】うっせぇわ (Usseewa)"), "うっせぇわ");
+        assert_eq!(clean_title("YOASOBI「アイドル」 Official Music Video [4K]"), "YOASOBI「アイドル」 Official Music Video");
+        assert_eq!(clean_title("(MV)"), "(MV)");
+        assert_eq!(clean_title("Plain title"), "Plain title");
     }
 
     #[test]

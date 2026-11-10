@@ -30,6 +30,8 @@ use std::{
 use store::{Store, User};
 
 const INDEX_HTML: &str = include_str!("../web/index.html");
+const FONT_LATIN: &[u8] = include_bytes!("../assets/jakarta-latin.woff2");
+const FONT_LATIN_EXT: &[u8] = include_bytes!("../assets/jakarta-latin-ext.woff2");
 const COOKIE: &str = "saturne_session";
 
 #[derive(Clone)]
@@ -38,6 +40,10 @@ struct App {
     http: reqwest::Client,
     gh: reqwest::Client,
     data_dir: PathBuf,
+    /// Titres dont on sait s'ils peuvent être lus dans un lecteur intégré (true) ou non (false).
+    emb: Arc<Mutex<HashMap<String, bool>>>,
+    /// Limite les vérifications simultanées auprès de YouTube.
+    sem: Arc<tokio::sync::Semaphore>,
     cache: Arc<Mutex<HashMap<String, (Instant, Value)>>>,
     port: u16,
     dev_html: Option<PathBuf>,
@@ -342,6 +348,86 @@ async fn put_data(State(app): State<App>, h: HeaderMap, body: String) -> Respons
     }
 }
 
+/* ---------- Polices embarquées ---------- */
+async fn font(axum::extract::Path(name): axum::extract::Path<String>) -> Response {
+    let bytes = match name.as_str() {
+        "jakarta-latin.woff2" => FONT_LATIN,
+        "jakarta-latin-ext.woff2" => FONT_LATIN_EXT,
+        _ => return StatusCode::NOT_FOUND.into_response(),
+    };
+    ([(header::CONTENT_TYPE, "font/woff2"), (header::CACHE_CONTROL, "public, max-age=31536000, immutable")], bytes).into_response()
+}
+
+/* ---------- Lisibilité des titres ---------- */
+/// Un titre est « lisible » si YouTube autorise son intégration (oEmbed ≠ 401/403/404). Résultat gardé 24 h.
+async fn embeddable(app: &App, id: &str) -> bool {
+    if let Some(v) = app.emb.lock().unwrap().get(id) {
+        return *v;
+    }
+    let ok = {
+        let _permit = app.sem.acquire().await.ok();
+        let url = format!("https://www.youtube.com/oembed?format=json&url={}", urlenc(&format!("https://www.youtube.com/watch?v={id}")));
+        match app.http.get(&url).send().await {
+            Ok(r) => !matches!(r.status().as_u16(), 401 | 403 | 404),
+            Err(_) => true, // réseau incertain : on ne bloque pas le titre
+        }
+    };
+    let mut c = app.emb.lock().unwrap();
+    if c.len() > 5000 {
+        c.clear();
+    }
+    c.insert(id.to_string(), ok);
+    ok
+}
+
+async fn filter_embeddable(app: &App, tracks: Vec<yt::Track>) -> Vec<yt::Track> {
+    let mut set = tokio::task::JoinSet::new();
+    for (i, t) in tracks.iter().enumerate() {
+        let (a, id) = (app.clone(), t.id.clone());
+        set.spawn(async move { (i, embeddable(&a, &id).await) });
+    }
+    let mut ok = vec![true; tracks.len()];
+    while let Some(Ok((i, v))) = set.join_next().await {
+        ok[i] = v;
+    }
+    tracks.into_iter().zip(ok).filter(|(_, v)| *v).map(|(t, _)| t).collect()
+}
+
+/// Autre version lisible d'un titre qui ne se lance pas (autre mise en ligne du même morceau).
+async fn api_alt(State(app): State<App>, Query(q): Q) -> Response {
+    let valid = |s: &str| s.len() == 11 && s.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-');
+    let id = q.get("id").cloned().unwrap_or_default();
+    if !valid(&id) {
+        return err(StatusCode::BAD_REQUEST, "Identifiant de vidéo invalide");
+    }
+    let clip = |k: &str| q.get(k).map(|s| s.trim().chars().take(200).collect::<String>()).unwrap_or_default();
+    let (title, channel) = (clip("title"), clip("channel"));
+    if title.is_empty() {
+        return err(StatusCode::BAD_REQUEST, "Titre manquant");
+    }
+    let dur: u32 = q.get("dur").and_then(|d| d.parse().ok()).unwrap_or(0);
+    let skip: HashSet<String> = q.get("skip").map(|s| s.split(',').filter(|x| valid(x)).map(str::to_string).collect()).unwrap_or_default();
+    let query = format!("{} {}", yt::clean_title(&title), channel).trim().to_string();
+    let list = match search_videos(&app, &query, "").await {
+        Ok(v) => v,
+        Err(e) => return fail(e),
+    };
+    for t in list.as_array().into_iter().flatten().filter_map(track_from).take(10) {
+        if t.id == id || skip.contains(&t.id) {
+            continue;
+        }
+        if let (true, Some(d)) = (dur > 0, t.duration) {
+            if d.abs_diff(dur) > (dur / 5).max(25) {
+                continue; // durée trop différente : probablement un autre morceau
+            }
+        }
+        if embeddable(&app, &t.id).await {
+            return Json(json!(t)).into_response();
+        }
+    }
+    err(StatusCode::NOT_FOUND, "Aucune autre version lisible trouvée")
+}
+
 /* ---------- Playlists publiques ---------- */
 async fn api_public(State(app): State<App>, h: HeaderMap) -> Response {
     let Some(user) = app.user(&h) else { return err(StatusCode::UNAUTHORIZED, "Connexion requise") };
@@ -437,6 +523,7 @@ async fn api_channel(State(app): State<App>, Query(q): Q) -> Response {
             };
             let mut seen = HashSet::new();
             let tracks: Vec<yt::Track> = top.into_iter().chain(page.tracks).filter(|t| seen.insert(t.id.clone())).take(40).collect();
+            let tracks = filter_embeddable(&app, tracks).await;
             Ok(json!({ "info": page.info, "tracks": tracks }))
         })
         .await;
@@ -515,6 +602,7 @@ async fn api_new(State(app): State<App>, Query(q): Q) -> Response {
             let mut fresh: Vec<yt::Track> = all.into_iter().filter(|t| good(t) && seen.insert(t.id.clone())).collect();
             fresh.sort_by_key(|t| (t.age_min.unwrap_or(u64::MAX), std::cmp::Reverse(t.views)));
             fresh.truncate(20);
+            let fresh = filter_embeddable(&app, fresh).await;
             Ok(json!(fresh))
         })
         .await;
@@ -543,6 +631,8 @@ fn router(app: App) -> Router {
         .route("/api/channel", get(api_channel))
         .route("/api/video", get(api_video))
         .route("/api/new", get(api_new))
+        .route("/api/alt", get(api_alt))
+        .route("/assets/{name}", get(font))
         .route("/api/public", get(api_public))
         .route("/api/public/playlist", get(api_public_playlist))
         .layer(DefaultBodyLimit::max(16 * 1024 * 1024))
@@ -616,7 +706,7 @@ fn main() {
     listener.set_nonblocking(true).unwrap();
     let port = listener.local_addr().unwrap().port();
     let dev_html = std::env::var("SATURNE_WEB").ok().map(PathBuf::from);
-    let app = App { store, http, gh, data_dir: dir.clone(), cache: Arc::new(Mutex::new(HashMap::new())), port, dev_html };
+    let app = App { store, http, gh, data_dir: dir.clone(), emb: Arc::new(Mutex::new(HashMap::new())), sem: Arc::new(tokio::sync::Semaphore::new(8)), cache: Arc::new(Mutex::new(HashMap::new())), port, dev_html };
 
     let server = std::thread::spawn(move || {
         let rt = tokio::runtime::Builder::new_multi_thread().enable_all().build().expect("runtime");
@@ -640,13 +730,14 @@ fn run_window(url: &str, dir: &std::path::Path) {
         dpi::LogicalSize,
         event::{Event, WindowEvent},
         event_loop::{ControlFlow, EventLoop},
-        window::WindowBuilder,
+        window::{Theme, WindowBuilder},
     };
     use wry::{NewWindowResponse, WebContext, WebViewBuilder};
 
     let event_loop = EventLoop::new();
     let window = WindowBuilder::new()
         .with_title("Saturne")
+        .with_theme(Some(Theme::Dark))
         .with_window_icon(tao::window::Icon::from_rgba(icon::render(64), 64, 64).ok())
         .with_inner_size(LogicalSize::new(1440.0, 880.0))
         .with_min_inner_size(LogicalSize::new(900.0, 600.0))
@@ -657,6 +748,9 @@ fn run_window(url: &str, dir: &std::path::Path) {
     let base = url.to_string();
     let _webview = WebViewBuilder::new_with_web_context(&mut ctx)
         .with_url(url)
+        // Fond noir dès l'ouverture (pas de flash blanc) ; lecture sans geste préalable, pour que le titre suivant démarre toujours.
+        .with_background_color((0, 0, 0, 255))
+        .with_autoplay(true)
         .with_new_window_req_handler(|u, _| {
             open_in_browser(&u);
             NewWindowResponse::Deny
