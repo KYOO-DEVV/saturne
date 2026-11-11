@@ -1,6 +1,9 @@
 /* ---------- Changelog (liste repliable) ---------- */
 const TAGS = {new:'Nouveau', improved:'Amélioré', fixed:'Corrigé'};
 const CHANGELOG = [
+  {v:'0.7.4', date:'Nov 2026', title:'Interface téléphone', changes:[
+    ['new', 'Sur téléphone : barre d’onglets en bas, lecteur compact, et page En lecture plein écran avec ses commandes.'],
+    ['improved', 'Plus aucun texte sur deux lignes : les titres se terminent par « … ».']]},
   {v:'0.7.3', date:'Nov 2026', title:'Panneau En lecture : retour au titre et dégradé', changes:[
     ['new', 'Bouton « Passer au titre » pour quitter le clip vidéo dans le panneau En lecture.'],
     ['improved', 'Le panneau En lecture prend un dégradé de la couleur de la pochette.']]},
@@ -84,6 +87,7 @@ const CHANGELOG = [
 ];
 const clOpen = new Set([CHANGELOG[0].v]);
 const CL_EN = {
+  '0.7.4': {title:'Phone interface', changes:['On phones: a tab bar at the bottom, a compact player, and a full-screen Now playing page with its controls.', 'No more two-line texts: titles end with “…”.']},
   '0.7.3': {title:'Now playing panel: back to the song, and a gradient', changes:['“Switch to song” button to leave the music video in the Now playing panel.','The Now playing panel takes a gradient from the cover’s color.']},
   '0.7.2': {title:'New layout: bar, panel and playlists', changes:[
     'Floating player bar: title on the left, controls and progress in the center, tools on the right (lyrics, queue, sleep timer, volume, full screen).',

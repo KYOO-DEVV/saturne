@@ -1,0 +1,58 @@
+/* ---------- 0.7.4 : interface téléphone (jamais de texte sur deux lignes, barre d'onglets, lecteur compact) ---------- */
+.tabbar{display:none}
+.pn-ctrl{display:none}
+@media (max-width:900px){
+  /* Une seule ligne partout : les titres se terminent par « … ». */
+  .tt,.card .tt,.row .tt,.trow .tt,.sl-title,.libcard b,.mini-row b,.nq b,.qm b,.pn-meta .tt,.pagehead h1,.np-info h1,.toplist b,.ch,.sub,.pn-ctx,.cl-t,.set h3{white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;display:block;-webkit-line-clamp:unset;min-height:0}
+  .card .tt{margin-top:8px}
+  .sl-title{font-size:clamp(22px,7vw,30px)}
+  .pagehead h1{font-size:clamp(28px,9vw,40px)}
+  .hero{height:240px}
+  .sl-body{max-width:calc(100% - 44px)}
+  .sl-by{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .shelf{grid-auto-columns:150px;gap:14px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .libgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+
+  /* Barre d'onglets en bas (comme une application iOS). */
+  .app{grid-template-rows:minmax(0,1fr) auto auto;grid-template-areas:"main" "bar" "tabs"}
+  .tabbar{grid-area:tabs;display:flex;justify-content:space-around;align-items:stretch;padding:4px 6px calc(4px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--line)}
+  .tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;color:var(--mute);font-size:10.5px;font-weight:600;border-radius:var(--r-btn);min-width:0}
+  .tabbar button svg{width:22px;height:22px}
+  .tabbar button.on{color:var(--hi)}
+  .tabbar button.on svg{color:var(--accent-hi)}
+  .tabbar .lbl{max-width:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .app.mini .tabbar{display:none}
+  #view{padding:4px 16px 24px}
+  .topbar{padding:calc(10px + env(safe-area-inset-top,0px)) 14px 8px}
+
+  /* Lecteur compact : image, titre sur une ligne, lecture / suivant, fine ligne de progression en haut. */
+  .bar{grid-template-columns:minmax(0,1fr) auto;gap:0 8px;margin:6px 6px 0;padding:8px 10px;position:relative;align-items:center}
+  .now img,.now .ph{width:44px;height:44px}
+  .center{display:contents}
+  .center .ctrls{grid-column:2;grid-row:1;width:auto;gap:2px}
+  .center .ctrls #bShuffle,.center .ctrls #bPrev,.center .ctrls #bRepeat{display:none}
+  .center .seekbox{position:absolute;left:12px;right:12px;top:0;height:3px;width:auto;max-width:none;display:block}
+  .center .seekbox span{display:none}
+  .center .seekbox #seek{width:100%;height:3px;margin:0}
+  .center .seekbox #seek::-webkit-slider-runnable-track{height:3px;border-radius:0}
+  .center .seekbox #seek::-webkit-slider-thumb{opacity:0;width:6px;height:6px;margin-top:-1.5px}
+  .volume{display:none}
+  .bar .playbtn{width:36px;height:36px}
+  .toast{bottom:calc(var(--barh) + 76px)}
+
+  /* Panneau En lecture : page plein écran avec ses propres commandes. */
+  .qdrawer{top:0;bottom:0;right:0;left:0;width:100%;z-index:90;border:0;padding:calc(12px + env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px));transform:translateY(102%);transition:transform .3s cubic-bezier(.2,.8,.2,1);box-shadow:none;background:var(--panel)}
+  .qdrawer.open{transform:none}
+  .qdrawer.tint{background:linear-gradient(180deg,color-mix(in srgb,var(--pt,transparent) 90%,var(--panel)) 0,color-mix(in srgb,var(--pt,transparent) 28%,var(--panel)) 280px,var(--panel) 520px)}
+  .pn-meta .tt{font-size:22px}
+  .pn-ctrl{display:grid;gap:6px;padding:0 4px}
+  .pn-ctrl input[type=range]{width:100%}
+  .pn-ctrl input[type=range]::-webkit-slider-thumb{opacity:1}
+  .pn-times{display:flex;justify-content:space-between;color:var(--mute);font-size:12px;font-variant-numeric:tabular-nums}
+  .pn-btns{display:flex;align-items:center;justify-content:space-between;padding:0 6px}
+  .pn-btns .ib{width:44px;height:44px}
+  .pn-btns .ib svg{width:24px;height:24px}
+  .pn-btns .bigplay{width:60px;height:60px;background:var(--hi);color:var(--bg)}
+  .pn-btns .bigplay svg{color:var(--bg)}
+}

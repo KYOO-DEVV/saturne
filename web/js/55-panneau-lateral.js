@@ -41,6 +41,7 @@ function nowPanelHtml(t){
     <div class="pn-art"><img src="https://i.ytimg.com/vi/${esc(t.id)}/maxresdefault.jpg" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='${esc(t.thumb)}'}">${S.clip ? '' : `<button class="pn-vid" data-do="clip" aria-pressed="false">${ic('play')}${L('Switch to video', 'Passer à la vidéo')}</button>`}</div>
     ${S.clip ? `<button class="pn-toggle" data-do="clip" aria-pressed="true">${ic('note')}${L('Switch to song', 'Passer au titre')}</button>` : ''}
     <div class="pn-meta"><div style="min-width:0"><b class="tt" data-notr>${esc(t.title)}</b><span class="ch" data-notr>${chLink(t)}</span></div>${bmBtn(t)}</div>
+    ${pnCtrlHtml()}
     ${lp ? `<section class="pn-card pn-lyr" id="pnLyr"><h4>${L('Lyrics preview', 'Aperçu des paroles')}</h4><div class="pn-lines">${lp}</div><button class="more" data-do="fulllyr">${L('Show all', 'Tout afficher')}${ic('right')}</button></section>` : ''}
     ${aboutHtml(t)}
     ${nx ? `<section class="pn-card"><div class="pn-row"><h4>${L('Next in queue', 'À suivre dans la file d’attente')}</h4><button class="more" data-ptab="queue">${L('Open queue', 'Ouvrir la file d’attente')}</button></div><button class="mini-row" data-act="qjump" data-qi="${ni}"><img src="${esc(nx.thumb)}" alt=""><span class="m"><b data-notr>${esc(nx.title)}</b><small data-notr>${esc(nx.channel)}</small></span></button></section>` : ''}</div>`;

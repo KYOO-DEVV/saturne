@@ -210,7 +210,7 @@ function renderSide(){
   const cb = $('#collapse');
   cb.setAttribute('aria-label', S.collapsed ? 'Agrandir la barre latérale' : 'Réduire la barre latérale'); cb.title = cb.getAttribute('aria-label');
   const navOn = v.type === 'artist' ? 'artists' : (v.type === 'list' || v.type === 'search') ? 'search' : (v.type === 'playlist' || v.type === 'pubpl') ? 'library' : v.type;
-  document.querySelectorAll('#nav button').forEach(b => { b.classList.toggle('on', b.dataset.nav === navOn); b.setAttribute('aria-current', b.dataset.nav === navOn ? 'page' : 'false'); if (!b.querySelector('svg')) b.insertAdjacentHTML('afterbegin', ic(b.dataset.ic)); });
+  document.querySelectorAll('#nav button,#tabbar button').forEach(b => { b.classList.toggle('on', b.dataset.nav === navOn); b.setAttribute('aria-current', b.dataset.nav === navOn ? 'page' : 'false'); if (!b.querySelector('svg')) b.insertAdjacentHTML('afterbegin', ic(b.dataset.ic)); });
   $('#plList').innerHTML = S.playlists.map(p => `<button class="pli ${v.type==='playlist'&&v.id===p.id?'on':''}" ${v.type==='playlist'&&v.id===p.id?'aria-current="page"':''} data-pl="${p.id}" title="${esc(p.name)}">${pthumb(p)}<b>${esc(p.name)}</b>${p.system ? '' : isPublic(p) ? ic('globe', 'lk') : ic('lock', 'lk')}</button>`).join('') +
     `<button class="pli create" data-act="newpl" title="Create Playlist"><span class="pthumb">${ic('plus')}</span><b>Create Playlist</b></button>`;
   $('#accAvatar').innerHTML = avatarHtml(u); $('#accName').textContent = u.display; $('#accUser').textContent = '@' + u.username;

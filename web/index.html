@@ -67,6 +67,14 @@
     <section id="view" tabindex="-1"></section>
   </main>
 
+  <nav class="tabbar" id="tabbar" aria-label="Navigation">
+    <button data-nav="home" data-ic="home"><span class="lbl">Home</span></button>
+    <button data-nav="search" data-ic="search"><span class="lbl">Search</span></button>
+    <button data-nav="artists" data-ic="person"><span class="lbl">Artists</span></button>
+    <button data-nav="library" data-ic="lib"><span class="lbl">Library</span></button>
+    <button data-nav="history" data-ic="history"><span class="lbl">History</span></button>
+  </nav>
+
   <aside class="qdrawer" id="qdrawer" data-dropq="1" aria-label="File d'attente">
     <div class="nuhead"><div class="ptabs" role="tablist"><button role="tab" data-ptab="now">Now playing</button><button role="tab" data-ptab="queue">Queue</button><button role="tab" data-ptab="recent">Recent</button></div><div class="r"><button class="clear" id="qSave" hidden>Save</button><button class="clear" id="qClear" hidden>Clear</button><button class="ib" id="qClose" data-ic="close" aria-label="Fermer"></button></div></div>
     <div class="scroll" id="qList" style="padding:0"></div>
