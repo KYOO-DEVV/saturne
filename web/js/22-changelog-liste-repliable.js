@@ -1,6 +1,9 @@
 /* ---------- Changelog (liste repliable) ---------- */
 const TAGS = {new:'Nouveau', improved:'Amélioré', fixed:'Corrigé'};
 const CHANGELOG = [
+  {v:'0.7.3', date:'Nov 2026', title:'Panneau En lecture : retour au titre et dégradé', changes:[
+    ['new', 'Bouton « Passer au titre » pour quitter le clip vidéo dans le panneau En lecture.'],
+    ['improved', 'Le panneau En lecture prend un dégradé de la couleur de la pochette.']]},
   {v:'0.7.2', date:'Nov 2026', title:'Nouvelle mise en page : barre, panneau et playlists', changes:[
     ['new', 'Barre de lecture flottante : titre à gauche, commandes et progression au centre, outils à droite (paroles, file, minuterie, volume, plein écran).'],
     ['new', 'Panneau latéral « En lecture / File d’attente / Récents » : grande image, bouton « Passer à la vidéo », aperçu des paroles, à propos de l’artiste, suite de la file.'],
@@ -81,6 +84,7 @@ const CHANGELOG = [
 ];
 const clOpen = new Set([CHANGELOG[0].v]);
 const CL_EN = {
+  '0.7.3': {title:'Now playing panel: back to the song, and a gradient', changes:['“Switch to song” button to leave the music video in the Now playing panel.','The Now playing panel takes a gradient from the cover’s color.']},
   '0.7.2': {title:'New layout: bar, panel and playlists', changes:[
     'Floating player bar: title on the left, controls and progress in the center, tools on the right (lyrics, queue, sleep timer, volume, full screen).',
     'Side panel “Now playing / Queue / Recent”: big picture, “Switch to video” button, lyrics preview, about the artist, next in queue.',

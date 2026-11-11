@@ -80,3 +80,10 @@
 .app.mini .center .seekbox{max-width:none}
 .app.mini .center .ctrls{width:auto;justify-content:center}
 .app.mini~.toast{display:none!important}
+
+/* Panneau « En lecture » : dégradé de la couleur de la pochette, et bouton pour revenir au titre. */
+.qdrawer.tint{background:linear-gradient(180deg,color-mix(in srgb,var(--pt,transparent) 90%,var(--panel)) 0,color-mix(in srgb,var(--pt,transparent) 28%,var(--panel)) 240px,var(--panel) 460px);transition:background .4s}
+.pn-toggle{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 16px;border-radius:999px;background:rgba(255,255,255,.12);font-weight:700;font-size:13.5px;color:var(--hi);justify-self:start;margin:0 4px}
+.pn-toggle:hover{background:rgba(255,255,255,.2)}
+.pn-toggle svg{width:16px;height:16px}
+.qdrawer.tint .pn-card:not(.pn-lyr){background:rgba(0,0,0,.28)}

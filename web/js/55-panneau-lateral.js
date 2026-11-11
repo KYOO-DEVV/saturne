@@ -38,7 +38,8 @@ function nowPanelHtml(t){
   const Y = S.lyr && S.lyr.id === t.id ? S.lyr : null, ctxPl = S.view.type === 'playlist' ? curPl() : null;
   const ni = S.order[S.pos + 1], nx = ni != null ? S.queue[ni] : null, lp = lyricsPreviewHtml(Y);
   return `<div class="pn"><p class="pn-ctx" data-notr>${esc(ctxPl ? ctxPl.name : t.channel)}</p>
-    <div class="pn-art"><img src="https://i.ytimg.com/vi/${esc(t.id)}/maxresdefault.jpg" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='${esc(t.thumb)}'}"><button class="pn-vid" data-do="clip" aria-pressed="${S.clip}">${ic('play')}${L('Switch to video', 'Passer à la vidéo')}</button></div>
+    <div class="pn-art"><img src="https://i.ytimg.com/vi/${esc(t.id)}/maxresdefault.jpg" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='${esc(t.thumb)}'}">${S.clip ? '' : `<button class="pn-vid" data-do="clip" aria-pressed="false">${ic('play')}${L('Switch to video', 'Passer à la vidéo')}</button>`}</div>
+    ${S.clip ? `<button class="pn-toggle" data-do="clip" aria-pressed="true">${ic('note')}${L('Switch to song', 'Passer au titre')}</button>` : ''}
     <div class="pn-meta"><div style="min-width:0"><b class="tt" data-notr>${esc(t.title)}</b><span class="ch" data-notr>${chLink(t)}</span></div>${bmBtn(t)}</div>
     ${lp ? `<section class="pn-card pn-lyr" id="pnLyr"><h4>${L('Lyrics preview', 'Aperçu des paroles')}</h4><div class="pn-lines">${lp}</div><button class="more" data-do="fulllyr">${L('Show all', 'Tout afficher')}${ic('right')}</button></section>` : ''}
     ${aboutHtml(t)}
@@ -54,7 +55,7 @@ function renderPanel(){
   document.querySelectorAll('#qdrawer [data-ptab]').forEach(b => { const on = b.dataset.ptab === S.ptab; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
   const isQ = S.ptab === 'queue'; $('#qClear').hidden = !isQ || !S.queue.length; $('#qSave').hidden = !isQ || !S.queue.length;
   if (!S.qopen) return;
-  const keep = box.scrollTop, t = current();
+  const keep = box.scrollTop, t = current(); $('#qdrawer').classList.toggle('tint', S.ptab === 'now' && !!t);
   if (S.ptab === 'queue') {
     const rest = S.queue.map((q, i) => i === S.cur ? '' : qRow(q, i)).join('');
     box.innerHTML = S.queue.length ? `${t ? `<h4 class="pn-h">${L('Now playing', 'Titre en cours de lecture')}</h4>${qRow(t, S.cur)}` : ''}${rest ? `<h4 class="pn-h">${L('Next up', 'À suivre')}</h4>${rest}` : ''}` : `<p class="hint">La file est vide. Lance un titre, ou glisse-en un ici.</p>`;
@@ -65,7 +66,8 @@ function renderPanel(){
     box.innerHTML = nowPanelHtml(t); box.scrollTop = keep;
     if (!S.lyr || S.lyr.id !== t.id) loadLyrics(t);
     loadArtistInfo(t);
-    coverColor(`https://i.ytimg.com/vi/${t.id}/mqdefault.jpg`).then(c => { const el = $('#pnLyr'); if (el && c) el.style.setProperty('--pc', toneOf(c, 130)); });
+    $('#qdrawer').classList.add('tint');
+    coverColor(`https://i.ytimg.com/vi/${t.id}/mqdefault.jpg`).then(c => { const el = $('#pnLyr'); if (el && c) el.style.setProperty('--pc', toneOf(c, 130)); if (c) $('#qdrawer').style.setProperty('--pt', toneOf(c, 150)); });
     placeClip();
   }
 }
