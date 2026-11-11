@@ -1,6 +1,10 @@
 /* ---------- Changelog (liste repliable) ---------- */
 const TAGS = {new:'Nouveau', improved:'Amélioré', fixed:'Corrigé'};
 const CHANGELOG = [
+  {v:'0.7.5', date:'Nov 2026', title:'Paroles fluides et clip plein cadre', changes:[
+    ['improved', 'L’aperçu des paroles défile en douceur, ligne par ligne.'],
+    ['improved', 'Clip vidéo : il remplit toute la zone, sans titre YouTube ni boutons par-dessus, et se survole normalement.'],
+    ['improved', 'Cliquer sur la pochette dans la barre de lecture ouvre le panneau En lecture.']]},
   {v:'0.7.4', date:'Nov 2026', title:'Interface téléphone', changes:[
     ['new', 'Sur téléphone : barre d’onglets en bas, lecteur compact, et page En lecture plein écran avec ses commandes.'],
     ['improved', 'Plus aucun texte sur deux lignes : les titres se terminent par « … ».']]},
@@ -87,6 +91,7 @@ const CHANGELOG = [
 ];
 const clOpen = new Set([CHANGELOG[0].v]);
 const CL_EN = {
+  '0.7.5': {title:'Smooth lyrics and full-frame video', changes:['The lyrics preview scrolls smoothly, line by line.', 'Music video: it fills the whole area, without the YouTube title or buttons on top, and can be hovered normally.', 'Clicking the cover in the player bar opens the Now playing panel.']},
   '0.7.4': {title:'Phone interface', changes:['On phones: a tab bar at the bottom, a compact player, and a full-screen Now playing page with its controls.', 'No more two-line texts: titles end with “…”.']},
   '0.7.3': {title:'Now playing panel: back to the song, and a gradient', changes:['“Switch to song” button to leave the music video in the Now playing panel.','The Now playing panel takes a gradient from the cover’s color.']},
   '0.7.2': {title:'New layout: bar, panel and playlists', changes:[

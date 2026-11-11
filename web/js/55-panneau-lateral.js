@@ -25,7 +25,7 @@ const PTABS = () => [['now', L('Now playing', 'En lecture')], ['queue', L('Queue
 const qRow = (q, i) => `<div class="nq ${i === S.cur ? 'on' : ''}" data-qi="${i}" draggable="true" title="${esc(q.title)}"><button class="qplay" data-act="qplay"><img src="${esc(q.thumb)}" alt=""><span class="qm"><b data-notr>${esc(q.title)}</b><small data-notr>${esc(q.channel)}</small></span></button><span class="qd">${q.duration ? fmt(q.duration) : ''}</span><button class="ib sm" data-act="qrm" aria-label="Retirer de la file">${ic('close')}</button></div>`;
 function lyricsPreviewHtml(Y){
   if (!Y || Y.state === 'loading') return `<p class="pn-dim">${L('Looking for lyrics…', 'Recherche des paroles…')}</p>`;
-  if (Y.lines) { const i = Math.max(0, lyrLine); return Y.lines.slice(i, i + 4).map((l, k) => `<p class="${k === 0 && lyrLine >= 0 ? 'cur' : ''}" data-notr>${esc(l.text) || '♪'}</p>`).join(''); }
+  if (Y.lines) return Y.lines.map((l, i) => `<p class="${i === lyrLine ? 'cur' : i < lyrLine ? 'past' : ''}" data-notr>${esc(l.text) || '♪'}</p>`).join('');
   if (Y.plain) return Y.plain.split('\n').filter(Boolean).slice(0, 4).map(l => `<p data-notr>${esc(l)}</p>`).join('');
   return '';
 }
@@ -42,7 +42,7 @@ function nowPanelHtml(t){
     ${S.clip ? `<button class="pn-toggle" data-do="clip" aria-pressed="true">${ic('note')}${L('Switch to song', 'Passer au titre')}</button>` : ''}
     <div class="pn-meta"><div style="min-width:0"><b class="tt" data-notr>${esc(t.title)}</b><span class="ch" data-notr>${chLink(t)}</span></div>${bmBtn(t)}</div>
     ${pnCtrlHtml()}
-    ${lp ? `<section class="pn-card pn-lyr" id="pnLyr"><h4>${L('Lyrics preview', 'Aperçu des paroles')}</h4><div class="pn-lines">${lp}</div><button class="more" data-do="fulllyr">${L('Show all', 'Tout afficher')}${ic('right')}</button></section>` : ''}
+    ${lp ? `<section class="pn-card pn-lyr" id="pnLyr"><h4>${L('Lyrics preview', 'Aperçu des paroles')}</h4><div class="pn-lines ${Y && Y.lines ? 'sync' : ''}">${lp}</div><button class="more" data-do="fulllyr">${L('Show all', 'Tout afficher')}${ic('right')}</button></section>` : ''}
     ${aboutHtml(t)}
     ${nx ? `<section class="pn-card"><div class="pn-row"><h4>${L('Next in queue', 'À suivre dans la file d’attente')}</h4><button class="more" data-ptab="queue">${L('Open queue', 'Ouvrir la file d’attente')}</button></div><button class="mini-row" data-act="qjump" data-qi="${ni}"><img src="${esc(nx.thumb)}" alt=""><span class="m"><b data-notr>${esc(nx.title)}</b><small data-notr>${esc(nx.channel)}</small></span></button></section>` : ''}</div>`;
 }
@@ -94,7 +94,10 @@ let pvLine = -2;
 setInterval(() => {
   if (!S.qopen || S.ptab !== 'now' || !S.lyr || !S.lyr.lines) return;
   if (lyrLine === pvLine) return; pvLine = lyrLine;
-  const el = document.querySelector('#pnLyr .pn-lines'); if (el) el.innerHTML = lyricsPreviewHtml(S.lyr);
+  const el = document.querySelector('#pnLyr .pn-lines'); if (!el) return;
+  if (el.children.length !== S.lyr.lines.length) el.innerHTML = lyricsPreviewHtml(S.lyr);
+  el.querySelectorAll('p').forEach((p, i) => { p.className = i === lyrLine ? 'cur' : i < lyrLine ? 'past' : ''; });
+  const c = el.querySelector('.cur'); if (c) el.scrollTo({top:c.offsetTop - el.clientHeight / 2 + c.offsetHeight / 2, behavior:S.settings.reduceMotion ? 'auto' : 'smooth'});
 }, 400);
 setInterval(() => { if (S.qopen && S.ptab === 'now' && S.lyr && S.lyr.lines && S.view.type !== 'now' && typeof syncLyrics === 'function') { /* la ligne courante est calculée ici quand la page « En lecture » n'est pas ouverte */
   const c = current(); if (!c || !ready) return; let now = 0; try { now = player.getCurrentTime() || 0; } catch {}

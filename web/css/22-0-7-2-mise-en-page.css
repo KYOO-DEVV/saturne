@@ -35,7 +35,7 @@
 .pn-h{margin:14px 6px 6px;font-size:15px;font-weight:800}
 .pn{display:grid;gap:12px;padding-bottom:12px}
 .pn-ctx{margin:0 4px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pn-art{position:relative;aspect-ratio:16/10;border-radius:14px;overflow:hidden;background:var(--raise)}
+.pn-art{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:var(--raise)}
 .pn-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .pn-vid{position:absolute;left:10px;bottom:10px;display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);color:#fff;font-weight:700;font-size:13px}
 .pn-vid svg{width:14px;height:14px}
