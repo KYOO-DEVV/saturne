@@ -7,7 +7,7 @@ const ACCENTS = {
   orange:['#c2410c','#fb923c','rgba(249,115,22,.15)','rgba(249,115,22,.2)']
 };
 const ACCENT_NAMES = {violet:'Violet', blue:'Bleu', green:'Vert', pink:'Rose', orange:'Orange'};
-const DEFAULT_SETTINGS = {seen:'', density:'comfortable', lyricsVideo:true, startMin:false, bgOverlay:80, bgTint:'bg', bgBlur:0, hideLogo:false, sideThumbs:true, bg:'oled', accentCustom:'', bgImage:'', homeGenre:'jpop', homeShelves:['Anime', 'City Pop'], lang:'', mediaKeys:true, tray:false, discord:false, discordId:'', onboarded:false, showPlayer:false, autoplay:true, remember:true, toasts:true, accent:'violet', radius:'soft', heroAuto:true, reduceMotion:false, autoUpdate:true};
+const DEFAULT_SETTINGS = {seen:'', density:'comfortable', lyricsVideo:true, startMin:false, bgOverlay:80, bgTint:'bg', bgBlur:0, hideLogo:false, sideThumbs:true, bg:'oled', accentCustom:'', bgImage:'', homeGenre:'jpop', homeShelves:['Anime', 'City Pop'], lang:'', mediaKeys:true, tray:false, discord:false, discordId:'', onboarded:false, showPlayer:false, autoplay:true, endless:true, remember:true, toasts:true, accent:'violet', radius:'soft', heroAuto:true, reduceMotion:false, autoUpdate:true};
 function applyTheme(){
   const a = ACCENTS[S.settings.accent] || ACCENTS.violet, st = document.documentElement.style;
   st.setProperty('--accent', a[0]); st.setProperty('--accent-hi', a[1]); st.setProperty('--accent-soft', a[2]); st.setProperty('--accent-glow', a[3]);
@@ -56,6 +56,7 @@ function settingsHtml(){
       ${setRow('Notifications', 'Affiche de petits messages quand tu ajoutes un titre, changes un réglage, etc. Les erreurs restent toujours visibles.', swc('toasts', T.toasts, 'Notifications'))}${desktopRows()}</div>`;
   else if (tab === 'playback') b = `<h2>Playback</h2><p class="lead">Comment la musique se lance et s'enchaîne.</p><div class="setgroup">
       ${setRow('Lecture automatique', 'Passe au titre suivant quand un titre se termine. Désactivé, la lecture s\'arrête à la fin du titre.', swc('autoplay', T.autoplay, 'Lecture automatique'))}
+      ${setRow(L('Endless play', 'Lecture sans fin'), L('When the queue ends, keep going with similar songs (YouTube radio). If YouTube is limiting requests, the queue starts over instead of stopping.', 'Quand la file se termine, enchaîne avec des titres similaires (radio YouTube). Si YouTube limite les requêtes, la file recommence au lieu de s\'arrêter.'), swc('endless', T.endless !== false, L('Endless play', 'Lecture sans fin')))}
       ${setRow('Reprendre la file d\'attente', 'Garde la file et le dernier titre au prochain lancement.', swc('remember', T.remember, 'Reprendre la file'))}
       ${setRow('Afficher le lecteur vidéo', 'Montre le lecteur YouTube dans un coin. Utile pour voir pourquoi un titre ne se lance pas (message de YouTube, âge, consentement…).', swc('showPlayer', T.showPlayer, 'Afficher le lecteur vidéo'))}
       ${sleepRow()}${playerLogHtml()}

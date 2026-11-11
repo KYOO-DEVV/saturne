@@ -1,6 +1,11 @@
 /* ---------- Changelog (liste repliable) ---------- */
 const TAGS = {new:'Nouveau', improved:'Amélioré', fixed:'Corrigé'};
 const CHANGELOG = [
+  {v:'0.7.9', date:'Nov 2026', title:'La musique ne s’arrête plus', changes:[
+    ['new', 'Lecture sans fin : quand la file se termine, Saturne enchaîne avec des titres similaires. Si YouTube ne répond pas, la file recommence au lieu de s’arrêter (Réglages › Lecture).'],
+    ['improved', 'Quand YouTube limite les requêtes, Saturne ressert la dernière réponse connue (recherches, artistes, playlists) au lieu d’afficher une erreur.'],
+    ['improved', 'Après un blocage, la pause avant de réessayer est plus courte (45 s) et ne s’allonge que si YouTube bloque à nouveau.'],
+    ['fixed', 'Lecteur : Saturne se présente correctement à YouTube (origine et référent), ce qui évite le refus « erreur 153 » chez certains utilisateurs.']]},
   {v:'0.7.8', date:'Nov 2026', title:'Page Paroles', changes:[
     ['new', 'Page Paroles façon Spotify : la pochette à gauche, les paroles à droite, avec la vidéo floutée en arrière-plan (désactivable).'],
     ['improved', 'Barre de lecture : le bouton Paroles remplace « En lecture », la minuterie de sommeil et le plein écran en sortent. La minuterie est dans Réglages › Lecture et dans la palette Ctrl + K.']]},
@@ -101,6 +106,7 @@ const CHANGELOG = [
 ];
 const clOpen = new Set([CHANGELOG[0].v]);
 const CL_EN = {
+  '0.7.9': {title:'Music no longer stops', changes:['Endless play: when the queue ends, Saturne carries on with similar songs. If YouTube does not answer, the queue starts over instead of stopping (Settings › Playback).', 'When YouTube limits requests, Saturne serves the last known answer (searches, artists, playlists) instead of an error.', 'After a block, the wait before retrying is shorter (45 s) and only grows if YouTube blocks again.', 'Player: Saturne now introduces itself properly to YouTube (origin and referrer), which avoids the “error 153” refusal for some users.']},
   '0.7.8': {title:'Lyrics page', changes:['Spotify-style Lyrics page: the cover on the left, the lyrics on the right, with the blurred video in the background (can be turned off).', 'Player bar: the Lyrics button replaces “Now playing”, and the sleep timer and full screen buttons are gone. The timer is in Settings › Playback and in the Ctrl + K palette.']},
   '0.7.7': {title:'Taskbar icon and animated background GIFs', changes:['Saturne’s icon had disappeared from the taskbar (0.6.2 to 0.7.6).', 'Animated GIFs now also work as the background image.']},
   '0.7.6': {title:'Every list as a table', changes:['Search, genres, artists, history and mixes use the same table as playlists.', 'Clicking a channel name in the table filters the list (click again, or the cross, to clear the filter).', 'Playlist banner: light line and color streak at the bottom of the header fixed, title easier to read over a bright image.']},

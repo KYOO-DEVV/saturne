@@ -43,28 +43,40 @@ pub fn thumb(id: &str) -> String {
 
 /// Moment (secondes depuis 1970) jusqu'auquel on évite d'interroger YouTube après un blocage anti-robot.
 static BLOCKED_UNTIL: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
-const BLOCK_PAUSE_SECS: u64 = 180;
+static BLOCK_STRIKES: std::sync::atomic::AtomicU32 = std::sync::atomic::AtomicU32::new(0);
 pub const BLOCKED_MSG: &str = "YouTube limite temporairement les recherches depuis cet ordinateur (trop de requêtes). Patiente quelques minutes puis réessaie.";
+
+/// Pause après un blocage : 45 s la première fois, puis le double à chaque nouveau blocage (10 min au plus).
+pub fn pause_for(strikes: u32) -> u64 {
+    (45u64 << strikes.min(4)).min(600)
+}
 
 pub fn unix_now() -> u64 {
     std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0)
 }
 
+/// Vrai pendant la pause qui suit un blocage anti-robot de la page de résultats.
+pub fn is_paused() -> bool {
+    unix_now() < BLOCKED_UNTIL.load(std::sync::atomic::Ordering::Relaxed)
+}
+
 pub async fn get(client: &reqwest::Client, url: &str) -> Result<String, String> {
     use std::sync::atomic::Ordering;
-    if unix_now() < BLOCKED_UNTIL.load(Ordering::Relaxed) {
+    if is_paused() {
         return Err(BLOCKED_MSG.to_string());
     }
     let resp = client.get(url).send().await.map_err(|e| format!("Connexion à YouTube impossible ({e})"))?;
     let status = resp.status();
     let to_sorry = resp.headers().get(reqwest::header::LOCATION).and_then(|l| l.to_str().ok()).is_some_and(|l| l.contains("/sorry"));
     if to_sorry || status == reqwest::StatusCode::TOO_MANY_REQUESTS {
-        BLOCKED_UNTIL.store(unix_now() + BLOCK_PAUSE_SECS, Ordering::Relaxed);
+        let n = BLOCK_STRIKES.fetch_add(1, Ordering::Relaxed);
+        BLOCKED_UNTIL.store(unix_now() + pause_for(n), Ordering::Relaxed);
         return Err(BLOCKED_MSG.to_string());
     }
     if !status.is_success() {
         return Err(format!("YouTube a répondu {status}"));
     }
+    BLOCK_STRIKES.store(0, Ordering::Relaxed);
     resp.text().await.map_err(|e| e.to_string())
 }
 
@@ -184,10 +196,10 @@ pub fn tracks_in(data: &Value) -> Vec<Track> {
     out
 }
 
-pub fn search_channels(html: &str) -> Result<Vec<Artist>, String> {
-    let data = initial_data(html)?;
+/// Chaînes (`channelRenderer`) d'une page de résultats déjà décodée.
+pub fn search_channels_in(data: &Value) -> Vec<Artist> {
     let mut out = Vec::new();
-    walk(&data, &mut |o| {
+    walk(data, &mut |o| {
         let Some(c) = o.get("channelRenderer") else { return };
         let Some(id) = c.get("channelId").and_then(Value::as_str) else { return };
         let thumbs = c.pointer("/thumbnail/thumbnails").and_then(Value::as_array);
@@ -195,7 +207,7 @@ pub fn search_channels(html: &str) -> Result<Vec<Artist>, String> {
         let subs = ["videoCountText", "subscriberCountText"].iter().map(|k| text_of(c.get(*k))).find(|t| is_subs(t)).unwrap_or_default();
         out.push(Artist { id: id.to_string(), name: text_of(c.get("title")), thumb: big_avatar(url), subs_text: subs });
     });
-    Ok(out)
+    out
 }
 
 pub struct ChannelPage {
@@ -371,6 +383,29 @@ mod tests {
         assert_eq!(parse_dur("abc"), None);
         assert_eq!(parse_views("5\u{202f}093\u{202f}918 vues"), 5_093_918);
         assert_eq!(parse_views("114 281 vues"), 114_281);
+    }
+
+    #[test]
+    fn block_pause_grows_then_caps() {
+        assert_eq!(pause_for(0), 45);
+        assert_eq!(pause_for(1), 90);
+        assert_eq!(pause_for(3), 360);
+        assert_eq!(pause_for(4), 600);
+        assert_eq!(pause_for(40), 600);
+    }
+
+    #[test]
+    fn channels_are_read_from_decoded_data() {
+        let data = serde_json::json!({"contents": {"x": [
+            {"videoRenderer": {"videoId": "abcdefghijk", "title": {"runs": [{"text": "Song"}]}, "lengthText": {"simpleText": "3:10"},
+              "ownerText": {"runs": [{"text": "Artist - Topic", "navigationEndpoint": {"browseEndpoint": {"browseId": "UC123"}}}]}}},
+            {"channelRenderer": {"channelId": "UC123", "title": {"simpleText": "Artist"}, "thumbnail": {"thumbnails": [{"url": "//yt3.ggpht.com/a=s88-c-k"}]}, "subscriberCountText": {"simpleText": "1 M d'abonnés"}}}
+        ]}});
+        let t = tracks_in(&data);
+        assert_eq!((t.len(), t[0].id.as_str(), t[0].channel.as_str(), t[0].duration), (1, "abcdefghijk", "Artist", Some(190)));
+        let a = search_channels_in(&data);
+        assert_eq!((a.len(), a[0].id.as_str()), (1, "UC123"));
+        assert!(a[0].thumb.starts_with("https://") && a[0].thumb.contains("=s240"));
     }
 
     #[test]

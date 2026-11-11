@@ -2,7 +2,7 @@
 let player = null, ready = false, ytLoading = false, pendingLoad = false, playing = false, errStreak = 0, seeking = false, lastLogged = '';
 function loadYT(){
   if (ytLoading) return; ytLoading = true;
-  window.onYouTubeIframeAPIReady = () => { player = new YT.Player('yt', {width:'200', height:'200', playerVars:{playsinline:1, rel:0, controls:0, disablekb:1}, events:{onReady, onStateChange, onError}}); };
+  window.onYouTubeIframeAPIReady = () => { player = new YT.Player('yt', {width:'200', height:'200', playerVars:{playsinline:1, rel:0, controls:0, disablekb:1, origin:location.origin, widget_referrer:location.origin}, events:{onReady, onStateChange, onError}}); };
   const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api';
   s.onerror = () => toast('Le lecteur n\'a pas pu se charger. Vérifie ta connexion puis relance Saturne.');
   setTimeout(() => { if (!ready) toast('Le lecteur met du temps à démarrer… vérifie ta connexion internet.'); }, 12000);
@@ -49,7 +49,7 @@ function next(auto){
   if (auto && S.repeat === 'one' && ready) { player.seekTo(0, true); player.playVideo(); return; }
   if (S.pos + 1 < S.order.length) S.pos++;
   else if (S.repeat === 'all') { if (S.shuffle) { S.cur = -1; rebuildOrder(); } S.pos = 0; }
-  else { if (!auto) toast('Fin de la file d\'attente'); return; }
+  else { if (auto && S.settings.endless !== false && S.queue.length) { endlessNext(); return; } if (!auto) toast('Fin de la file d\'attente'); return; }
   S.cur = S.order[S.pos]; loadCurrent();
 }
 function prev(){

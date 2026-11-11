@@ -87,10 +87,17 @@ impl App {
                 return Ok(v.clone());
             }
         }
-        let v = make().await?;
+        let v = match make().await {
+            Ok(v) => v,
+            // YouTube nous limite ou ne répond pas : une réponse plus ancienne vaut mieux qu'une erreur.
+            Err(e) => return self.cache.lock().unwrap().get(&key).map(|(_, v)| v.clone()).ok_or(e),
+        };
         let mut c = self.cache.lock().unwrap();
-        if c.len() > 400 {
-            c.clear();
+        if c.len() > 600 {
+            c.retain(|_, (at, _)| at.elapsed() < Duration::from_secs(24 * 3600));
+            if c.len() > 600 {
+                c.clear();
+            }
         }
         c.insert(key, (Instant::now(), v.clone()));
         Ok(v)
@@ -482,27 +489,31 @@ fn fail(e: String) -> Response {
     err(StatusCode::BAD_GATEWAY, &e)
 }
 
+/// Une page de résultats (données de la page + clé du client web, pour « Afficher plus »).
+async fn search_page(app: &App, q: &str, sp: &str, gl: &str) -> Result<(Value, Option<ytmore::Cfg>), String> {
+    let h = yt::get(&app.http, &results_url(q, sp, gl)).await?;
+    Ok((yt::initial_data(&h)?, ytmore::cfg(&h)))
+}
+
 async fn search_videos(app: &App, q: &str, gl: &str) -> Result<Value, String> {
     let (q, gl) = (q.to_string(), gl.to_string());
     app.cached(format!("sv|{gl}|{q}"), Duration::from_secs(1800), || async {
         // D'abord les vidéos de moins de 4 minutes (surtout des chansons). Si ça ne suffit pas (lo-fi, jazz…), on ajoute toutes les vidéos.
         let mut page: Option<(ytmore::Cfg, Value)> = None;
         let mut list = Vec::new();
-        match yt::get(&app.http, &results_url(&q, yt::SP_SHORT, &gl)).await {
-            Ok(h) => {
-                let data = yt::initial_data(&h)?;
+        match search_page(app, &q, yt::SP_SHORT, &gl).await {
+            Ok((data, cfg)) => {
                 list = yt::tracks_in(&data);
-                page = ytmore::cfg(&h).map(|c| (c, data));
+                page = cfg.map(|c| (c, data));
             }
             Err(e) if e == yt::BLOCKED_MSG => return Err(e),
             Err(_) => {}
         }
         let enough = list.iter().filter(|t| matches!(t.duration, Some(d) if (60..=900).contains(&d))).count() >= 10;
         if !enough {
-            let h = yt::get(&app.http, &results_url(&q, yt::SP_VIDEO, &gl)).await?;
-            let data = yt::initial_data(&h)?;
+            let (data, cfg) = search_page(app, &q, yt::SP_VIDEO, &gl).await?;
             list.extend(yt::tracks_in(&data));
-            page = ytmore::cfg(&h).map(|c| (c, data));
+            page = cfg.map(|c| (c, data));
         }
         // Jeton de la page suivante (bouton « Afficher plus »).
         let next = page.and_then(|(c, d)| ytmore::continuation_token(&d).map(|t| json!({"t": t, "k": c.key, "v": c.ver})));
@@ -513,7 +524,11 @@ async fn search_videos(app: &App, q: &str, gl: &str) -> Result<Value, String> {
 
 async fn search_channels(app: &App, q: &str) -> Result<Value, String> {
     let q = q.to_string();
-    app.cached(format!("sc|{q}"), Duration::from_secs(6 * 3600), || async { Ok(json!(yt::search_channels(&yt::get(&app.http, &results_url(&q, yt::SP_CHANNEL, "")).await?)?)) }).await
+    app.cached(format!("sc|{q}"), Duration::from_secs(6 * 3600), || async {
+        let (data, _) = search_page(app, &q, yt::SP_CHANNEL, "").await?;
+        Ok(json!(yt::search_channels_in(&data)))
+    })
+    .await
 }
 
 async fn api_search(State(app): State<App>, Query(q): Q) -> Response {

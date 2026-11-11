@@ -2,7 +2,7 @@
 const altMap = (() => { try { return JSON.parse(localStorage.getItem('saturne.alt2') || '{}'); } catch { return {}; } })();
 const saveAlt = () => { try { localStorage.setItem('saturne.alt2', JSON.stringify(Object.fromEntries(Object.entries(altMap).slice(-300)))); } catch {} };
 const playId = t => altMap[t.id] || t.id;
-const ERR_TEXT = {2:'identifiant invalide', 5:'erreur du lecteur', 100:'vidéo introuvable ou privée', 101:'lecture interdite hors de YouTube', 150:'lecture interdite hors de YouTube'};
+const ERR_TEXT = {2:'identifiant invalide', 5:'erreur du lecteur', 100:'vidéo introuvable ou privée', 101:'lecture interdite hors de YouTube', 150:'lecture interdite hors de YouTube', 153:'lecteur refusé par YouTube (en-tête manquant)'};
 const playerLog = [];
 const logPlayer = (t, msg) => { playerLog.unshift({at:Date.now(), title:t ? t.title : '?', msg}); playerLog.length = Math.min(playerLog.length, 8); if (S.view.type === 'settings' && S.setTab === 'playback') renderView(); };
 const triedAlt = new Map();
