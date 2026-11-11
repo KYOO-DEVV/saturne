@@ -125,3 +125,85 @@ pub fn blend_title_bar(window: &tao::window::Window) {
 }
 #[cfg(not(windows))]
 pub fn blend_title_bar(_: &tao::window::Window) {}
+
+/// Couleur de la barre de titre (elle suit le thème choisi dans l'application). Sur fond clair, les boutons de fenêtre passent en sombre.
+#[cfg(windows)]
+pub fn title_bar_color(window: &tao::window::Window, r: u8, g: u8, b: u8) {
+    use tao::platform::windows::WindowExtWindows;
+    #[link(name = "dwmapi")]
+    unsafe extern "system" {
+        fn DwmSetWindowAttribute(hwnd: isize, attr: u32, value: *const u32, size: u32) -> i32;
+    }
+    let hwnd = window.hwnd() as isize;
+    let color: u32 = (b as u32) << 16 | (g as u32) << 8 | r as u32; // COLORREF 0x00BBGGRR
+    let dark: u32 = ((r as u32 * 299 + g as u32 * 587 + b as u32 * 114) / 1000 < 140) as u32;
+    unsafe {
+        DwmSetWindowAttribute(hwnd, 20, &dark, 4); // DWMWA_USE_IMMERSIVE_DARK_MODE
+        DwmSetWindowAttribute(hwnd, 35, &color, 4);
+        DwmSetWindowAttribute(hwnd, 34, &color, 4);
+    }
+}
+#[cfg(not(windows))]
+pub fn title_bar_color(_: &tao::window::Window, _: u8, _: u8, _: u8) {}
+
+/// `rrggbb` -> (r, g, b).
+pub fn parse_hex(s: &str) -> Option<(u8, u8, u8)> {
+    let s = s.trim_start_matches('#');
+    if s.len() != 6 || !s.is_ascii() {
+        return None;
+    }
+    Some((u8::from_str_radix(&s[0..2], 16).ok()?, u8::from_str_radix(&s[2..4], 16).ok()?, u8::from_str_radix(&s[4..6], 16).ok()?))
+}
+
+/// Taille, position et options de la fenêtre, gardées d'un lancement à l'autre (`window.json`).
+#[derive(serde::Serialize, serde::Deserialize, Clone, Copy, Debug, PartialEq)]
+pub struct WinState {
+    pub w: u32,
+    pub h: u32,
+    pub x: i32,
+    pub y: i32,
+    #[serde(default)]
+    pub max: bool,
+    /// Démarrer réduit dans la zone de notification.
+    #[serde(default)]
+    pub startmin: bool,
+}
+
+impl WinState {
+    pub fn load(dir: &std::path::Path) -> Option<WinState> {
+        let s: WinState = serde_json::from_str(&std::fs::read_to_string(dir.join("window.json")).ok()?).ok()?;
+        // Une taille absurde (fichier abîmé, écran débranché) est ignorée.
+        ((400..=10000).contains(&s.w) && (300..=10000).contains(&s.h)).then_some(s)
+    }
+    pub fn save(&self, dir: &std::path::Path) {
+        if let Ok(j) = serde_json::to_string(self) {
+            let _ = std::fs::write(dir.join("window.json"), j);
+        }
+    }
+    /// Vrai si le coin de la fenêtre tombe dans un des écrans (rectangles x, y, largeur, hauteur).
+    pub fn on_screen(&self, screens: &[(i32, i32, u32, u32)]) -> bool {
+        screens.iter().any(|(sx, sy, sw, sh)| self.x + 80 > *sx && self.x + 80 < sx + *sw as i32 && self.y >= *sy - 10 && self.y + 40 < sy + *sh as i32)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn window_state() {
+        assert_eq!(parse_hex("#0a0B0c"), Some((10, 11, 12)));
+        assert_eq!(parse_hex("zzz"), None);
+        let s = WinState { w: 1200, h: 800, x: 100, y: 50, max: false, startmin: false };
+        assert!(s.on_screen(&[(0, 0, 1920, 1080)]));
+        assert!(!WinState { x: 5000, ..s }.on_screen(&[(0, 0, 1920, 1080)]));
+        assert!(WinState { x: -1800, ..s }.on_screen(&[(-1920, 0, 1920, 1080), (0, 0, 1920, 1080)]));
+        let dir = std::env::temp_dir().join(format!("saturne-win-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        s.save(&dir);
+        assert_eq!(WinState::load(&dir), Some(s));
+        std::fs::write(dir.join("window.json"), r#"{"w":5,"h":5,"x":0,"y":0}"#).unwrap();
+        assert_eq!(WinState::load(&dir), None);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+}

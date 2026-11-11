@@ -7,13 +7,14 @@ const ACCENTS = {
   orange:['#c2410c','#fb923c','rgba(249,115,22,.15)','rgba(249,115,22,.2)']
 };
 const ACCENT_NAMES = {violet:'Violet', blue:'Bleu', green:'Vert', pink:'Rose', orange:'Orange'};
-const DEFAULT_SETTINGS = {seen:'', density:'comfortable', lang:'', mediaKeys:true, tray:false, discord:false, discordId:'', onboarded:false, showPlayer:false, autoplay:true, remember:true, toasts:true, accent:'violet', radius:'soft', heroAuto:true, reduceMotion:false, autoUpdate:true};
+const DEFAULT_SETTINGS = {seen:'', density:'comfortable', startMin:false, bg:'oled', accentCustom:'', bgImage:'', homeGenre:'jpop', homeShelves:['Anime', 'City Pop'], lang:'', mediaKeys:true, tray:false, discord:false, discordId:'', onboarded:false, showPlayer:false, autoplay:true, remember:true, toasts:true, accent:'violet', radius:'soft', heroAuto:true, reduceMotion:false, autoUpdate:true};
 function applyTheme(){
   const a = ACCENTS[S.settings.accent] || ACCENTS.violet, st = document.documentElement.style;
   st.setProperty('--accent', a[0]); st.setProperty('--accent-hi', a[1]); st.setProperty('--accent-soft', a[2]); st.setProperty('--accent-glow', a[3]);
   document.documentElement.dataset.radius = ['square', 'soft', 'round'].includes(S.settings.radius) ? S.settings.radius : 'soft';
   document.documentElement.classList.toggle('no-motion', !!S.settings.reduceMotion);
   document.documentElement.dataset.density = S.settings.density === 'compact' ? 'compact' : 'comfortable';
+  applyThemeExtra();
   const yb = document.querySelector('.ytbox'); if (yb) yb.classList.toggle('show', !!S.settings.showPlayer);
 }
 function setCollapsed(v){
@@ -25,7 +26,9 @@ function toggleSetting(k){
   if (k === 'collapsed') return setCollapsed(!S.collapsed);
   S.settings[k] = !S.settings[k];
   if (k === 'reduceMotion') applyTheme();
-  if (k === 'mediaKeys' || k === 'tray') applyNative();
+  if (k === 'startMin' && S.settings.startMin) S.settings.tray = true;
+  if (k === 'tray' && !S.settings.tray) S.settings.startMin = false;
+  if (k === 'mediaKeys' || k === 'tray' || k === 'startMin') applyNative();
   if (k === 'discord') { presKey = ''; syncPresence(); }
   save(); renderView();
 }
@@ -46,7 +49,7 @@ function settingsHtml(){
       ${setRow('Se déconnecter', 'Tu seras déconnecté de cet appareil.', `<button class="ghost" data-act="logout">${ic('logout')}Log out</button>`)}
       ${setRow('Supprimer le compte', 'Supprime définitivement ton compte, tes playlists et ton historique.', `<button class="ghost warn" data-act="deleteacct">${ic('trash')}Delete</button>`, 'danger')}</div>`;
   else if (tab === 'general') b = `<h2>General</h2><p class="lead">Région, barre latérale et notifications.</p><div class="setgroup">
-      ${langRow()}
+      ${langRow()}${homeRows()}
       ${setRow('Région de recherche', 'Change la région des résultats de la recherche et des genres.', dd('region', 'Région de recherche'))}
       ${setRow('Barre latérale réduite', 'Garde seulement les icônes pour laisser plus de place à la musique.', swc('collapsed', S.collapsed, 'Barre latérale réduite'))}
       ${setRow('Notifications', 'Affiche de petits messages quand tu ajoutes un titre, changes un réglage, etc. Les erreurs restent toujours visibles.', swc('toasts', T.toasts, 'Notifications'))}${desktopRows()}</div>`;
@@ -59,6 +62,7 @@ function settingsHtml(){
       <div class="set"><p class="kv" style="width:100%">${shortcutsKv()}</p></div></div>`;
   else if (tab === 'appearance') b = `<h2>Appearance</h2><p class="lead">Couleur, arrondis et animations.</p><div class="setgroup">
       ${setRow('Couleur d\'accent', 'Boutons, sélection et barre de progression.', `<div class="swatches" role="group" aria-label="Couleur d'accent">${Object.entries(ACCENTS).map(([k, c]) => `<button class="swatch ${T.accent === k ? 'on' : ''}" data-accent="${k}" style="--c:${c[0]}" title="${ACCENT_NAMES[k]}" aria-label="${ACCENT_NAMES[k]}" aria-pressed="${T.accent === k}"></button>`).join('')}</div>`)}
+      ${themeRows()}
       ${setRow('Style des coins', 'Carrés pour un rendu plus sobre, arrondis pour plus de douceur.', `<div class="seg" role="group" aria-label="Style des coins">${segBtn('data-radiusset', 'square', T.radius, '', 'Square')}${segBtn('data-radiusset', 'soft', T.radius, '', 'Soft')}${segBtn('data-radiusset', 'round', T.radius, '', 'Round')}</div>`)}
       ${setRow('Bannière d\'accueil automatique', 'Fait défiler les nouvelles sorties toutes les 7 secondes.', swc('heroAuto', T.heroAuto, 'Bannière automatique'))}
       ${setRow('Densité', 'Compact réduit les marges et la taille des cartes pour voir plus de titres.', `<div class="seg" role="group" aria-label="Densité">${segBtn('data-densityset', 'comfortable', T.density, '', 'Comfortable')}${segBtn('data-densityset', 'compact', T.density, '', 'Compact')}</div>`)}

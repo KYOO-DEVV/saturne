@@ -1,6 +1,18 @@
 /* ---------- Changelog (liste repliable) ---------- */
 const TAGS = {new:'Nouveau', improved:'Amélioré', fixed:'Corrigé'};
 const CHANGELOG = [
+  {v:'0.7.0', date:'Nov 2026', title:'Paroles, clip, suivis, mixes et thèmes', changes:[
+    ['new', 'Paroles du titre en cours dans Now playing, synchronisées quand elles existent (clique une ligne pour y aller).'],
+    ['new', 'Clip vidéo : le lecteur YouTube s’affiche sur la pochette de Now playing.'],
+    ['new', 'Suivre des artistes : section « Suivis » et nouveautés de tes artistes sur l\'accueil.'],
+    ['new', 'Mixes automatiques (« Fait pour toi ») créés à partir de ton historique d\'écoute.'],
+    ['new', 'Palette de commandes (Ctrl + K) : pages, playlists, réglages et actions au clavier.'],
+    ['new', 'Playlists : filtre, tri, sélection multiple, retrait des doublons, et enregistrement de la file comme playlist.'],
+    ['new', 'Import d\'un fichier CSV Spotify (export Exportify), titre par titre.'],
+    ['new', 'Thèmes : couleur d\'accent libre, fond OLED / gris sombre / clair, image de fond ; la barre de titre suit le fond.'],
+    ['new', 'Accueil personnalisable : genre principal et étagères au choix.'],
+    ['new', 'La fenêtre retient sa taille et sa position ; option « Démarrer réduit ».'],
+    ['improved', 'Écran de secours avec bouton Recharger si la page ne démarre pas, et vérification automatique du script avant chaque version.']]},
   {v:'0.6.3', date:'Nov 2026', title:'Écran noir corrigé', changes:[
     ['fixed', 'Les versions 0.6.1 et 0.6.2 pouvaient démarrer sur un écran noir (erreur dans la page).']]},
   {v:'0.6.1', date:'Nov 2026', title:'Le bon morceau', changes:[
@@ -57,6 +69,18 @@ const CHANGELOG = [
 ];
 const clOpen = new Set([CHANGELOG[0].v]);
 const CL_EN = {
+  '0.7.0': {title:'Lyrics, music video, follows, mixes and themes', changes:[
+    'Lyrics for the current song in Now playing, synced when available (click a line to jump to it).',
+    'Music video: the YouTube player appears over the Now playing cover.',
+    'Follow artists: a “Following” section and new releases from your artists on Home.',
+    'Automatic mixes (“Made for you”) built from your listening history.',
+    'Command palette (Ctrl + K): pages, playlists, settings and actions from the keyboard.',
+    'Playlists: filter, sort, multi-select, duplicate removal, and saving the queue as a playlist.',
+    'Import a Spotify CSV file (Exportify export), song by song.',
+    'Themes: free accent color, OLED / dark grey / light background, background image; the title bar follows the background.',
+    'Customizable Home: main genre and shelves of your choice.',
+    'The window remembers its size and position; “Start minimized” option.',
+    'Fallback screen with a Reload button if the page fails to start, and an automatic script check before each version.']},
   '0.6.3': {title:'Black screen fixed', changes:['Versions 0.6.1 and 0.6.2 could start on a black screen (an error in the page).']},
   '0.6.1': {title:'The right song', changes:['A song could be replaced by another track by the artist when Saturne looked for another version: the replacement must now have the same title.']},
   '0.6.0': {title:'Language, history, radio, mini player and more', changes:[

@@ -20,6 +20,7 @@ Application de streaming musical pour Windows, écrite en Rust. Noir OLED, un se
 - **Glisser-déposer** pour réorganiser une playlist et la file d'attente.
 - **Historique** par jour et **statistiques** d'écoute, **Discord Rich Presence** (optionnel).
 - **Import d'un export** (fusionner ou remplacer) et **sauvegardes automatiques** restaurables (*Settings › Data*).
+- **0.7** : paroles (lrclib.net), clip vidéo, artistes suivis, mixes automatiques, palette Ctrl+K, outils de playlist, import Spotify CSV, thèmes (accent libre, fond clair, image), accueil personnalisable, mémoire de la fenêtre.
 - Barres de défilement masquées (flèches sur les étagères), accessibilité clavier et lecteur d'écran soignée.
 
 ## Installer (Windows 10/11)

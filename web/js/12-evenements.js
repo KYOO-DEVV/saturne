@@ -37,13 +37,13 @@ $('#view').addEventListener('click', e => {
   const g = e.target.closest('[data-genre]');
   if (g) { const x = GENRES[+g.dataset.genre]; return go({type:'list', q:x.q, title:x.n, cc:x.cc, eyebrow:'Genre'}); }
   const mo = e.target.closest('[data-more]');
-  if (mo) { if (mo.dataset.more === '__new__') return go({type:'list', q:'__new__', title:'New Releases', eyebrow:'Latest'}); const s = SHELVES.find(x => x.key === mo.dataset.more); return go({type:'list', q:s.q, title:s.title, cc:s.cc, eyebrow:'Home'}); }
+  if (mo) { if (mo.dataset.more === '__new__') return go({type:'list', q:'__new__', title:'New Releases', eyebrow:'Latest'}); const s = SHELVES.find(x => x.key === mo.dataset.more); if (!s) return; return go({type:'list', q:s.q, title:s.title, cc:s.cc, eyebrow:'Home'}); }
   const cl = e.target.closest('[data-cl]'); if (cl) return toggleCl(cl.dataset.cl);
   const ca = e.target.closest('[data-clall]'); if (ca) return setAllCl(ca.dataset.clall === 'open');
   const st = e.target.closest('[data-settab]'); if (st) { S.setTab = st.dataset.settab; renderView(); if (['updates', 'about', 'data', 'changelog'].includes(S.setTab)) loadAbout(); if (S.setTab === 'data') loadBackups(); return; }
   const sw = e.target.closest('[data-set]'); if (sw) return toggleSetting(sw.dataset.set);
   const sd = e.target.closest('[data-densityset]'); if (sd) { S.settings.density = sd.dataset.densityset; applyTheme(); save(); return renderView(); }
-  const sa = e.target.closest('[data-accent]'); if (sa) { S.settings.accent = sa.dataset.accent; applyTheme(); save(); return renderView(); }
+  const sa = e.target.closest('[data-accent]'); if (sa) { S.settings.accentCustom = ''; S.settings.accent = sa.dataset.accent; applyTheme(); save(); return renderView(); }
   const sr = e.target.closest('[data-radiusset]'); if (sr) { S.settings.radius = sr.dataset.radiusset; applyTheme(); save(); return renderView(); }
   const b = e.target.closest('[data-act]'); if (!b) return;
   const act = b.dataset.act, holder = b.closest('[data-src]'), src = holder ? holder.dataset.src : defaultSrc(), l = tracksOf(src);
@@ -54,8 +54,8 @@ $('#view').addEventListener('click', e => {
   else if (act === 'queue') addToQueue(t);
   else if (act === 'menu') { e.stopPropagation(); openMenu(b, t); }
   else if (act === 'plmenu') { e.stopPropagation(); const pp = S.playlists.find(x => x.id === b.dataset.pid); if (pp) openPlMenu(b, pp); }
-  else if (act === 'remove') removeTrackAt(l, i);
-  else if (act === 'up' || act === 'down') { const j = act === 'up' ? i - 1 : i + 1; if (j < 0 || j >= l.length) return; [l[i], l[j]] = [l[j], l[i]]; save(); render(); }
+  else if (act === 'remove') { if (src === 'pl' && p) removeTrackAt(p.tracks, p.tracks.indexOf(t)); else removeTrackAt(l, i); }
+  else if ((act === 'up' || act === 'down') && (src !== 'pl' || plPlain())) { const j = act === 'up' ? i - 1 : i + 1; if (j < 0 || j >= l.length) return; [l[i], l[j]] = [l[j], l[i]]; save(); render(); }
   else if (act === 'playall') { S.shuffle = false; playList(l, 0); }
   else if (act === 'shuffleall') { S.shuffle = true; playList(l, Math.floor(Math.random() * l.length)); }
   else if (act === 'playmain') { S.shuffle = false; playList(S.home.main.tracks, 0); }

@@ -4,6 +4,7 @@ const native = cmd => { if (NATIVE) { try { window.ipc.postMessage(cmd); } catch
 function applyNative(){
   native(S.settings.mediaKeys ? 'media:on' : 'media:off');
   native(S.settings.tray ? 'tray:on' : 'tray:off');
+  native(S.settings.startMin && S.settings.tray ? 'startmin:on' : 'startmin:off');
 }
 let lastMedia = 0;
 /* Commande de lecture venue d'une touche multimédia (Windows) ou de l'icône de notification. Un petit délai évite le double déclenchement. */

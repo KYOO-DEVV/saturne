@@ -2,7 +2,8 @@
 const ytId = s => { const m = s.match(/(?:youtu\.be\/|[?&]v=|\/shorts\/|\/embed\/|\/live\/)([\w-]{11})/); return m ? m[1] : null; };
 const dedupe = l => { const seen = new Set(); return l.filter(t => !seen.has(t.id) && seen.add(t.id)); };
 const fetchTracks = async (q, gl) => (await api('search', {type:'video', q, gl:gl || ''})).items;
-const HOME_QUERIES = ['J-POP 人気曲 MV', 'J-POP official music video'];
+let HOME_QUERIES = ['J-POP 人気曲 MV', 'J-POP official music video'], HOME_CC = 'JP', HOME_NEWQ = 'J-POP', HOME_NAME = 'J-POP';
+const homeNew = () => ({gl:HOME_CC, q:HOME_NEWQ});
 let homeSeq = 0;
 async function loadHome(fresh){
   if (!fresh && S.home.main.tracks.length) return;
@@ -11,17 +12,17 @@ async function loadHome(fresh){
   SHELVES.forEach(s => H.shelves[s.key] = {tracks:[], loading:true, error:''}); render();
   const done = fn => v => { if (seq === homeSeq) { fn(v); if (S.view.type === 'home') renderView(); } };
   await Promise.all([
-    api('new', {gl:'JP'}).then(done(j => H.fresh = {tracks:j.items, loading:false, error:''}), done(e => H.fresh = {tracks:[], loading:false, error:errText(e)})),
-    Promise.all(HOME_QUERIES.map(q => fetchTracks(q, 'JP'))).then(done(a => H.main = {tracks:dedupe(a.flat()), loading:false, error:''}), done(e => H.main = {tracks:[], loading:false, error:errText(e)})),
+    api('new', homeNew()).then(done(j => H.fresh = {tracks:j.items, loading:false, error:''}), done(e => H.fresh = {tracks:[], loading:false, error:errText(e)})),
+    Promise.all(HOME_QUERIES.map(q => fetchTracks(q, HOME_CC))).then(done(a => H.main = {tracks:dedupe(a.flat()), loading:false, error:''}), done(e => H.main = {tracks:[], loading:false, error:errText(e)})),
     ...SHELVES.map(s => fetchTracks(s.q, s.cc).then(done(t => H.shelves[s.key] = {tracks:t, loading:false, error:''}), done(e => H.shelves[s.key] = {tracks:[], loading:false, error:errText(e)})))
   ]);
-  if (seq === homeSeq) render();
+  if (seq === homeSeq) { render(); loadFollowNew(); }
 }
 let listSeq = 0;
 async function loadList(v){
   const seq = ++listSeq;
   S.list = {title:v.title, eyebrow:v.eyebrow || 'Genre', q:v.q, cc:v.cc || '', loading:true, error:'', tracks:[]}; render();
-  try { const j = v.q === '__new__' ? {items:(await api('new', {gl:'JP'})).items, next:null} : await fetchPage(v.q, v.cc || S.cc); if (seq !== listSeq) return; S.list.tracks = j.items; S.list.next = j.next; }
+  try { const j = v.q === '__new__' ? {items:(await api('new', homeNew())).items, next:null} : await fetchPage(v.q, v.cc || S.cc); if (seq !== listSeq) return; S.list.tracks = j.items; S.list.next = j.next; }
   catch (e) { if (seq !== listSeq) return; S.list.error = errText(e); }
   S.list.loading = false; render();
 }

@@ -22,7 +22,7 @@ function ytImportModal(url){
 }
 function importModal(){
   openModal(`<h3>${L('Import a playlist', 'Importer une playlist')}</h3><p>${L('Paste a <b>SATURNE1…</b> share code from a friend, or the link of a public YouTube playlist. The playlist is added to your library, privately.', "Colle un code de partage <b>SATURNE1…</b> reçu d'un ami, ou le lien d'une playlist YouTube publique. La playlist est ajoutée à ta bibliothèque, en privé.")}</p>
-    <form id="imf"><textarea class="codebox" id="imCode" placeholder="SATURNE1.…  /  https://www.youtube.com/playlist?list=…" aria-label="${L('Share code or link', 'Code ou lien')}"></textarea><div class="merr" id="imErr" role="alert"></div>
+    <p style="margin:0 0 12px"><button type="button" class="ghost" id="imSpotify">${ic('upload')}${L('Import a Spotify CSV file', 'Importer un fichier CSV Spotify')}</button></p><form id="imf"><textarea class="codebox" id="imCode" placeholder="SATURNE1.…  /  https://www.youtube.com/playlist?list=…" aria-label="${L('Share code or link', 'Code ou lien')}"></textarea><div class="merr" id="imErr" role="alert"></div>
     <div class="mactions"><button type="button" class="ghost" data-mclose>${L('Cancel', 'Annuler')}</button><button class="btn">${ic('upload')}${L('Import', 'Importer')}</button></div></form>`,
   m => m.querySelector('#imf').addEventListener('submit', async e => {
     e.preventDefault();

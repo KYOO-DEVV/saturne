@@ -5,7 +5,7 @@
 .set p{margin:0;color:var(--mute);max-width:46ch}
 .set .grow{flex:1;min-width:200px}
 .switch{width:46px;height:28px;border-radius:var(--r-btn);background:var(--line2);position:relative;transition:background .2s;flex:none}
-.switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:var(--r-sm);background:#fff;transition:transform .2s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:var(--r-sm);background:var(--hi);transition:transform .2s}
 .switch[aria-checked=true]{background:var(--accent)}
 .switch[aria-checked=true]::after{transform:translateX(18px)}
 .profile{display:flex;gap:18px;align-items:center;flex-wrap:wrap}

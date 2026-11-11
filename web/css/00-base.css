@@ -3,12 +3,12 @@
 /* Design : noir OLED, texte blanc/gris, un seul accent violet. Rail gauche, contenu, barre de lecture en bas, file d'attente en tiroir. */
 :root{
   color-scheme:dark;
-  --bg:#000; --panel:#08080b; --raise:#101015; --raise2:#18181f; --line:#1c1c24; --line2:#2a2a35;
+  --bg:#000; --panel:#08080b; --raise:#101015; --raise2:#18181f; --line:#1c1c24; --line2:var(--line2);
   --fg:#f5f5f8; --mute:#8b8b99; --accent:#7c3aed; --accent-hi:#a78bfa; --accent-soft:rgba(139,92,246,.15);
   --font:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --sw:248px; --barh:84px;
   --r-btn:10px; --r-ctl:12px; --r-sm:8px;
-  --faint:#8a8a98; --bookmark:#fbbf24; --accent-glow:rgba(139,92,246,.2);
+  --faint:#8a8a98; --hi:#fff; --fg2:#d0d0da; --veil:transparent; --bookmark:#fbbf24; --accent-glow:rgba(139,92,246,.2);
 }
 html[data-radius="square"]{--r-btn:5px;--r-ctl:7px;--r-sm:4px}
 html[data-radius="round"]{--r-btn:999px;--r-ctl:16px;--r-sm:10px}

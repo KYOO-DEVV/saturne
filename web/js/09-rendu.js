@@ -4,12 +4,14 @@ function tracksOf(src){
   if (src === 'fresh') return S.home.fresh.tracks;
   if (src === 'recent') return S.history;
   if (src === 'plays') return playsTracks();
+  if (src === 'mix') return (S.mix || {tracks:[]}).tracks;
+  if (src === 'follownew') return S.home.follow ? S.home.follow.tracks : [];
   if (src && src.startsWith('shelf:')) return (S.home.shelves[src.slice(6)] || {}).tracks || [];
   if (src === 'list') return S.list.tracks;
   if (src === 'search') return S.search.tracks;
   if (src === 'artist') return S.artist.tracks;
   if (src === 'pub') return (S.pub.data || {tracks:[]}).tracks;
-  if (src === 'pl') return (curPl() || {tracks:[]}).tracks;
+  if (src === 'pl') return plView();
   return [];
 }
 const defaultSrc = () => ({home:'main', list:'list', search:'search', playlist:'pl', artist:'artist', pubpl:'pub'}[S.view.type]);
@@ -24,11 +26,13 @@ function card(t, i){
     <div class="tt" title="${esc(t.title)}">${esc(t.title)}</div><div class="ch">${chLink(t)}</div></li>`;
 }
 function row(t, i, n){
-  const c = current(), on = c && c.id === t.id, own = S.view.type === 'playlist';
+  const c = current(), on = c && c.id === t.id, own = S.view.type === 'playlist', plain = own && plPlain();
   let acts = bmBtn(t) + `<button class="ib" data-act="queue" aria-label="Ajouter à la file d'attente" title="Ajouter à la file d'attente">${ic('addq')}</button><button class="ib" data-act="menu" aria-label="Ajouter à une playlist" title="Ajouter à une playlist">${ic('plus')}</button>`;
-  if (own) acts += `<button class="ib" data-act="up" aria-label="Monter" ${i===0?'disabled':''}>${ic('up')}</button><button class="ib" data-act="down" aria-label="Descendre" ${i===n-1?'disabled':''}>${ic('down')}</button><button class="ib" data-act="remove" aria-label="Retirer" title="Retirer">${ic('close')}</button>`;
-  return `<li class="row ${on?'on':''}" data-i="${i}" draggable="true" style="--d:${Math.min(i, 14)}">
-    <button class="cover" data-act="play" aria-label="Lire ${esc(t.title)}"><img src="${esc(t.thumb)}" alt="" loading="lazy"><span class="ov">${ic('play')}</span></button>
+  if (own && S.plv.sel) acts = '';
+  else if (own && !plain) acts += `<button class="ib" data-act="remove" aria-label="Retirer" title="Retirer">${ic('close')}</button>`;
+  else if (own) acts += `<button class="ib" data-act="up" aria-label="Monter" ${i===0?'disabled':''}>${ic('up')}</button><button class="ib" data-act="down" aria-label="Descendre" ${i===n-1?'disabled':''}>${ic('down')}</button><button class="ib" data-act="remove" aria-label="Retirer" title="Retirer">${ic('close')}</button>`;
+  return `<li class="row ${on?'on':''} ${own && S.plv.sel && S.plv.sel.has(t.id) ? 'picked' : ''}" data-i="${i}" draggable="true" style="--d:${Math.min(i, 14)}">
+    ${own && S.plv.sel ? `<button class="selbox" data-do="pick" role="checkbox" aria-checked="${S.plv.sel.has(t.id)}" aria-label="${esc(t.title)}">${S.plv.sel.has(t.id) ? ic('check') : ''}</button>` : ''}<button class="cover" data-act="play" aria-label="Lire ${esc(t.title)}"><img src="${esc(t.thumb)}" alt="" loading="lazy"><span class="ov">${ic('play')}</span></button>
     <div style="min-width:0"><div class="tt">${esc(t.title)}</div><div class="ch">${chLink(t)}</div></div>
     <div class="dur">${t.duration ? fmt(t.duration) : ''}</div><div class="acts">${acts}</div></li>`;
 }
@@ -127,8 +131,9 @@ function renderView(){
     h = `<p class="greet">${greeting()}, <b>${esc(S.user.display)}</b></p>` + heroHtml();
     if (S.history.length) h += `<section class="block"><div class="sechd"><h2 class="sh">Recently Played</h2><button class="more" data-go="history">See all${ic('right')}</button></div>${shelf(S.history.slice(0, 12), 'recent')}</section>`;
     if (F.tracks.length > 6) h += `<section class="block"><div class="sechd"><h2 class="sh">New Releases</h2><button class="more" data-more="__new__">See all${ic('right')}</button></div>${shelf(F.tracks, 'fresh')}</section>`;
-    h += `<section class="block"><div class="sechd"><h2 class="sh">Trending J-POP</h2><span style="display:flex;gap:14px">${M.tracks.length ? `<button class="more" data-act="playmain">Play all${ic('right')}</button>` : ''}<button class="more" data-act="refresh" aria-label="Actualiser">${ic('refresh')}</button></span></div>` +
+    h += `<section class="block"><div class="sechd"><h2 class="sh">${esc(L('Trending ' + HOME_NAME, HOME_NAME + ' du moment'))}</h2><span style="display:flex;gap:14px">${M.tracks.length ? `<button class="more" data-act="playmain">Play all${ic('right')}</button>` : ''}<button class="more" data-act="refresh" aria-label="Actualiser">${ic('refresh')}</button></span></div>` +
       (M.loading ? skeleton(10) : M.error ? (F.error ? offlineHtml(M.error) : retry(M.error, 'refresh')) : M.tracks.length ? grid(M.tracks, 'main') : '<p class="empty">Rien à afficher pour le moment.</p>') + '</section>';
+    h += homeExtraHtml();
     SHELVES.forEach(s => {
       const X = H.shelves[s.key]; if (!X || (X.error && M.error)) return;
       h += `<section class="block"><div class="sechd"><h2 class="sh">${esc(s.title)}</h2><button class="more" data-more="${s.key}">See all${ic('right')}</button></div>` +
@@ -154,6 +159,7 @@ function renderView(){
     const A = S.artists, got = A.items.filter(Boolean);
     h = `<div class="pagehead"><p class="eyebrow">Artists</p><h1>Artists</h1><p class="sub">${A.mode === 'search' ? `Résultats pour « ${esc(A.query)} ».` : 'Une sélection d\'artistes à découvrir. Cherche un nom pour en trouver d\'autres.'}</p></div>
       <form class="asearch" id="artistForm"><div class="search"><span>${ic('search')}</span><input id="artistQ" type="search" placeholder="Nom d'un artiste" aria-label="Chercher un artiste" autocomplete="off" value="${esc(A.query)}"></div><button class="btn">Chercher</button>${A.mode === 'search' ? `<button type="button" class="ghost" data-act="artists-back">${ic('left')}Retour</button>` : ''}</form>`;
+    if (A.mode !== 'search') h += followsHtml();
     if (A.loading && !got.length) h += skeleton(12, 'artists', 'round');
     else if (A.error) h += retry(A.error, 'artists-retry');
     else h += got.length ? `<ul class="artists">${got.map(artistTile).join('')}</ul>` : '<p class="empty">Aucun artiste trouvé.</p>';
@@ -164,7 +170,7 @@ function renderView(){
         <div class="bmeta"><p class="eyebrow" style="color:#fff;opacity:.85">Artiste</p><h1>${esc(info.name || '…')}</h1><p class="sub">${esc([info.subsText, l.length ? countText(l) : ''].filter(Boolean).join(' · '))}</p></div></div>`;
     if (A.loading) h += `<p class="sub">Chargement des titres…</p>${skeleton(6, 'grid')}`;
     else if (A.error) h += retry(A.error, 'artist-retry');
-    else h += (l.length ? `<div class="head-actions" style="margin-bottom:20px">${playActions()}</div>${rows(l, 'artist')}` : '<p class="empty">Aucun titre lisible trouvé pour cet artiste.</p>');
+    else h += (l.length ? `<div class="head-actions" style="margin-bottom:20px">${playActions()}${followBtn(info)}</div>${rows(l, 'artist')}` : '<p class="empty">Aucun titre lisible trouvé pour cet artiste.</p>');
   } else if (v.type === 'library') {
     h = libHtml();
   } else if (v.type === 'pubpl') {
@@ -183,9 +189,11 @@ function renderView(){
         ${p.system ? '' : `<div class="seg" role="group" aria-label="Confidentialité"><button data-act="setpriv" data-v="private" class="${!isPublic(p)?'on':''}">${ic('lock')}Private</button><button data-act="setpriv" data-v="public" class="${isPublic(p)?'on':''}">${ic('globe')}Public</button></div>`}
         ${p.cover ? `<button class="ghost" data-act="pfp-clear">${ic('close')}Retirer la pochette</button>` : ''}${p.system ? '' : `<button class="ghost ${v.confirm?'warn':''}" data-act="delpl">${ic('trash')}${v.confirm ? 'Confirmer la suppression' : 'Supprimer'}</button>`}</div>
       <p class="privacy-note">${p.system ? ic('lock') + 'Tes bookmarks sont toujours privés.' : isPublic(p) ? ic('globe') + 'Public : les autres comptes de cet ordinateur peuvent voir et écouter cette playlist (onglet Community).' : ic('lock') + 'Private : toi seul peux voir cette playlist.'}</p>
-      ${l.length ? rows(l, 'pl') : '<p class="empty">Cette playlist est vide. Glisse un titre sur elle dans la barre latérale, ou utilise le bouton « + ».</p>'}`;
+      ${l.length ? plToolsHtml(p) + (plView().length ? rows(plView(), 'pl') : `<p class="empty">${L('No song matches this filter.', 'Aucun titre ne correspond à ce filtre.')}</p>`) : '<p class="empty">Cette playlist est vide. Glisse un titre sur elle dans la barre latérale, ou utilise le bouton « + ».</p>'}`;
   } else if (v.type === 'history') {
     h = historyHtml();
+  } else if (v.type === 'mix') {
+    h = mixHtml();
   } else if (v.type === 'now') {
     h = nowHtml();
   } else if (v.type === 'settings') {
@@ -198,7 +206,7 @@ function renderView(){
   if (keepScroll && (v.type === 'home' || v.type === 'library')) el.scrollTop = keepScroll;
   const busy = v.type === 'list' ? S.list.loading : v.type === 'search' ? S.search.loading : v.type === 'artist' ? S.artist.loading : v.type === 'artists' ? S.artists.loading && !S.artists.items.filter(Boolean).length : v.type === 'pubpl' ? S.pub.loading : false;
   const sig = [v.type, v.id || v.q || v.owner || '', busy ? 'L' : 'D', v.type === 'library' ? S.lib.chip : '', v.type === 'settings' ? S.setTab : ''].join('|');
-  settleImages(); document.querySelectorAll('.shelf').forEach(updShelf);
+  settleImages(); document.querySelectorAll('.shelf').forEach(updShelf); afterRender();
   if (sig !== lastViewSig) { lastViewSig = sig; el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter'); clearTimeout(enterTimer); enterTimer = setTimeout(() => el.classList.remove('enter'), 800); }
 }
 function renderTop(){
@@ -228,7 +236,7 @@ function renderBar(){
   const rr = $('#bRepeat'); rr.innerHTML = ic(S.repeat === 'one' ? 'repeat1' : 'repeat'); rr.classList.toggle('act', S.repeat !== 'off');
   rr.title = {off:'Répétition désactivée', all:'Répéter toute la file', one:'Répéter ce titre'}[S.repeat];
   $('#volBtn').innerHTML = ic(S.muted || S.volume === 0 ? 'mute' : 'vol');
-  $('#qClear').hidden = !S.queue.length;
+  $('#qClear').hidden = !S.queue.length; $('#qSave').hidden = !S.queue.length;
   $('#qList').innerHTML = S.queue.length ? S.queue.map((q, i) => `<div class="nq ${i===S.cur?'on':''}" data-qi="${i}" draggable="true" title="${esc(q.title)}"><button class="qplay" data-act="qplay"><img src="${esc(q.thumb)}" alt=""><span class="qm"><b>${esc(q.title)}</b><small>${esc(q.channel)}</small></span></button><span class="qd">${q.duration ? fmt(q.duration) : ''}</span><button class="ib sm" data-act="qrm" aria-label="Retirer de la file">${ic('close')}</button></div>`).join('')
     : '<p class="hint">La file est vide. Lance un titre, ou glisse-en un ici.</p>';
   syncMediaSession(); syncPresence(); updateSleepBtn();

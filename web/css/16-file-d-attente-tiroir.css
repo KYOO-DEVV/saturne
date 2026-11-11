@@ -1,12 +1,12 @@
 /* ---------- File d'attente (tiroir) ---------- */
-.qdrawer{position:fixed;top:0;right:0;bottom:var(--barh);width:min(380px,100vw);background:#000;border-left:1px solid var(--line);z-index:40;display:flex;flex-direction:column;padding:20px 16px 12px;transform:translateX(102%);transition:transform .3s cubic-bezier(.2,.8,.2,1);box-shadow:-20px 0 60px rgba(0,0,0,.7)}
+.qdrawer{position:fixed;top:0;right:0;bottom:var(--barh);width:min(380px,100vw);background:var(--bg);border-left:1px solid var(--line);z-index:40;display:flex;flex-direction:column;padding:20px 16px 12px;transform:translateX(102%);transition:transform .3s cubic-bezier(.2,.8,.2,1);box-shadow:-20px 0 60px rgba(0,0,0,.7)}
 .qdrawer.open{transform:none}
 .qdrawer.over{outline:2px dashed var(--accent-hi);outline-offset:-6px}
 .nuhead{display:flex;align-items:center;justify-content:space-between;margin:0 4px 12px}
 .nuhead b{font-size:18px;font-weight:800}
 .nuhead .r{display:flex;align-items:center;gap:6px}
 .nuhead .clear{color:var(--mute);font-size:13px;padding:6px 10px;border-radius:var(--r-sm)}
-.nuhead .clear:hover{color:#fff;background:var(--raise)}
+.nuhead .clear:hover{color:var(--hi);background:var(--raise)}
 .nq{display:flex;align-items:center;gap:12px;padding:6px;border-radius:12px;min-width:0}
 .nq:hover{background:var(--raise)}
 .nq .qplay{display:flex;align-items:center;gap:12px;flex:1;min-width:0}

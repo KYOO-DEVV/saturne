@@ -1,6 +1,7 @@
 /* ---------- Navigation (avec précédent / suivant) ---------- */
 function go(v, push = true){
   closeDrawer(); closeMenu();
+  S.plv = {q:'', sort:'manual', sel:null}; if (v.type !== 'now') setClip(false);
   if (push) { S.hist = S.hist.slice(0, S.hpos + 1); S.hist.push(v); S.hpos = S.hist.length - 1; }
   S.view = v; render(); $('#view').scrollTop = 0;
   if (v.type === 'home') loadHome();

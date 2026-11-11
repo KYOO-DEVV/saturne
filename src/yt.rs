@@ -294,6 +294,35 @@ pub fn clean_title(title: &str) -> String {
     if cleaned.chars().count() < 2 { title.trim().to_string() } else { cleaned }
 }
 
+/// Devine le nom du morceau et de l'artiste à partir du titre d'une vidéo et du nom de sa chaîne (pour chercher des paroles).
+pub fn song_guess(title: &str, channel: &str) -> (String, String) {
+    let artist_of = |c: &str| c.trim().trim_end_matches(" - Topic").trim_end_matches("VEVO").trim_end_matches(" Official").trim_end_matches(" official").trim().to_string();
+    // Titres japonais : le morceau est entre crochets 「…」 ou 『…』.
+    for (open, close) in [('「', '」'), ('『', '』')] {
+        if let (Some(i), Some(j)) = (title.find(open), title.find(close)) {
+            if j > i {
+                let track = title[i + open.len_utf8()..j].trim().to_string();
+                let before = title[..i].trim().trim_end_matches(['-', '–', '/']).trim();
+                if !track.is_empty() {
+                    return (track, if before.is_empty() { artist_of(channel) } else { before.to_string() });
+                }
+            }
+        }
+    }
+    let t = clean_title(title);
+    const NOISE: [&str; 12] = ["official", "music", "video", "mv", "m/v", "audio", "lyrics", "lyric", "hd", "4k", "visualizer", "clip"];
+    let strip = |s: &str| s.split_whitespace().filter(|w| !NOISE.contains(&w.to_lowercase().trim_matches(|c: char| !c.is_alphanumeric() && c != '/'))).collect::<Vec<_>>().join(" ");
+    for sep in [" - ", " – ", " — "] {
+        if let Some((a, b)) = t.split_once(sep) {
+            let (a, b) = (strip(a), strip(b));
+            if !a.is_empty() && !b.is_empty() {
+                return (b.trim_matches('"').to_string(), a);
+            }
+        }
+    }
+    (strip(&t), artist_of(channel))
+}
+
 fn title_tokens(t: &str) -> Vec<String> {
     const NOISE: [&str; 14] = ["official", "music", "video", "mv", "audio", "lyrics", "lyric", "hd", "ft", "feat", "the", "version", "live", "m"];
     t.to_lowercase().split(|c: char| !c.is_alphanumeric()).filter(|w| !w.is_empty() && !NOISE.contains(w)).map(str::to_string).collect()
@@ -365,6 +394,13 @@ mod tests {
     fn avatar_size() {
         assert_eq!(big_avatar("//yt3.ggpht.com/abc=s88-c-k-c0x00ffffff-no-rj"), "https://yt3.ggpht.com/abc=s240-c-k-c0x00ffffff-no-rj");
     }
+    #[test]
+    fn guessing_songs() {
+        assert_eq!(song_guess("YOASOBI「アイドル」 Official Music Video", "Ayase / YOASOBI"), ("アイドル".to_string(), "YOASOBI".to_string()));
+        assert_eq!(song_guess("Rick Astley - Never Gonna Give You Up (Official Video) [4K Remaster]", "Rick Astley"), ("Never Gonna Give You Up".to_string(), "Rick Astley".to_string()));
+        assert_eq!(song_guess("Bohemian Rhapsody (Official Video)", "Queen Official"), ("Bohemian Rhapsody".to_string(), "Queen".to_string()));
+    }
+
     #[test]
     fn same_song_check() {
         assert!(same_song("YOASOBI「UNDEAD」 Official Music Video", "YOASOBI「UNDEAD」Lyrics"));

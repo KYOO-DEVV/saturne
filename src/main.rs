@@ -44,6 +44,8 @@ struct App {
     store: Arc<Store>,
     http: reqwest::Client,
     gh: reqwest::Client,
+    /// Client pour le service de paroles (lrclib.net) : pas de redirection, délai court.
+    ext: reqwest::Client,
     data_dir: PathBuf,
     /// Titres dont on sait s'ils peuvent être lus dans un lecteur intégré (true) ou non (false).
     emb: Arc<Mutex<HashMap<String, bool>>>,
@@ -657,6 +659,106 @@ async fn api_artists(State(app): State<App>) -> Response {
     Json(json!({"items": items, "pending": pending, "total": ARTISTS.len()})).into_response()
 }
 
+/* ---------- Paroles (lrclib.net) ---------- */
+async fn api_lyrics(State(app): State<App>, h: HeaderMap, Query(q): Q) -> Response {
+    if app.user(&h).is_none() {
+        return err(StatusCode::UNAUTHORIZED, "Connexion requise");
+    }
+    let clip = |k: &str| q.get(k).map(|s| s.trim().chars().take(200).collect::<String>()).unwrap_or_default();
+    let (title, channel) = (clip("title"), clip("artist"));
+    if title.is_empty() {
+        return err(StatusCode::BAD_REQUEST, "Titre manquant");
+    }
+    let dur: f64 = q.get("dur").and_then(|d| d.parse().ok()).unwrap_or(0.0);
+    let (track, artist) = yt::song_guess(&title, &channel);
+    let res = app
+        .cached(format!("ly|{track}|{artist}|{dur}"), Duration::from_secs(24 * 3600), || async {
+            let mut found: Option<Value> = None;
+            // D'abord « morceau + artiste », puis le morceau seul (les noms de chaînes ne sont pas toujours ceux des artistes).
+            for query in [format!("{track} {artist}"), track.clone()] {
+                let url = format!("https://lrclib.net/api/search?q={}", urlenc(query.trim()));
+                let resp = app.ext.get(url).send().await.map_err(|e| format!("Service de paroles injoignable ({e})"))?;
+                if !resp.status().is_success() {
+                    return Err(format!("Le service de paroles a répondu {}", resp.status()));
+                }
+                let list: Vec<Value> = serde_json::from_str(&resp.text().await.map_err(|e| e.to_string())?).unwrap_or_default();
+                let usable = |v: &&Value| v["syncedLyrics"].as_str().is_some_and(|s| !s.is_empty()) || v["plainLyrics"].as_str().is_some_and(|s| !s.is_empty());
+                let close = |v: &&Value| dur <= 0.0 || v["duration"].as_f64().is_some_and(|d| (d - dur).abs() <= 12.0);
+                let same = |v: &&Value| yt::same_song(&track, v["trackName"].as_str().unwrap_or(""));
+                // Les paroles synchronisées d'abord, à durée proche ; sinon n'importe quelle version du même morceau.
+                found = list.iter().filter(usable).filter(same).filter(close).find(|v| v["syncedLyrics"].as_str().is_some_and(|s| !s.is_empty())).or_else(|| list.iter().filter(usable).filter(same).find(close)).or_else(|| list.iter().filter(usable).find(same)).cloned();
+                if found.is_some() {
+                    break;
+                }
+            }
+            Ok(match found {
+                Some(v) => json!({"found": true, "track": v["trackName"], "artist": v["artistName"], "synced": v["syncedLyrics"], "plain": v["plainLyrics"]}),
+                None => json!({"found": false}),
+            })
+        })
+        .await;
+    match res {
+        Ok(v) => Json(v).into_response(),
+        Err(e) => fail(e),
+    }
+}
+
+/* ---------- Derniers titres des artistes suivis ---------- */
+async fn api_follows_new(State(app): State<App>, h: HeaderMap, Query(q): Q) -> Response {
+    if app.user(&h).is_none() {
+        return err(StatusCode::UNAUTHORIZED, "Connexion requise");
+    }
+    let ids: Vec<String> = q.get("ids").map(|s| s.split(',').filter(|i| i.len() == 24 && i.starts_with("UC") && i.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-')).map(str::to_string).take(12).collect()).unwrap_or_default();
+    let mut per: Vec<Vec<yt::Track>> = Vec::new();
+    for id in &ids {
+        let cached = app.cache.lock().unwrap().contains_key(&format!("chl|{id}"));
+        let res = app
+            .cached(format!("chl|{id}"), Duration::from_secs(3 * 3600), || async {
+                let page = yt::channel_page(&yt::get(&app.http, &format!("https://www.youtube.com/channel/{id}/videos?hl=fr")).await?)?;
+                Ok(json!(page.tracks.into_iter().take(3).collect::<Vec<_>>()))
+            })
+            .await;
+        match res {
+            Ok(v) => per.push(v.as_array().into_iter().flatten().filter_map(track_from).collect()),
+            Err(e) if e == yt::BLOCKED_MSG => break,
+            Err(_) => {}
+        }
+        if !cached {
+            tokio::time::sleep(Duration::from_millis(700)).await; // doucement avec YouTube
+        }
+    }
+    // Un titre de chaque artiste à tour de rôle : le plus récent de chacun passe devant.
+    let mut items = Vec::new();
+    for k in 0..3 {
+        for l in &per {
+            if let Some(t) = l.get(k) {
+                items.push(t.clone());
+            }
+        }
+    }
+    Json(json!({ "items": items })).into_response()
+}
+
+/* ---------- Retrouver un titre (import Spotify) ---------- */
+async fn api_match(State(app): State<App>, h: HeaderMap, Query(q): Q) -> Response {
+    if app.user(&h).is_none() {
+        return err(StatusCode::UNAUTHORIZED, "Connexion requise");
+    }
+    let clip = |k: &str| q.get(k).map(|s| s.trim().chars().take(150).collect::<String>()).unwrap_or_default();
+    let (title, artist) = (clip("title"), clip("artist"));
+    if title.is_empty() {
+        return err(StatusCode::BAD_REQUEST, "Titre manquant");
+    }
+    let list = match search_videos(&app, format!("{artist} {title}").trim(), "").await {
+        Ok(v) => v,
+        Err(e) => return fail(e),
+    };
+    match list["items"].as_array().into_iter().flatten().filter_map(track_from).take(8).find(|t| yt::same_song(&title, &t.title)) {
+        Some(t) => Json(json!(t)).into_response(),
+        None => err(StatusCode::NOT_FOUND, "Titre introuvable"),
+    }
+}
+
 /* ---------- Sauvegardes automatiques ---------- */
 async fn api_backups(State(app): State<App>, h: HeaderMap) -> Response {
     let Some(user) = app.user(&h) else { return err(StatusCode::UNAUTHORIZED, "Connexion requise") };
@@ -824,6 +926,9 @@ fn router(app: App) -> Router {
         .route("/api/backups", get(api_backups))
         .route("/api/backups/restore", post(api_backup_restore))
         .route("/api/presence", post(api_presence))
+        .route("/api/lyrics", get(api_lyrics))
+        .route("/api/follows/new", get(api_follows_new))
+        .route("/api/match", get(api_match))
         .route("/assets/{name}", get(font))
         .route("/api/public", get(api_public))
         .route("/api/public/playlist", get(api_public_playlist))
@@ -898,7 +1003,8 @@ fn main() {
     listener.set_nonblocking(true).unwrap();
     let port = listener.local_addr().unwrap().port();
     let dev_html = std::env::var("SATURNE_WEB").ok().map(PathBuf::from);
-    let app = App { store, http, gh, data_dir: dir.clone(), emb: Arc::new(Mutex::new(HashMap::new())), sem: Arc::new(tokio::sync::Semaphore::new(8)), cache: Arc::new(Mutex::new(HashMap::new())), port, dev_html, warming: Arc::new(std::sync::atomic::AtomicBool::new(false)), presence: Arc::new(Mutex::new(None)), artists: Arc::new(Mutex::new(vec![None; ARTISTS.len()])) };
+    let ext = reqwest::Client::builder().user_agent(format!("Saturne/{} (https://github.com/KYOO-DEVV/saturne)", update::CURRENT)).timeout(Duration::from_secs(12)).redirect(reqwest::redirect::Policy::none()).build().expect("client HTTP paroles");
+    let app = App { store, http, gh, ext, data_dir: dir.clone(), emb: Arc::new(Mutex::new(HashMap::new())), sem: Arc::new(tokio::sync::Semaphore::new(8)), cache: Arc::new(Mutex::new(HashMap::new())), port, dev_html, warming: Arc::new(std::sync::atomic::AtomicBool::new(false)), presence: Arc::new(Mutex::new(None)), artists: Arc::new(Mutex::new(vec![None; ARTISTS.len()])) };
 
     let server = std::thread::spawn(move || {
         let rt = tokio::runtime::Builder::new_multi_thread().enable_all().build().expect("runtime");
@@ -929,14 +1035,29 @@ fn run_window(url: &str, dir: &std::path::Path) {
 
     let event_loop = EventLoopBuilder::<UserEvent>::with_user_event().build();
     let proxy = event_loop.create_proxy();
-    let window = WindowBuilder::new()
+    // Taille et position du dernier lancement (si l'écran existe encore).
+    let mut state = native::WinState::load(dir);
+    let start_hidden = state.is_some_and(|s| s.startmin);
+    let mut builder = WindowBuilder::new()
         .with_title("Saturne")
         .with_theme(Some(Theme::Dark))
         .with_window_icon(tao::window::Icon::from_rgba(icon::render(64), 64, 64).ok())
-        .with_inner_size(LogicalSize::new(1440.0, 880.0))
         .with_min_inner_size(LogicalSize::new(900.0, 600.0))
-        .build(&event_loop)
-        .expect("fenêtre");
+        .with_visible(!start_hidden);
+    builder = match state {
+        Some(s) => builder.with_inner_size(PhysicalSize::new(s.w, s.h)),
+        None => builder.with_inner_size(LogicalSize::new(1440.0, 880.0)),
+    };
+    let window = builder.build(&event_loop).expect("fenêtre");
+    if let Some(s) = state {
+        let screens: Vec<(i32, i32, u32, u32)> = window.available_monitors().map(|m| (m.position().x, m.position().y, m.size().width, m.size().height)).collect();
+        if s.on_screen(&screens) {
+            window.set_outer_position(PhysicalPosition::new(s.x, s.y));
+        }
+        if s.max {
+            window.set_maximized(true);
+        }
+    }
     native::blend_title_bar(&window);
     // Le dossier du navigateur intégré garde la session de connexion d'un lancement à l'autre.
     let mut ctx = WebContext::new(Some(dir.join("webview")));
@@ -967,15 +1088,36 @@ fn run_window(url: &str, dir: &std::path::Path) {
         .expect("navigateur intégré (WebView2)");
 
     let debug_log = std::env::var("SATURNE_DEBUG").ok().map(|_| dir.join("ipc.log"));
+    let data_dir = dir.to_path_buf();
     let mut keys = native::MediaKeys::new(proxy.clone());
-    let mut tray: Option<tray_icon::TrayIcon> = None;
+    // Démarrage réduit : l'icône de notification existe tout de suite, sinon la fenêtre serait introuvable.
+    let mut tray: Option<tray_icon::TrayIcon> = None; // créée dès le démarrage de la boucle si « démarrer réduit »
     let mut to_tray = false; // la croix réduit la fenêtre dans la zone de notification
     let mut saved: Option<(PhysicalSize<u32>, PhysicalPosition<i32>)> = None; // taille avant le mini-lecteur
 
     event_loop.run(move |event, _, flow| {
         *flow = ControlFlow::Wait;
         match event {
+            Event::NewEvents(tao::event::StartCause::Init) if start_hidden => {
+                tray = native::tray(proxy.clone(), icon::render(32), 32);
+                to_tray = tray.is_some();
+                if let Some(p) = &debug_log { let _ = std::fs::write(p, format!("init tray={}
+", tray.is_some())); }
+                window.set_visible(tray.is_none()); // caché seulement si l’icône existe
+                if tray.is_none() {
+                    window.set_visible(true); // sans icône, on ne cache jamais la fenêtre : elle serait introuvable
+                }
+            }
             Event::WindowEvent { event: WindowEvent::CloseRequested, .. } => {
+                // On retient la taille et la position (pas celles du mini-lecteur ni d'une fenêtre réduite).
+                if saved.is_none() && !window.is_minimized() && window.is_visible() {
+                    let max = window.is_maximized();
+                    let prev = state.unwrap_or(native::WinState { w: 1440, h: 880, x: 80, y: 60, max: false, startmin: false });
+                    let (size, pos) = (window.inner_size(), window.outer_position().unwrap_or_default());
+                    let now = if max { native::WinState { max: true, ..prev } } else { native::WinState { w: size.width, h: size.height, x: pos.x, y: pos.y, max: false, startmin: prev.startmin } };
+                    now.save(&data_dir);
+                    state = Some(now);
+                }
                 if to_tray && tray.is_some() {
                     window.set_visible(false);
                 } else {
@@ -1034,10 +1176,46 @@ fn run_window(url: &str, dir: &std::path::Path) {
                         window.set_visible(true);
                         window.set_focus();
                     }
+                    "startmin:on" | "startmin:off" => {
+                        let size = window.inner_size();
+                        let pos = window.outer_position().unwrap_or_default();
+                        let mut s = state.unwrap_or(native::WinState { w: size.width, h: size.height, x: pos.x, y: pos.y, max: false, startmin: false });
+                        s.startmin = cmd == "startmin:on";
+                        s.save(&data_dir);
+                        state = Some(s);
+                    }
+                    c if c.starts_with("titlebar:") => {
+                        if let Some((r, g, b)) = native::parse_hex(&c[9..]) {
+                            native::title_bar_color(&window, r, g, b);
+                        }
+                    }
                     _ => {}
                 }
             }
             _ => {}
         }
     });
+}
+
+#[cfg(test)]
+mod web_tests {
+    /// Le JavaScript assemblé doit être syntaxiquement valide (sinon l'application démarre sur un écran noir).
+    /// Vérifié avec `node --check` ; ignoré si Node.js n'est pas installé.
+    #[test]
+    fn bundle_js_parses() {
+        let html = crate::bundle::assemble(std::path::Path::new("web")).expect("assemblage");
+        assert!(html.contains("window.__booted = true"), "le script principal doit signaler son démarrage");
+        let start = html.rfind("<script>
+").expect("script") + 9;
+        let end = html.rfind("</script>").expect("fin du script");
+        let file = std::env::temp_dir().join(format!("saturne-check-{}.js", std::process::id()));
+        std::fs::write(&file, &html[start..end]).unwrap();
+        let out = std::process::Command::new("node").arg("--check").arg(&file).output();
+        let _ = std::fs::remove_file(&file);
+        match out {
+            Ok(o) => assert!(o.status.success(), "JavaScript invalide :
+{}", String::from_utf8_lossy(&o.stderr)),
+            Err(_) => eprintln!("node introuvable : vérification de syntaxe ignorée"),
+        }
+    }
 }

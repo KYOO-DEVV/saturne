@@ -72,7 +72,7 @@ const GENRES = [
   {n:'R&B', q:'r&b soul'}, {n:'Électro', q:'electronic dance music'}, {n:'Lo-fi', q:'lofi chill'}, {n:'Jazz', q:'jazz music'},
   {n:'Classique', q:'classical piano'}, {n:'Metal', q:'metal music'}, {n:'Reggae', q:'reggae'}, {n:'Latino', q:'reggaeton latin'}
 ];
-const SHELVES = [
+let SHELVES = [
   {key:'anime', title:'Anime & OST', q:'anime opening', cc:'JP'},
   {key:'citypop', title:'City Pop', q:'city pop', cc:'JP'}
 ];

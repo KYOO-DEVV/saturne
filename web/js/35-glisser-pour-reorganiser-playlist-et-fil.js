@@ -5,7 +5,7 @@ document.addEventListener('dragstart', e => {
   if (!e.dataTransfer || !e.target.closest) return;
   const q = e.target.closest('.nq'), li = e.target.closest('[data-src="pl"] > [data-i]');
   if (q) dragPos = {kind:'q', i:+q.dataset.qi, over:null};
-  else if (li && S.view.type === 'playlist') dragPos = {kind:'pl', i:+li.dataset.i, over:null};
+  else if (li && S.view.type === 'playlist' && plPlain() && !S.plv.sel) dragPos = {kind:'pl', i:+li.dataset.i, over:null};
   else return;
   e.dataTransfer.effectAllowed = 'copyMove';
 });

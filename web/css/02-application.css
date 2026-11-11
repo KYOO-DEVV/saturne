@@ -1,6 +1,6 @@
 /* ---------- Application ---------- */
 .app{height:100dvh;display:grid;grid-template-columns:var(--sw) minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;grid-template-areas:"side main" "bar bar";transition:grid-template-columns .25s cubic-bezier(.2,.8,.2,1)}
-.side{grid-area:side;background:#000;border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden}
+.side{grid-area:side;background:var(--bg);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden}
 .sidehead{display:flex;align-items:center;height:72px;padding:0 14px 0 25px}
 .brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:14px;letter-spacing:.3em;white-space:nowrap}
 .brand svg{flex:none}
@@ -8,19 +8,19 @@
 .lbl{display:inline-block;max-width:190px;overflow:hidden;white-space:nowrap}
 .nav{display:flex;flex-direction:column;gap:2px;padding:0 12px}
 .nav button,.navlike{display:flex;align-items:center;gap:16px;width:100%;padding:11px 17px;border-radius:var(--r-btn);font-weight:600;font-size:14.5px;color:var(--mute);white-space:nowrap;transition:background .15s,color .15s}
-.nav button:hover,.navlike:hover{color:#fff;background:var(--raise)}
-.nav button.on{color:#fff;background:var(--accent-soft)}
+.nav button:hover,.navlike:hover{color:var(--hi);background:var(--raise)}
+.nav button.on{color:var(--hi);background:var(--accent-soft)}
 .nav button.on svg{color:var(--accent-hi)}
 .nav button svg,.navlike svg{width:21px;height:21px}
 .navlike svg{transition:transform .34s cubic-bezier(.4,0,.2,1)}
 .sep{height:1px;background:var(--line);margin:14px 18px 8px}
-.pl-head{display:flex;align-items:center;justify-content:space-between;height:36px;padding:0 16px 0 29px;font-weight:700;font-size:13px;color:#fff;white-space:nowrap}
+.pl-head{display:flex;align-items:center;justify-content:space-between;height:36px;padding:0 16px 0 29px;font-weight:700;font-size:13px;color:var(--hi);white-space:nowrap}
 .scroll{overflow-y:auto;overflow-x:hidden;min-height:0;flex:1;display:flex;flex-direction:column;gap:2px;padding:0 12px}
-.pli{display:flex;align-items:center;gap:12px;padding:7px 10px;border-radius:var(--r-ctl);min-width:0;color:#c9c9d4;font-weight:500;white-space:nowrap}
-.pli:hover,.pli.over{background:var(--raise);color:#fff}
-.pli.on{background:var(--accent-soft);color:#fff}
+.pli{display:flex;align-items:center;gap:12px;padding:7px 10px;border-radius:var(--r-ctl);min-width:0;color:var(--fg2);font-weight:500;white-space:nowrap}
+.pli:hover,.pli.over{background:var(--raise);color:var(--hi)}
+.pli.on{background:var(--accent-soft);color:var(--hi)}
 .pli.over{outline:2px dashed var(--accent-hi);outline-offset:-2px}
-.pthumb{width:36px;height:36px;border-radius:9px;flex:none;overflow:hidden;display:grid;place-items:center;font-weight:700;font-size:15px;background:var(--raise2);color:#d8d8e2}
+.pthumb{width:36px;height:36px;border-radius:9px;flex:none;overflow:hidden;display:grid;place-items:center;font-weight:700;font-size:15px;background:var(--raise2);color:var(--fg2)}
 .pthumb img{width:100%;height:100%;object-fit:cover}
 .pthumb svg{width:18px;height:18px}
 .pli.on .pthumb{color:var(--accent-hi)}

@@ -4,11 +4,11 @@
 .banner::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9),rgba(0,0,0,.1) 80%);pointer-events:none}
 .banner>*{position:relative;z-index:2}
 .banner.over,.pfp.over{outline:2px dashed var(--accent-hi);outline-offset:-8px}
-.pfp{width:156px;aspect-ratio:1;border-radius:12px;flex:none;overflow:hidden;position:relative;background:var(--raise2);box-shadow:0 16px 40px rgba(0,0,0,.7);cursor:pointer;display:grid;place-items:center;font-weight:800;font-size:54px;color:#d8d8e2}
+.pfp{width:156px;aspect-ratio:1;border-radius:12px;flex:none;overflow:hidden;position:relative;background:var(--raise2);box-shadow:0 16px 40px rgba(0,0,0,.7);cursor:pointer;display:grid;place-items:center;font-weight:800;font-size:54px;color:var(--fg2)}
 .pfp.round{border-radius:50%;cursor:default}
 .pfp svg{width:54px;height:54px}
 .pfp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.pfp .pov{position:absolute;inset:0;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;background:rgba(0,0,0,.62);opacity:0;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;text-align:center;padding:8px;transition:opacity .15s;color:#fff}
+.pfp .pov{position:absolute;inset:0;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;background:rgba(0,0,0,.62);opacity:0;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;text-align:center;padding:8px;transition:opacity .15s;color:var(--hi)}
 .pfp .pov svg{width:26px;height:26px}
 .pfp:hover .pov,.pfp.over .pov,.pfp:focus-visible .pov{opacity:1}
 .pfp.static{cursor:default}
@@ -17,7 +17,7 @@
 .title-input{font-weight:800;font-size:clamp(26px,4.4vw,48px);line-height:1.05;letter-spacing:-.04em;background:none;border:0;border-bottom:2px solid transparent;width:100%;padding:0;margin:4px 0 6px;text-shadow:0 2px 16px rgba(0,0,0,.6)}
 .title-input:hover,.title-input:focus{border-bottom-color:rgba(255,255,255,.3);outline:0}
 .title-input:disabled{opacity:1;border-color:transparent}
-.desc-input{background:none;border:0;border-bottom:1px solid transparent;width:100%;max-width:560px;padding:2px 0;color:#d2d2dc;margin:0 0 6px;display:block}
+.desc-input{background:none;border:0;border-bottom:1px solid transparent;width:100%;max-width:560px;padding:2px 0;color:var(--fg2);margin:0 0 6px;display:block}
 .desc-input:hover,.desc-input:focus{border-bottom-color:rgba(255,255,255,.3);outline:0}
 .desc-input::placeholder{color:#8b8b99}
 .btools{position:absolute!important;top:14px;right:14px;display:flex;gap:6px;opacity:0;transition:opacity .15s}
@@ -27,14 +27,14 @@
 .btools button:hover{background:rgba(0,0,0,.92)}
 .bhint{position:absolute!important;inset:0;display:none;place-items:center;background:rgba(0,0,0,.65);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:13px}
 .banner.over .bhint{display:grid}
-.banner .sub{margin:0;color:#c9c9d4;text-shadow:0 1px 10px rgba(0,0,0,.6)}
+.banner .sub{margin:0;color:var(--fg2);text-shadow:0 1px 10px rgba(0,0,0,.6)}
 .back{margin:0 0 10px}
 .seg{display:inline-flex;background:var(--raise);border:1px solid var(--line2);border-radius:var(--r-ctl);padding:3px}
 .seg button{display:flex;align-items:center;gap:8px;padding:7px 16px;border-radius:var(--r-btn);font-weight:600;color:var(--mute)}
 .seg button svg{width:16px;height:16px}
-.seg button.on{background:var(--accent);color:#fff}
+.seg button.on{background:var(--accent);color:var(--hi)}
 .privacy-note{color:var(--mute);font-size:13px;margin:10px 0 18px;display:flex;gap:8px;align-items:center}
 .privacy-note svg{width:16px;height:16px;flex:none}
-.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:var(--r-sm);border:1px solid rgba(255,255,255,.22);font-size:12px;font-weight:600;color:#e6e6ee;margin-left:10px;vertical-align:middle}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:var(--r-sm);border:1px solid rgba(255,255,255,.22);font-size:12px;font-weight:600;color:var(--fg2);margin-left:10px;vertical-align:middle}
 .badge svg{width:13px;height:13px}
 
