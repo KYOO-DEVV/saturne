@@ -4,6 +4,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#000000">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Saturne (démo)</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%230a0a0e'/%3E%3Ccircle cx='12' cy='12' r='4.6' fill='%23f5f5fa'/%3E%3Cellipse cx='12' cy='12' rx='9.4' ry='3.1' transform='rotate(-22 12 12)' fill='none' stroke='%238b5cf6' stroke-width='1.6'/%3E%3C/svg%3E">
 <style>
@@ -722,7 +723,7 @@ html.no-sidethumbs .pli:not(.create){padding-left:16px}
 .pn-h{margin:14px 6px 6px;font-size:15px;font-weight:800}
 .pn{display:grid;gap:12px;padding-bottom:12px}
 .pn-ctx{margin:0 4px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pn-art{position:relative;aspect-ratio:16/10;border-radius:14px;overflow:hidden;background:var(--raise)}
+.pn-art{position:relative;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:var(--raise)}
 .pn-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .pn-vid{position:absolute;left:10px;bottom:10px;display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);color:#fff;font-weight:700;font-size:13px}
 .pn-vid svg{width:14px;height:14px}
@@ -776,7 +777,7 @@ html.no-sidethumbs .pli:not(.create){padding-left:16px}
 .qdrawer.tint .pn-card:not(.pn-lyr){background:rgba(0,0,0,.28)}
 /* ---------- 0.7.2 : page Playlist (en-tête en dégradé, barre d'actions, tableau) ---------- */
 .plhero{position:relative;margin:-8px -32px 14px;padding:36px 32px 14px;border-radius:0;background:linear-gradient(180deg,var(--hd,#2a2250) 0,color-mix(in srgb,var(--hd,#2a2250) 45%,var(--bg)) 55%,var(--bg) 100%)}
-.plhero.hasbanner{background:linear-gradient(180deg,rgba(0,0,0,.25),var(--bg) 96%),var(--bnr) center/cover;cursor:grab;user-select:none}
+.plhero.hasbanner{background:linear-gradient(var(--bg),var(--bg)) bottom/100% 3px no-repeat,linear-gradient(90deg,rgba(0,0,0,.5),rgba(0,0,0,0) 70%),linear-gradient(180deg,rgba(0,0,0,.3),var(--bg) 97%),var(--bnr) 50% var(--bposy,50%)/cover;cursor:grab;user-select:none}
 .plhero.hasbanner.grab{cursor:grabbing}
 .plhero.over{outline:2px dashed var(--accent-hi);outline-offset:-8px}
 .plhero .bhint{position:absolute;inset:0;display:none;place-items:center;background:rgba(0,0,0,.65);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:13px;z-index:5}
@@ -841,6 +842,116 @@ h1.pltitle{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (max-width:1100px){.thead,.trow{grid-template-columns:42px minmax(0,4fr) minmax(0,2fr) 64px auto}.thead>:nth-child(4),.trow .tdate{display:none}}
 @media (max-width:900px){.plhero{margin:-4px -16px 12px;padding:24px 16px 12px}.plhead{flex-direction:column;align-items:flex-start;gap:14px}.plcover{width:min(200px,60vw)}.thead,.trow{grid-template-columns:36px minmax(0,1fr) auto auto;gap:10px}.thead>:nth-child(3),.trow .talb{display:none}.trow .acts{opacity:1}}
 html[data-bg="light"] .plhero .eyebrow,html[data-bg="light"] .pltitle,html[data-bg="light"] .plmeta b{color:#fff}
+
+/* Toutes les listes en tableau : colonnes sans date, chaîne cliquable (filtre), puce de filtre. */
+.thead.nodate,.rows.nodate .trow{grid-template-columns:42px minmax(0,4fr) minmax(0,3fr) 64px auto}
+.thead.nodate>:nth-child(4),.rows.nodate .tdate{display:none}
+button.talb{text-align:left;color:var(--mute);font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;padding:2px 0;max-width:100%}
+button.talb:hover{color:var(--hi);text-decoration:underline}
+.fchip{display:inline-flex;align-items:center;gap:8px;margin:2px 0 10px;padding:6px 8px 6px 14px;border-radius:999px;background:var(--accent-soft);color:var(--accent-hi);font-weight:600;font-size:13px}
+.fchip b{color:var(--hi)}
+.fchip button{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:inherit}
+.fchip button:hover{background:rgba(255,255,255,.15)}
+.fchip svg{width:14px;height:14px}
+@media (max-width:1100px){.thead.nodate,.rows.nodate .trow{grid-template-columns:42px minmax(0,4fr) minmax(0,2fr) 64px auto}}
+@media (max-width:900px){.thead.nodate,.rows.nodate .trow{grid-template-columns:36px minmax(0,1fr) auto auto}}
+/* ---------- 0.7.4 : interface téléphone (jamais de texte sur deux lignes, barre d'onglets, lecteur compact) ---------- */
+.tabbar{display:none}
+.pn-ctrl{display:none}
+@media (max-width:900px){
+  /* Une seule ligne partout : les titres se terminent par « … ». */
+  .tt,.card .tt,.row .tt,.trow .tt,.sl-title,.libcard b,.mini-row b,.nq b,.qm b,.pn-meta .tt,.pagehead h1,.np-info h1,.toplist b,.ch,.sub,.pn-ctx,.cl-t,.set h3{white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;display:block;-webkit-line-clamp:unset;min-height:0}
+  .card .tt{margin-top:8px}
+  .sl-title{font-size:clamp(22px,7vw,30px)}
+  .pagehead h1{font-size:clamp(28px,9vw,40px)}
+  .hero{height:240px}
+  .sl-body{max-width:calc(100% - 44px)}
+  .sl-by{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .shelf{grid-auto-columns:150px;gap:14px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .libgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+
+  /* Barre d'onglets en bas (comme une application iOS). */
+  .app{grid-template-rows:minmax(0,1fr) auto auto;grid-template-areas:"main" "bar" "tabs"}
+  .tabbar{grid-area:tabs;display:flex;justify-content:space-around;align-items:stretch;padding:4px 6px calc(4px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--line)}
+  .tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;color:var(--mute);font-size:10.5px;font-weight:600;border-radius:var(--r-btn);min-width:0}
+  .tabbar button svg{width:22px;height:22px}
+  .tabbar button.on{color:var(--hi)}
+  .tabbar button.on svg{color:var(--accent-hi)}
+  .tabbar .lbl{max-width:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .app.mini .tabbar{display:none}
+  #view{padding:4px 16px 24px}
+  .topbar{padding:calc(10px + env(safe-area-inset-top,0px)) 14px 8px}
+
+  /* Lecteur compact : image, titre sur une ligne, lecture / suivant, fine ligne de progression en haut. */
+  .bar{grid-template-columns:minmax(0,1fr) auto;gap:0 8px;margin:6px 6px 0;padding:8px 10px;position:relative;align-items:center}
+  .now img,.now .ph{width:44px;height:44px}
+  .center{display:contents}
+  .center .ctrls{grid-column:2;grid-row:1;width:auto;gap:2px}
+  .center .ctrls #bShuffle,.center .ctrls #bPrev,.center .ctrls #bRepeat{display:none}
+  .center .seekbox{position:absolute;left:12px;right:12px;top:0;height:3px;width:auto;max-width:none;display:block}
+  .center .seekbox span{display:none}
+  .center .seekbox #seek{width:100%;height:3px;margin:0}
+  .center .seekbox #seek::-webkit-slider-runnable-track{height:3px;border-radius:0}
+  .center .seekbox #seek::-webkit-slider-thumb{opacity:0;width:6px;height:6px;margin-top:-1.5px}
+  .volume{display:none}
+  .bar .playbtn{width:36px;height:36px}
+  .toast{bottom:calc(var(--barh) + 76px)}
+
+  /* Panneau En lecture : page plein écran avec ses propres commandes. */
+  .qdrawer{top:0;bottom:0;right:0;left:0;width:100%;z-index:90;border:0;padding:calc(12px + env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px));transform:translateY(102%);transition:transform .3s cubic-bezier(.2,.8,.2,1);box-shadow:none;background:var(--panel)}
+  .qdrawer.open{transform:none}
+  .qdrawer.tint{background:linear-gradient(180deg,color-mix(in srgb,var(--pt,transparent) 90%,var(--panel)) 0,color-mix(in srgb,var(--pt,transparent) 28%,var(--panel)) 280px,var(--panel) 520px)}
+  .pn-meta .tt{font-size:22px}
+  .pn-ctrl{display:grid;gap:6px;padding:0 4px}
+  .pn-ctrl input[type=range]{width:100%}
+  .pn-ctrl input[type=range]::-webkit-slider-thumb{opacity:1}
+  .pn-times{display:flex;justify-content:space-between;color:var(--mute);font-size:12px;font-variant-numeric:tabular-nums}
+  .pn-btns{display:flex;align-items:center;justify-content:space-between;padding:0 6px}
+  .pn-btns .ib{width:44px;height:44px}
+  .pn-btns .ib svg{width:24px;height:24px}
+  .pn-btns .bigplay{width:60px;height:60px;background:var(--hi);color:var(--bg)}
+  .pn-btns .bigplay svg{color:var(--bg)}
+}
+/* ---------- 0.7.5 : paroles fluides, clip sans titre ni barres ---------- */
+.pn-lines{position:relative;overflow:hidden}
+.pn-lines.sync{height:156px;-webkit-mask-image:linear-gradient(transparent,#000 24%,#000 76%,transparent);mask-image:linear-gradient(transparent,#000 24%,#000 76%,transparent)}
+.pn-lines.sync p{margin:0;padding:6px 0;font-size:19px;line-height:1.3;color:rgba(255,255,255,.4);transition:color .45s ease,transform .45s ease;transform-origin:left center}
+.pn-lines.sync p.past{color:rgba(255,255,255,.28)}
+.pn-lines.sync p.cur{color:#fff;transform:scale(1.04)}
+/* Clip : la vidéo remplit la zone ; le cadre du lecteur est rogné pour cacher le titre YouTube et les boutons du haut et du bas. */
+.ytbox.clip{overflow:hidden;background:#000}
+.ytbox.clip iframe,.ytbox.clip #yt{position:absolute!important;left:0;top:-64px;width:100%!important;height:calc(100% + 128px)!important}
+/* ---------- 0.7.8 : page Paroles ---------- */
+.lypage{position:relative;z-index:50;display:grid;grid-template-columns:minmax(240px,400px) minmax(0,1fr);gap:56px;align-items:center;min-height:calc(100dvh - var(--barh,84px) - 150px);padding:8px 8px 24px}
+.lypage.novid::before{content:"";position:absolute;inset:-12px -32px -24px;z-index:-1;background:linear-gradient(180deg,var(--lyc,#2a2250) 0,#000 100%)}
+.ly-left{display:grid;gap:16px;justify-items:start;min-width:0;width:100%}
+.ly-art{width:100%;aspect-ratio:1;border-radius:14px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.6);background:var(--raise)}
+.ly-art img{width:100%;height:100%;object-fit:cover;display:block}
+.ly-meta{min-width:0;width:100%;color:#fff}
+.ly-meta b{display:block;font-size:24px;font-weight:800;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ly-meta span{display:block;color:rgba(255,255,255,.72);font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ly-meta .alink:hover{color:#fff}
+.ly-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ly-tools .ib{color:#fff}
+.ly-right{min-width:0}
+.lypage .np-lyrics{margin:0}
+.lypage .np-lyrics .np-h{display:none}
+.lypage .ly-src{color:rgba(255,255,255,.5)}
+.lypage .ly-info{color:rgba(255,255,255,.7);font-size:20px}
+.lypage .ly-lines{max-height:calc(100dvh - var(--barh,84px) - 200px);padding:150px 0}
+.lypage .ly-lines p{font-size:clamp(24px,3.2vw,42px);font-weight:800;line-height:1.18;letter-spacing:-.02em;color:rgba(255,255,255,.38);padding:10px 0;transition:color .4s ease,transform .4s ease;transform-origin:left center}
+.lypage .ly-lines p:hover{color:rgba(255,255,255,.7)}
+.lypage .ly-lines p.on{color:#fff;transform:scale(1.03)}
+.lypage .ly-plain{font-size:24px;font-weight:700;line-height:1.5;color:rgba(255,255,255,.88);max-height:calc(100dvh - var(--barh,84px) - 200px);overflow-y:auto}
+/* Vidéo en fond : étirée sur la page, floue et assombrie, sous le contenu. */
+.ytbox.bgvid{opacity:1;pointer-events:none;z-index:40;overflow:hidden;border-radius:16px;background:#000}
+.ytbox.bgvid::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.36);pointer-events:none}
+.ytbox.bgvid iframe,.ytbox.bgvid #yt{position:absolute!important;left:var(--bgl)!important;top:var(--bgt)!important;width:var(--bgw)!important;height:var(--bgh)!important;filter:blur(34px) saturate(1.3);transform:scale(1.18)}
+html.bgvid-active.has-bgimg main{isolation:auto}
+html.bgvid-active.has-bgimg main::before,html.bgvid-active.has-bgimg main::after{display:none}
+#app.lyricspage .topbar{position:relative;z-index:50}
+@media (max-width:900px){.lypage{grid-template-columns:minmax(0,1fr);gap:20px;align-items:start}.ly-art{max-width:300px}.lypage .ly-lines{max-height:none;padding:20px 0}}
 </style>
 </head>
 <body>
@@ -902,6 +1013,14 @@ html[data-bg="light"] .plhero .eyebrow,html[data-bg="light"] .pltitle,html[data-
     <section id="view" tabindex="-1"></section>
   </main>
 
+  <nav class="tabbar" id="tabbar" aria-label="Navigation">
+    <button data-nav="home" data-ic="home"><span class="lbl">Home</span></button>
+    <button data-nav="search" data-ic="search"><span class="lbl">Search</span></button>
+    <button data-nav="artists" data-ic="person"><span class="lbl">Artists</span></button>
+    <button data-nav="library" data-ic="lib"><span class="lbl">Library</span></button>
+    <button data-nav="history" data-ic="history"><span class="lbl">History</span></button>
+  </nav>
+
   <aside class="qdrawer" id="qdrawer" data-dropq="1" aria-label="File d'attente">
     <div class="nuhead"><div class="ptabs" role="tablist"><button role="tab" data-ptab="now">Now playing</button><button role="tab" data-ptab="queue">Queue</button><button role="tab" data-ptab="recent">Recent</button></div><div class="r"><button class="clear" id="qSave" hidden>Save</button><button class="clear" id="qClear" hidden>Clear</button><button class="ib" id="qClose" data-ic="close" aria-label="Fermer"></button></div></div>
     <div class="scroll" id="qList" style="padding:0"></div>
@@ -923,7 +1042,7 @@ html[data-bg="light"] .plhero .eyebrow,html[data-bg="light"] .pltitle,html[data-
     </div>
     <div class="seekbox"><span id="tCur">0:00</span><input type="range" id="seek" min="0" max="100" value="0" step="1" aria-label="Position dans le titre"><span id="tDur">0:00</span></div>
     </div>
-    <div class="volume"><button class="ib" id="bLyrics" data-ic="mic" aria-label="Now playing" title="Now playing"></button><button class="ib" id="bQueue" data-ic="queue" aria-label="File d'attente" title="File d'attente"></button><button class="ib" id="bSleep" data-ic="moon" aria-label="Sleep timer" title="Sleep timer"></button><button class="ib" id="bMini" data-ic="mini" aria-label="Mini player" title="Mini player" aria-pressed="false" hidden></button><button class="ib" id="volBtn" aria-label="Couper le son"></button><input type="range" id="vol" min="0" max="100" value="80" aria-label="Volume"><button class="ib" id="bFull" data-ic="expand" aria-label="Full screen" title="Full screen"></button></div>
+    <div class="volume"><button class="ib" id="bLyrics" data-ic="lyrics" aria-label="Lyrics" title="Lyrics"></button><button class="ib" id="bQueue" data-ic="queue" aria-label="File d'attente" title="File d'attente"></button><button class="ib" id="bSleep" data-ic="moon" aria-label="Sleep timer" title="Sleep timer" hidden></button><button class="ib" id="bMini" data-ic="mini" aria-label="Mini player" title="Mini player" aria-pressed="false" hidden></button><button class="ib" id="volBtn" aria-label="Couper le son"></button><input type="range" id="vol" min="0" max="100" value="80" aria-label="Volume"><button class="ib" id="bFull" data-ic="expand" aria-label="Full screen" title="Full screen" hidden></button></div>
   </footer>
 </div>
 
@@ -1001,6 +1120,7 @@ const ICONS = {
   genres:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
   sidebar:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/>',
   history:'<path d="M4 6v6h6"/><path d="M5.2 12A8 8 0 1 0 8 6.1L4 10"/><path d="M12 8v4l3 2"/>',
+  lyrics:'<path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-4 3v-3H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M8 9.5h8M8 13h5"/>',
   mic:'<path d="M4 20c3-1 5-3 6-5"/><path d="m14 4 6 6-8 8-6-6z"/><path d="m12 8 4 4"/>',
   expand:'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
   moon:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
@@ -1154,7 +1274,7 @@ async function logout(){ try { await send('/api/auth/logout', {}); } catch {} lo
 let player = null, ready = false, ytLoading = false, pendingLoad = false, playing = false, errStreak = 0, seeking = false, lastLogged = '';
 function loadYT(){
   if (ytLoading) return; ytLoading = true;
-  window.onYouTubeIframeAPIReady = () => { player = new YT.Player('yt', {width:'200', height:'200', playerVars:{playsinline:1, rel:0, controls:0, disablekb:1}, events:{onReady, onStateChange, onError}}); };
+  window.onYouTubeIframeAPIReady = () => { player = new YT.Player('yt', {width:'200', height:'200', playerVars:{playsinline:1, rel:0, controls:0, disablekb:1, origin:location.origin, widget_referrer:location.origin}, events:{onReady, onStateChange, onError}}); };
   const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api';
   s.onerror = () => toast('Le lecteur n\'a pas pu se charger. Vérifie ta connexion puis relance Saturne.');
   setTimeout(() => { if (!ready) toast('Le lecteur met du temps à démarrer… vérifie ta connexion internet.'); }, 12000);
@@ -1201,7 +1321,7 @@ function next(auto){
   if (auto && S.repeat === 'one' && ready) { player.seekTo(0, true); player.playVideo(); return; }
   if (S.pos + 1 < S.order.length) S.pos++;
   else if (S.repeat === 'all') { if (S.shuffle) { S.cur = -1; rebuildOrder(); } S.pos = 0; }
-  else { if (!auto) toast('Fin de la file d\'attente'); return; }
+  else { if (auto && S.settings.endless !== false && S.queue.length) { endlessNext(); return; } if (!auto) toast('Fin de la file d\'attente'); return; }
   S.cur = S.order[S.pos]; loadCurrent();
 }
 function prev(){
@@ -1361,7 +1481,7 @@ function step(d){ const i = S.hpos + d; if (i < 0 || i >= S.hist.length) return;
 function setQueueOpen(open, tab){ S.qopen = open; if (tab) S.ptab = tab; $('#qdrawer').classList.toggle('open', open); $('#bQueue').classList.toggle('act', open && S.ptab === 'queue'); $('#bLyrics').classList.toggle('act', open && S.ptab === 'now'); if (open) renderPanel(); }
 
 /* ---------- Rendu ---------- */
-function tracksOf(src){
+function tracksOfRaw(src){
   if (src === 'main') return S.home.main.tracks;
   if (src === 'fresh') return S.home.fresh.tracks;
   if (src === 'recent') return S.history;
@@ -1376,6 +1496,13 @@ function tracksOf(src){
   if (src === 'pl') return plView();
   return [];
 }
+/* Listes en tableau : un filtre commun (clic sur une chaîne, ou champ de la playlist) ; tracksOf et rows voient la même liste filtrée, donc les index restent justes. */
+const TABLE_SRC = new Set(['search', 'list', 'artist', 'mix', 'plays', 'pub']);
+function filterList(l, src){
+  const q = (S.plv.q || '').trim().toLowerCase(); if (!q || !TABLE_SRC.has(src)) return l;
+  return l.filter(t => ((t.title || '') + ' ' + (t.channel || '')).toLowerCase().includes(q));
+}
+function tracksOf(src){ return filterList(tracksOfRaw(src), src); }
 const defaultSrc = () => ({home:'main', list:'list', search:'search', playlist:'pl', artist:'artist', pubpl:'pub'}[S.view.type]);
 const countText = l => plural(l.length, 'song');
 const playActions = () => `<button class="btn" data-act="playall">${ic('play')}Play</button><button class="ghost" data-act="shuffleall">${ic('shuffle')}Shuffle</button>`;
@@ -1400,7 +1527,7 @@ function row(t, i, n){
 }
 const grid = (l, src) => `<ul class="grid" data-src="${src}">${l.slice(0, capOf(src)).map(card).join('')}</ul>${moreItems(l, src)}`;
 const shelf = (l, src) => `<div class="shelfwrap"><ul class="shelf" data-src="${src}">${l.map(card).join('')}</ul><button class="sarrow l" data-sh="-1" aria-label="Scroll left" hidden>${ic('left')}</button><button class="sarrow r" data-sh="1" aria-label="Scroll right">${ic('right')}</button></div>`;
-const rows = (l, src) => `<ul class="rows" data-src="${src}">${l.slice(0, capOf(src)).map((t, i) => (src === 'pl' || src === 'pub') ? trow(t, i, l.length) : row(t, i, l.length)).join('')}</ul>${moreItems(l, src)}`;
+const rows = (l, src) => { const v = filterList(l, src), hd = src === 'plays' || v.some(t => t.added); return `${filterChip(src)}${theadHtml(src, hd)}<ul class="rows ${hd ? '' : 'nodate'}" data-src="${src}">${v.slice(0, capOf(src)).map((t, i) => trow(t, i, v.length)).join('')}</ul>${moreItems(v, src)}`; };
 const skeleton = (n = 8, cls = 'grid', extra = '') => `<ul class="${cls}">${`<li><div class="sk ${extra}"></div></li>`.repeat(n)}</ul>`;
 const retry = (msg, act) => `<div class="errbox"><span class="err">${esc(msg)}</span><button class="ghost" data-act="${act}">${ic('refresh')}Réessayer</button></div>`;
 const avatarHtml = u => u.avatar ? `<img src="${esc(u.avatar)}" alt="">` : esc(initial(u.display || u.username));
@@ -1515,7 +1642,7 @@ function renderView(){
     h = `<div class="pagehead"><p class="eyebrow">${esc(L.eyebrow)}</p><h1>${esc(L.title)}</h1>`;
     if (L.loading) h += `<p class="sub" style="margin:0">Recherche en cours…</p></div>${skeleton(10)}`;
     else if (L.error) h += `</div>${retry(L.error, 'retrylist')}`;
-    else h += `<p class="sub">${countText(l)}</p>${l.length ? `<div class="head-actions">${playActions()}</div>` : ''}</div>` + (l.length ? grid(l, 'list') + moreBtn(L, 'list') : '<p class="empty">Aucun titre trouvé.</p>');
+    else h += `<p class="sub">${countText(l)}</p>${l.length ? `<div class="head-actions">${playActions()}</div>` : ''}</div>` + (l.length ? rows(l, 'list') + moreBtn(L, 'list') : '<p class="empty">Aucun titre trouvé.</p>');
   } else if (v.type === 'artists') {
     const A = S.artists, got = A.items.filter(Boolean);
     h = `<div class="pagehead"><p class="eyebrow">Artists</p><h1>Artists</h1><p class="sub">${A.mode === 'search' ? `Résultats pour « ${esc(A.query)} ».` : 'Une sélection d\'artistes à découvrir. Cherche un nom pour en trouver d\'autres.'}</p></div>
@@ -1546,19 +1673,19 @@ function renderView(){
   } else if (v.type === 'mix') {
     h = mixHtml();
   } else if (v.type === 'now') {
-    h = nowHtml();
+    h = lyricsPageHtml();
   } else if (v.type === 'settings') {
     h = settingsHtml();
   }
   el.innerHTML = h;
-  if (v.type === 'playlist') { const p = curPl(), b = $('#banner'); if (p && p.banner && b) { b.style.setProperty('--bnr', `url("${p.banner.replace(/"/g, '%22')}")`); b.style.backgroundPosition = `50% ${p.bannerY ?? 50}%`; } }
+  if (v.type === 'playlist') { const p = curPl(), b = $('#banner'); if (p && p.banner && b) { b.style.setProperty('--bnr', `url("${p.banner.replace(/"/g, '%22')}")`); b.style.setProperty('--bposy', `${p.bannerY ?? 50}%`); } }
   if (v.type === 'pubpl' && S.pub.data && S.pub.data.banner) { const b = $('#banner'); if (b) { b.classList.add('hasbanner'); b.style.setProperty('--bnr', `url("${S.pub.data.banner.replace(/"/g, '%22')}")`); } }
   if (v.type === 'profile' && S.profile.banner) { const b = $('#pbanner'); if (b) b.style.backgroundImage = `url("${S.profile.banner.replace(/"/g, '%22')}")`; }
   if (v.type === 'artist' && S.artist.info && S.artist.info.banner) { const b = $('#abanner'); if (b) b.style.backgroundImage = `url("${S.artist.info.banner.replace(/"/g, '%22')}")`; }
   if (keepScroll && (v.type === 'home' || v.type === 'library')) el.scrollTop = keepScroll;
   const busy = v.type === 'list' ? S.list.loading : v.type === 'search' ? S.search.loading : v.type === 'artist' ? S.artist.loading : v.type === 'artists' ? S.artists.loading && !S.artists.items.filter(Boolean).length : v.type === 'pubpl' ? S.pub.loading : false;
   const sig = [v.type, v.id || v.q || v.owner || '', busy ? 'L' : 'D', v.type === 'library' ? S.lib.chip : '', v.type === 'settings' ? S.setTab : ''].join('|');
-  settleImages(); document.querySelectorAll('.shelf').forEach(updShelf); afterRender(); afterRender2();
+  settleImages(); document.querySelectorAll('.shelf').forEach(updShelf); afterRender(); afterRender2(); paintLyrics();
   if (sig !== lastViewSig) { lastViewSig = sig; el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter'); clearTimeout(enterTimer); enterTimer = setTimeout(() => el.classList.remove('enter'), 800); }
 }
 function renderTop(){
@@ -1572,7 +1699,7 @@ function renderSide(){
   const cb = $('#collapse');
   cb.setAttribute('aria-label', S.collapsed ? 'Agrandir la barre latérale' : 'Réduire la barre latérale'); cb.title = cb.getAttribute('aria-label');
   const navOn = v.type === 'artist' ? 'artists' : (v.type === 'list' || v.type === 'search') ? 'search' : (v.type === 'playlist' || v.type === 'pubpl') ? 'library' : v.type;
-  document.querySelectorAll('#nav button').forEach(b => { b.classList.toggle('on', b.dataset.nav === navOn); b.setAttribute('aria-current', b.dataset.nav === navOn ? 'page' : 'false'); if (!b.querySelector('svg')) b.insertAdjacentHTML('afterbegin', ic(b.dataset.ic)); });
+  document.querySelectorAll('#nav button,#tabbar button').forEach(b => { b.classList.toggle('on', b.dataset.nav === navOn); b.setAttribute('aria-current', b.dataset.nav === navOn ? 'page' : 'false'); if (!b.querySelector('svg')) b.insertAdjacentHTML('afterbegin', ic(b.dataset.ic)); });
   $('#plList').innerHTML = S.playlists.map(p => `<button class="pli ${v.type==='playlist'&&v.id===p.id?'on':''}" ${v.type==='playlist'&&v.id===p.id?'aria-current="page"':''} data-pl="${p.id}" title="${esc(p.name)}">${pthumb(p)}<b>${esc(p.name)}</b>${p.system ? '' : isPublic(p) ? ic('globe', 'lk') : ic('lock', 'lk')}</button>`).join('') +
     `<button class="pli create" data-act="newpl" title="Create Playlist"><span class="pthumb">${ic('plus')}</span><b>Create Playlist</b></button>`;
   $('#accAvatar').innerHTML = avatarHtml(u); $('#accName').textContent = u.display; $('#accUser').textContent = '@' + u.username;
@@ -1728,7 +1855,7 @@ $('#view').addEventListener('pointerdown', e => {
 $('#view').addEventListener('pointermove', e => {
   if (!bd) return;
   bd.p.bannerY = Math.max(0, Math.min(100, bd.start - (e.clientY - bd.y) / bd.h * 160));
-  bd.el.style.backgroundPosition = `50% ${bd.p.bannerY}%`;
+  bd.el.style.setProperty('--bposy', `${bd.p.bannerY}%`);
 });
 const endBd = () => { if (bd) { bd.el.classList.remove('grab'); save(); bd = null; } };
 $('#view').addEventListener('pointerup', endBd); $('#view').addEventListener('pointercancel', endBd);
@@ -1919,7 +2046,7 @@ const ACCENTS = {
   orange:['#c2410c','#fb923c','rgba(249,115,22,.15)','rgba(249,115,22,.2)']
 };
 const ACCENT_NAMES = {violet:'Violet', blue:'Bleu', green:'Vert', pink:'Rose', orange:'Orange'};
-const DEFAULT_SETTINGS = {seen:'', density:'comfortable', startMin:false, bgOverlay:80, bgTint:'bg', bgBlur:0, hideLogo:false, sideThumbs:true, bg:'oled', accentCustom:'', bgImage:'', homeGenre:'jpop', homeShelves:['Anime', 'City Pop'], lang:'', mediaKeys:true, tray:false, discord:false, discordId:'', onboarded:false, showPlayer:false, autoplay:true, remember:true, toasts:true, accent:'violet', radius:'soft', heroAuto:true, reduceMotion:false, autoUpdate:true};
+const DEFAULT_SETTINGS = {seen:'', density:'comfortable', lyricsVideo:true, startMin:false, bgOverlay:80, bgTint:'bg', bgBlur:0, hideLogo:false, sideThumbs:true, bg:'oled', accentCustom:'', bgImage:'', homeGenre:'jpop', homeShelves:['Anime', 'City Pop'], lang:'', mediaKeys:true, tray:false, discord:false, discordId:'', onboarded:false, showPlayer:false, autoplay:true, endless:true, remember:true, toasts:true, accent:'violet', radius:'soft', heroAuto:true, reduceMotion:false, autoUpdate:true};
 function applyTheme(){
   const a = ACCENTS[S.settings.accent] || ACCENTS.violet, st = document.documentElement.style;
   st.setProperty('--accent', a[0]); st.setProperty('--accent-hi', a[1]); st.setProperty('--accent-soft', a[2]); st.setProperty('--accent-glow', a[3]);
@@ -1968,9 +2095,10 @@ function settingsHtml(){
       ${setRow('Notifications', 'Affiche de petits messages quand tu ajoutes un titre, changes un réglage, etc. Les erreurs restent toujours visibles.', swc('toasts', T.toasts, 'Notifications'))}${desktopRows()}</div>`;
   else if (tab === 'playback') b = `<h2>Playback</h2><p class="lead">Comment la musique se lance et s'enchaîne.</p><div class="setgroup">
       ${setRow('Lecture automatique', 'Passe au titre suivant quand un titre se termine. Désactivé, la lecture s\'arrête à la fin du titre.', swc('autoplay', T.autoplay, 'Lecture automatique'))}
+      ${setRow(L('Endless play', 'Lecture sans fin'), L('When the queue ends, keep going with similar songs (YouTube radio). If YouTube is limiting requests, the queue starts over instead of stopping.', 'Quand la file se termine, enchaîne avec des titres similaires (radio YouTube). Si YouTube limite les requêtes, la file recommence au lieu de s\'arrêter.'), swc('endless', T.endless !== false, L('Endless play', 'Lecture sans fin')))}
       ${setRow('Reprendre la file d\'attente', 'Garde la file et le dernier titre au prochain lancement.', swc('remember', T.remember, 'Reprendre la file'))}
       ${setRow('Afficher le lecteur vidéo', 'Montre le lecteur YouTube dans un coin. Utile pour voir pourquoi un titre ne se lance pas (message de YouTube, âge, consentement…).', swc('showPlayer', T.showPlayer, 'Afficher le lecteur vidéo'))}
-      ${playerLogHtml()}
+      ${sleepRow()}${playerLogHtml()}
       <h4>Raccourcis clavier</h4>
       <div class="set"><p class="kv" style="width:100%">${shortcutsKv()}</p></div></div>`;
   else if (tab === 'appearance') b = `<h2>Appearance</h2><p class="lead">Couleur, arrondis et animations.</p><div class="setgroup">
@@ -2234,6 +2362,28 @@ $('#nowTitle').addEventListener('click', () => { if (current()) go({type:'now'})
 /* ---------- Changelog (liste repliable) ---------- */
 const TAGS = {new:'Nouveau', improved:'Amélioré', fixed:'Corrigé'};
 const CHANGELOG = [
+  {v:'0.7.9', date:'Nov 2026', title:'La musique ne s’arrête plus', changes:[
+    ['new', 'Lecture sans fin : quand la file se termine, Saturne enchaîne avec des titres similaires. Si YouTube ne répond pas, la file recommence au lieu de s’arrêter (Réglages › Lecture).'],
+    ['improved', 'Quand YouTube limite les requêtes, Saturne ressert la dernière réponse connue (recherches, artistes, playlists) au lieu d’afficher une erreur.'],
+    ['improved', 'Après un blocage, la pause avant de réessayer est plus courte (45 s) et ne s’allonge que si YouTube bloque à nouveau.'],
+    ['fixed', 'Lecteur : Saturne se présente correctement à YouTube (origine et référent), ce qui évite le refus « erreur 153 » chez certains utilisateurs.']]},
+  {v:'0.7.8', date:'Nov 2026', title:'Page Paroles', changes:[
+    ['new', 'Page Paroles façon Spotify : la pochette à gauche, les paroles à droite, avec la vidéo floutée en arrière-plan (désactivable).'],
+    ['improved', 'Barre de lecture : le bouton Paroles remplace « En lecture », la minuterie de sommeil et le plein écran en sortent. La minuterie est dans Réglages › Lecture et dans la palette Ctrl + K.']]},
+  {v:'0.7.7', date:'Nov 2026', title:'Icône de la barre des tâches et GIF de fond', changes:[
+    ['fixed', 'L’icône de Saturne avait disparu de la barre des tâches (0.6.2 à 0.7.6).'],
+    ['fixed', 'Les GIF animés fonctionnent maintenant aussi en image de fond.']]},
+  {v:'0.7.6', date:'Nov 2026', title:'Toutes les listes en tableau', changes:[
+    ['improved', 'Recherche, genres, artistes, historique et mixes utilisent le même tableau que les playlists.'],
+    ['new', 'Cliquer sur le nom d’une chaîne dans le tableau filtre la liste (cliquer encore, ou sur la croix, retire le filtre).'],
+    ['fixed', 'Bannière de playlist : filet clair et traînée de couleur en bas de l’en-tête corrigés, titre plus lisible sur une image claire.']]},
+  {v:'0.7.5', date:'Nov 2026', title:'Paroles fluides et clip plein cadre', changes:[
+    ['improved', 'L’aperçu des paroles défile en douceur, ligne par ligne.'],
+    ['improved', 'Clip vidéo : il remplit toute la zone, sans titre YouTube ni boutons par-dessus, et se survole normalement.'],
+    ['improved', 'Cliquer sur la pochette dans la barre de lecture ouvre le panneau En lecture.']]},
+  {v:'0.7.4', date:'Nov 2026', title:'Interface téléphone', changes:[
+    ['new', 'Sur téléphone : barre d’onglets en bas, lecteur compact, et page En lecture plein écran avec ses commandes.'],
+    ['improved', 'Plus aucun texte sur deux lignes : les titres se terminent par « … ».']]},
   {v:'0.7.3', date:'Nov 2026', title:'Panneau En lecture : retour au titre et dégradé', changes:[
     ['new', 'Bouton « Passer au titre » pour quitter le clip vidéo dans le panneau En lecture.'],
     ['improved', 'Le panneau En lecture prend un dégradé de la couleur de la pochette.']]},
@@ -2317,6 +2467,12 @@ const CHANGELOG = [
 ];
 const clOpen = new Set([CHANGELOG[0].v]);
 const CL_EN = {
+  '0.7.9': {title:'Music no longer stops', changes:['Endless play: when the queue ends, Saturne carries on with similar songs. If YouTube does not answer, the queue starts over instead of stopping (Settings › Playback).', 'When YouTube limits requests, Saturne serves the last known answer (searches, artists, playlists) instead of an error.', 'After a block, the wait before retrying is shorter (45 s) and only grows if YouTube blocks again.', 'Player: Saturne now introduces itself properly to YouTube (origin and referrer), which avoids the “error 153” refusal for some users.']},
+  '0.7.8': {title:'Lyrics page', changes:['Spotify-style Lyrics page: the cover on the left, the lyrics on the right, with the blurred video in the background (can be turned off).', 'Player bar: the Lyrics button replaces “Now playing”, and the sleep timer and full screen buttons are gone. The timer is in Settings › Playback and in the Ctrl + K palette.']},
+  '0.7.7': {title:'Taskbar icon and animated background GIFs', changes:['Saturne’s icon had disappeared from the taskbar (0.6.2 to 0.7.6).', 'Animated GIFs now also work as the background image.']},
+  '0.7.6': {title:'Every list as a table', changes:['Search, genres, artists, history and mixes use the same table as playlists.', 'Clicking a channel name in the table filters the list (click again, or the cross, to clear the filter).', 'Playlist banner: light line and color streak at the bottom of the header fixed, title easier to read over a bright image.']},
+  '0.7.5': {title:'Smooth lyrics and full-frame video', changes:['The lyrics preview scrolls smoothly, line by line.', 'Music video: it fills the whole area, without the YouTube title or buttons on top, and can be hovered normally.', 'Clicking the cover in the player bar opens the Now playing panel.']},
+  '0.7.4': {title:'Phone interface', changes:['On phones: a tab bar at the bottom, a compact player, and a full-screen Now playing page with its controls.', 'No more two-line texts: titles end with “…”.']},
   '0.7.3': {title:'Now playing panel: back to the song, and a gradient', changes:['“Switch to song” button to leave the music video in the Now playing panel.','The Now playing panel takes a gradient from the cover’s color.']},
   '0.7.2': {title:'New layout: bar, panel and playlists', changes:[
     'Floating player bar: title on the left, controls and progress in the center, tools on the right (lyrics, queue, sleep timer, volume, full screen).',
@@ -2424,7 +2580,7 @@ async function announceVersion(){
 const altMap = (() => { try { return JSON.parse(localStorage.getItem('saturne.alt2') || '{}'); } catch { return {}; } })();
 const saveAlt = () => { try { localStorage.setItem('saturne.alt2', JSON.stringify(Object.fromEntries(Object.entries(altMap).slice(-300)))); } catch {} };
 const playId = t => altMap[t.id] || t.id;
-const ERR_TEXT = {2:'identifiant invalide', 5:'erreur du lecteur', 100:'vidéo introuvable ou privée', 101:'lecture interdite hors de YouTube', 150:'lecture interdite hors de YouTube'};
+const ERR_TEXT = {2:'identifiant invalide', 5:'erreur du lecteur', 100:'vidéo introuvable ou privée', 101:'lecture interdite hors de YouTube', 150:'lecture interdite hors de YouTube', 153:'lecteur refusé par YouTube (en-tête manquant)'};
 const playerLog = [];
 const logPlayer = (t, msg) => { playerLog.unshift({at:Date.now(), title:t ? t.title : '?', msg}); playerLog.length = Math.min(playerLog.length, 8); if (S.view.type === 'settings' && S.setTab === 'playback') renderView(); };
 const triedAlt = new Map();
@@ -3203,14 +3359,14 @@ function statsHtml(){
     <div class="twocol"><div class="box"><h3>${L('Top artists', 'Artistes les plus écoutés')}</h3>${top(tally(p => p[2]), k => k)}</div><div class="box"><h3>${L('Top songs', 'Titres les plus écoutés')}</h3>${top(tally(p => p[0]), k => (byId.get(k) || [])[1] || k)}</div></div>`;
 }
 function historyHtml(){
-  const tab = S.hv, list = playsTracks();
+  const tab = S.hv; let list = playsTracks();
   let h = `<div class="pagehead"><p class="eyebrow">${L('Activity', 'Activité')}</p><h1>${tab === 'stats' ? L('Listening stats', "Statistiques d'écoute") : L('Listening history', "Historique d'écoute")}</h1></div>
     <div class="toolbar"><div class="chips"><button class="chip ${tab === 'history' ? 'on' : ''}" data-hvtab="history">${L('History', 'Historique')}</button><button class="chip ${tab === 'stats' ? 'on' : ''}" data-hvtab="stats">${L('Stats', 'Statistiques')}</button></div>${list.length ? `<button class="ghost" data-act="clearhist">${ic('trash')}${L('Clear history', "Effacer l'historique")}</button>` : ''}</div>`;
   if (!list.length) return h + `<p class="empty">${L('Nothing played yet. Your listening history and stats will show up here.', "Rien d'écouté pour le moment. Ton historique et tes statistiques apparaîtront ici.")}</p>`;
   if (tab === 'stats') return h + statsHtml();
-  const cap = capOf('plays'); let last = '', out = '';
-  list.slice(0, cap).forEach((t, i) => { const d = dayLabel(t.at); if (d !== last) { last = d; out += `<li class="dayhead">${esc(d)}</li>`; } out += row(t, i, list.length); });
-  return h + `<ul class="rows" data-src="plays">${out}</ul>${moreItems(list, 'plays')}`;
+  const cap = capOf('plays'); let last = '', out = ''; list = filterList(list, 'plays');
+  list.slice(0, cap).forEach((t, i) => { const d = dayLabel(t.at); if (d !== last) { last = d; out += `<li class="dayhead">${esc(d)}</li>`; } out += trow(t, i, list.length); });
+  return h + `${filterChip('plays')}${theadHtml('plays', true)}<ul class="rows" data-src="plays">${out}</ul>${moreItems(list, 'plays')}`;
 }
 
 /* ---------- Liste : « Afficher plus » et allègement des longues listes ---------- */
@@ -3293,6 +3449,25 @@ async function startRadio(t){
   toast(L('Starting radio…', 'Lancement de la radio…'));
   try { const j = await api('radio', {id:t.id}); S.shuffle = false; playList([t, ...j.items], 0); toast(L('Radio started: ', 'Radio lancée : ') + t.title.slice(0, 40)); }
   catch (e) { toast(errText(e)); }
+}
+
+/* Lecture sans fin : quand la file se termine, on enchaîne avec la radio du dernier titre ; si YouTube ne répond pas, on recommence la file plutôt que de s'arrêter. */
+let endlessBusy = false;
+async function endlessNext(){
+  if (endlessBusy) return; endlessBusy = true;
+  const q0 = S.queue, last = q0[q0.length - 1];
+  let again = false, items = null;
+  try { items = (await api('radio', {id:last.id})).items; } catch {}
+  endlessBusy = false;
+  // Pendant l'attente, l'utilisateur a pu lancer autre chose : on ne touche pas à sa nouvelle file.
+  if (S.queue !== q0 || S.pos + 1 < S.order.length) return;
+  const seen = new Set(q0.map(q => q.id)), add = (items || []).filter(x => !seen.has(x.id)).slice(0, 25).map(slim);
+  if (add.length) { const start = q0.length; q0.push(...add); S.order.push(...add.map((_, i) => start + i)); S.pos++; S.cur = S.order[S.pos]; }
+  else if (q0.length > 1) { again = true; S.pos = 0; S.cur = S.order[0]; }
+  if (S.cur >= 0 && S.queue[S.cur] && (again || S.pos > 0)) {
+    loadCurrent();
+    toast(again ? L('Queue ended: starting over', 'File terminée : on recommence') : L('Queue ended: playing similar songs', 'File terminée : titres similaires à la suite'));
+  } else { playing = false; renderBar(); }
 }
 
 /* ---------- Importer une playlist YouTube ---------- */
@@ -3492,6 +3667,7 @@ $('#view').addEventListener('click', e => {
 
 /* ---------- Clip vidéo (le lecteur YouTube, d'habitude caché, se place sur la pochette de Now playing) ---------- */
 function placeClip(){
+  if (typeof placeBgVideo === 'function' && placeBgVideo()) return;
   const yb = document.querySelector('.ytbox'), art = document.querySelector('.np-art') || (S.qopen && S.ptab === 'now' ? document.querySelector('.pn-art') : null);
   if (!S.clip || !art) { yb.classList.remove('clip'); yb.style.cssText = ''; return; }
   const r = art.getBoundingClientRect(), h = Math.min(r.height, r.width * 9 / 16);
@@ -3648,7 +3824,7 @@ function paletteItems(){
   const act = (label, icon, run) => ({label, icon, kind:'Action', run});
   return [
     nav(L('Home', 'Accueil'), {type:'home'}, 'home'), nav(L('Search', 'Recherche'), {type:'search', q:''}, 'search'), nav(L('Artists', 'Artistes'), {type:'artists'}, 'person'),
-    nav(L('Your Library', 'Ma bibliothèque'), {type:'library'}, 'lib'), nav(L('History', 'Historique'), {type:'history'}, 'history'), nav(L('Now playing', 'En lecture'), {type:'now'}, 'note'),
+    nav(L('Your Library', 'Ma bibliothèque'), {type:'library'}, 'lib'), nav(L('History', 'Historique'), {type:'history'}, 'history'), nav(L('Lyrics', 'Paroles'), {type:'now'}, 'lyrics'),
     ...S.playlists.map(p => ({label:p.name, icon:p.id === 'favs' ? 'bookmarkf' : 'queue', kind:'Playlist', raw:true, run:() => go({type:'playlist', id:p.id})})),
     ...S.follows.map(a => ({label:a.name, icon:'person', kind:L('Artist', 'Artiste'), raw:true, run:() => go({type:'artist', id:a.id})})),
     ...GENRES.map(g => ({label:g.n, icon:'genres', kind:L('Genre', 'Genre'), raw:true, run:() => go({type:'list', q:g.q, title:g.n, cc:g.cc, eyebrow:'Genre'})})),
@@ -3804,7 +3980,7 @@ $('#view').addEventListener('change', e => { if (e.target.id === 'accentPick') r
 $('#bgPick').addEventListener('change', async e => {
   const f = e.target.files[0]; e.target.value = ''; if (!f) return;
   const url = URL.createObjectURL(f);
-  try { S.settings.bgImage = await toDataURL(url, 1280, 800, false); applyTheme(); save(); renderView(); toast(L('Background image updated', 'Image de fond mise à jour')); }
+  try { if (isGif(f) && f.size <= GIF_MAX) S.settings.bgImage = await fileDataUrl(f); else { S.settings.bgImage = await toDataURL(url, 1280, 800, false); if (isGif(f)) toast(L('This GIF is over 4 MB: it is shown without animation.', 'Ce GIF dépasse 4 Mo : il est affiché sans animation.')); } applyTheme(); save(); renderView(); toast(L('Background image updated', 'Image de fond mise à jour')); }
   catch { toast(L('Could not read this image', 'Impossible de lire cette image')); }
   finally { URL.revokeObjectURL(url); }
 });
@@ -3912,7 +4088,7 @@ $('#view').addEventListener('submit', e => {
 /* À la fin de chaque rendu : état « recherche vide » de l'application (la barre du haut s'efface) et mise au point. */
 function afterRender2(){
   const empty = S.view.type === 'search' && !S.view.q;
-  $('#app').classList.toggle('searchhome', empty); colorizeHead();
+  $('#app').classList.toggle('searchhome', empty); $('#app').classList.toggle('lyricspage', S.view.type === 'now'); colorizeHead();
   if (empty) { const b = $('#bigQ'); if (b && !b.matches(':focus')) setTimeout(() => b.focus(), 30); }
 }
 /* ---------- Couleur dominante d'une pochette (en-tête de playlist, carte des paroles) ---------- */
@@ -3942,7 +4118,7 @@ const PTABS = () => [['now', L('Now playing', 'En lecture')], ['queue', L('Queue
 const qRow = (q, i) => `<div class="nq ${i === S.cur ? 'on' : ''}" data-qi="${i}" draggable="true" title="${esc(q.title)}"><button class="qplay" data-act="qplay"><img src="${esc(q.thumb)}" alt=""><span class="qm"><b data-notr>${esc(q.title)}</b><small data-notr>${esc(q.channel)}</small></span></button><span class="qd">${q.duration ? fmt(q.duration) : ''}</span><button class="ib sm" data-act="qrm" aria-label="Retirer de la file">${ic('close')}</button></div>`;
 function lyricsPreviewHtml(Y){
   if (!Y || Y.state === 'loading') return `<p class="pn-dim">${L('Looking for lyrics…', 'Recherche des paroles…')}</p>`;
-  if (Y.lines) { const i = Math.max(0, lyrLine); return Y.lines.slice(i, i + 4).map((l, k) => `<p class="${k === 0 && lyrLine >= 0 ? 'cur' : ''}" data-notr>${esc(l.text) || '♪'}</p>`).join(''); }
+  if (Y.lines) return Y.lines.map((l, i) => `<p class="${i === lyrLine ? 'cur' : i < lyrLine ? 'past' : ''}" data-notr>${esc(l.text) || '♪'}</p>`).join('');
   if (Y.plain) return Y.plain.split('\n').filter(Boolean).slice(0, 4).map(l => `<p data-notr>${esc(l)}</p>`).join('');
   return '';
 }
@@ -3958,7 +4134,8 @@ function nowPanelHtml(t){
     <div class="pn-art"><img src="https://i.ytimg.com/vi/${esc(t.id)}/maxresdefault.jpg" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='${esc(t.thumb)}'}">${S.clip ? '' : `<button class="pn-vid" data-do="clip" aria-pressed="false">${ic('play')}${L('Switch to video', 'Passer à la vidéo')}</button>`}</div>
     ${S.clip ? `<button class="pn-toggle" data-do="clip" aria-pressed="true">${ic('note')}${L('Switch to song', 'Passer au titre')}</button>` : ''}
     <div class="pn-meta"><div style="min-width:0"><b class="tt" data-notr>${esc(t.title)}</b><span class="ch" data-notr>${chLink(t)}</span></div>${bmBtn(t)}</div>
-    ${lp ? `<section class="pn-card pn-lyr" id="pnLyr"><h4>${L('Lyrics preview', 'Aperçu des paroles')}</h4><div class="pn-lines">${lp}</div><button class="more" data-do="fulllyr">${L('Show all', 'Tout afficher')}${ic('right')}</button></section>` : ''}
+    ${pnCtrlHtml()}
+    ${lp ? `<section class="pn-card pn-lyr" id="pnLyr"><h4>${L('Lyrics preview', 'Aperçu des paroles')}</h4><div class="pn-lines ${Y && Y.lines ? 'sync' : ''}">${lp}</div><button class="more" data-do="fulllyr">${L('Show all', 'Tout afficher')}${ic('right')}</button></section>` : ''}
     ${aboutHtml(t)}
     ${nx ? `<section class="pn-card"><div class="pn-row"><h4>${L('Next in queue', 'À suivre dans la file d’attente')}</h4><button class="more" data-ptab="queue">${L('Open queue', 'Ouvrir la file d’attente')}</button></div><button class="mini-row" data-act="qjump" data-qi="${ni}"><img src="${esc(nx.thumb)}" alt=""><span class="m"><b data-notr>${esc(nx.title)}</b><small data-notr>${esc(nx.channel)}</small></span></button></section>` : ''}</div>`;
 }
@@ -4003,14 +4180,16 @@ $('#qdrawer').addEventListener('click', e => {
   else if (k === 'fulllyr') go({type:'now'});
   else if (k === 'followp' && t) { const A = S.artistInfo[t.channelId || t.channel]; if (A) { toggleFollow(A); renderPanel(); } }
 });
-$('#bLyrics').addEventListener('click', () => openPanel('now'));
 $('#bFull').addEventListener('click', () => go({type:'now'}));
 /* Aperçu des paroles : la ligne en cours suit la lecture. */
 let pvLine = -2;
 setInterval(() => {
   if (!S.qopen || S.ptab !== 'now' || !S.lyr || !S.lyr.lines) return;
   if (lyrLine === pvLine) return; pvLine = lyrLine;
-  const el = document.querySelector('#pnLyr .pn-lines'); if (el) el.innerHTML = lyricsPreviewHtml(S.lyr);
+  const el = document.querySelector('#pnLyr .pn-lines'); if (!el) return;
+  if (el.children.length !== S.lyr.lines.length) el.innerHTML = lyricsPreviewHtml(S.lyr);
+  el.querySelectorAll('p').forEach((p, i) => { p.className = i === lyrLine ? 'cur' : i < lyrLine ? 'past' : ''; });
+  const c = el.querySelector('.cur'); if (c) el.scrollTo({top:c.offsetTop - el.clientHeight / 2 + c.offsetHeight / 2, behavior:S.settings.reduceMotion ? 'auto' : 'smooth'});
 }, 400);
 setInterval(() => { if (S.qopen && S.ptab === 'now' && S.lyr && S.lyr.lines && S.view.type !== 'now' && typeof syncLyrics === 'function') { /* la ligne courante est calculée ici quand la page « En lecture » n'est pas ouverte */
   const c = current(); if (!c || !ready) return; let now = 0; try { now = player.getCurrentTime() || 0; } catch {}
@@ -4024,6 +4203,7 @@ function fmtTotal(sec){
   return h ? `${h} h ${m % 60 ? String(m % 60).padStart(2, '0') + ' min' : ''}`.trim() : `${Math.max(1, m)} min`;
 }
 const fmtAdded = ts => ts ? new Date(ts).toLocaleDateString(dateLocale(), {day:'numeric', month:'short', year:'numeric'}) : '';
+const dateCell = t => t.added ? fmtAdded(t.added) : t.at ? new Date(t.at).toLocaleTimeString(dateLocale(), {hour:'2-digit', minute:'2-digit'}) : '';
 /* Ligne du tableau (playlists) : numéro, titre + chaîne, « album » (chaîne), date d'ajout, durée. */
 function trow(t, i, n){
   const c = current(), on = c && c.id === t.id, own = S.view.type === 'playlist', sel = own && S.plv.sel;
@@ -4034,9 +4214,10 @@ function trow(t, i, n){
     : `<span class="tnum"><span class="n">${on && playing ? ic('note') : i + 1}</span><button class="tplay" data-act="play" aria-label="Lire ${esc(t.title)}">${ic('play')}</button></span>`;
   return `<li class="trow ${on ? 'on' : ''} ${picked ? 'picked' : ''}" data-i="${i}" draggable="true" style="--d:${Math.min(i, 14)}">${first}
     <div class="tmain"><img src="${esc(t.thumb)}" alt="" loading="lazy"><div style="min-width:0"><div class="tt" title="${esc(t.title)}">${esc(t.title)}</div><div class="ch">${chLink(t)}</div></div></div>
-    <div class="talb" data-notr>${esc(t.channel)}</div><div class="tdate">${fmtAdded(t.added)}</div><div class="dur">${t.duration ? fmt(t.duration) : ''}</div><div class="acts">${acts}</div></li>`;
+    <button class="talb" data-filter="${esc(t.channel)}" data-notr title="${L('Filter by this channel', 'Filtrer par cette chaîne')}">${esc(t.channel)}</button><div class="tdate">${dateCell(t)}</div><div class="dur">${t.duration ? fmt(t.duration) : ''}</div><div class="acts">${acts}</div></li>`;
 }
-const theadHtml = () => `<div class="thead"><span>#</span><span>${L('Title', 'Titre')}</span><span>${L('Channel', 'Chaîne')}</span><span>${L('Date added', 'Date d’ajout')}</span><span class="r" aria-label="${L('Duration', 'Durée')}">${ic('history')}</span><span></span></div>`;
+const theadHtml = (src = '', hd = true) => `<div class="thead ${hd ? '' : 'nodate'}"><span>#</span><span>${L('Title', 'Titre')}</span><span>${L('Channel', 'Chaîne')}</span><span>${src === 'plays' ? L('Played at', 'Écouté à') : L('Date added', 'Date d’ajout')}</span><span class="r" aria-label="${L('Duration', 'Durée')}">${ic('history')}</span><span></span></div>`;
+const filterChip = src => S.plv.q && src !== 'pl' ? `<div class="fchip">${L('Filter', 'Filtre')} : <b data-notr>${esc(S.plv.q)}</b><button data-do="clearfilter" aria-label="${L('Clear the filter', 'Effacer le filtre')}">${ic('close')}</button></div>` : '';
 
 function plRightHtml(){
   return `<div class="plright"><label class="plsearch"><span>${ic('search')}</span><input id="plFilter" type="search" placeholder="${L('Filter', 'Filtrer')}" aria-label="${L('Filter this playlist', 'Filtrer cette playlist')}" value="${esc(S.plv.q)}" autocomplete="off"></label>${dd('plsort', L('Sort', 'Trier'))}</div>`;
@@ -4063,7 +4244,7 @@ function playlistPageHtml(p){
   const l = p.tracks, view = plView(), sel = S.plv.sel, n = sel ? sel.size : 0;
   const selbar = sel ? `<div class="selbar"><b>${n} ${n > 1 ? L('selected', 'sélectionnés') : L('selected', 'sélectionné')}</b><button class="ghost" data-do="selall">${L('Select all', 'Tout sélectionner')}</button><button class="ghost" data-do="selqueue" ${n ? '' : 'disabled'}>${ic('addq')}${L('Add to queue', 'Ajouter à la file')}</button><button class="ghost" data-do="seladd" ${n ? '' : 'disabled'}>${ic('plus')}${L('Add to playlist…', 'Ajouter à une playlist…')}</button><button class="ghost warn" data-do="selremove" ${n ? '' : 'disabled'}>${ic('trash')}${L('Remove', 'Retirer')}</button></div>` : '';
   return plHeroHtml({p, owner:S.user.display, readonly:false, avatar:avatarHtml(S.user)}) + selbar +
-    (l.length ? theadHtml() + (view.length ? rows(view, 'pl') : `<p class="empty">${L('No song matches this filter.', 'Aucun titre ne correspond à ce filtre.')}</p>`) : '<p class="empty">Cette playlist est vide. Glisse un titre sur elle dans la barre latérale, ou utilise le bouton « + ».</p>');
+    (l.length ? (view.length ? rows(view, 'pl') : `<p class="empty">${L('No song matches this filter.', 'Aucun titre ne correspond à ce filtre.')}</p>`) : '<p class="empty">Cette playlist est vide. Glisse un titre sur elle dans la barre latérale, ou utilise le bouton « + ».</p>');
 }
 function pubPageHtml(){
   const P = S.pub, d = P.data;
@@ -4071,7 +4252,7 @@ function pubPageHtml(){
   if (P.loading) return h + skeleton(6, 'grid');
   if (P.error) return h + `<div class="errbox"><span class="err">${esc(P.error)}</span></div>`;
   if (!d) return h;
-  return h + plHeroHtml({p:{...d, tracks:d.tracks}, owner:d.ownerDisplay, readonly:true}) + (d.tracks.length ? theadHtml() + rows(d.tracks, 'pub') : '<p class="empty">Cette playlist est vide.</p>');
+  return h + plHeroHtml({p:{...d, tracks:d.tracks}, owner:d.ownerDisplay, readonly:true}) + (d.tracks.length ? rows(d.tracks, 'pub') : '<p class="empty">Cette playlist est vide.</p>');
 }
 /* Couleur de l'en-tête : celle de la pochette (ou du premier titre). */
 function colorizeHead(){
@@ -4087,6 +4268,79 @@ $('#view').addEventListener('click', e => {
   else if (b.dataset.do === 'focustitle') { const t = $('#plTitle'); if (t) { t.focus(); t.select(); } }
 });
 $('#view').addEventListener('dblclick', e => { const li = e.target.closest('.trow'); if (li && !e.target.closest('button,a,input')) { const b = li.querySelector('[data-act="play"]'); if (b) b.click(); } });
+
+/* Clic sur une chaîne : filtre la liste (un second clic l'enlève). */
+$('#view').addEventListener('click', e => {
+  const f = e.target.closest('[data-filter]'), c = e.target.closest('[data-do="clearfilter"]');
+  if (c) { S.plv.q = ''; renderView(); return; }
+  if (!f) return;
+  const v = f.dataset.filter; S.plv.q = S.plv.q === v ? '' : v; renderView();
+});
+/* ---------- 0.7.4 : téléphone ---------- */
+const MOBILE = () => innerWidth <= 900;
+/* Barre d'onglets : renvoie le clic au bouton correspondant de la navigation. */
+$('#tabbar').addEventListener('click', e => { const b = e.target.closest('[data-nav]'); if (!b) return; const t = $(`#nav [data-nav="${b.dataset.nav}"]`); if (t) t.click(); });
+/* Sur téléphone, toucher le lecteur ouvre le panneau « En lecture » plein écran. */
+$('#nowImg').addEventListener('click', e => { if (current()) { e.stopImmediatePropagation(); openPanel('now'); } }, true);
+$('#nowTitle').addEventListener('click', e => { if (current()) { e.stopImmediatePropagation(); openPanel('now'); } }, true);
+$('#nowCh').addEventListener('click', () => { if (current()) openPanel('now'); });
+const pnCtrlHtml = () => `<div class="pn-ctrl"><input type="range" id="pnSeek" min="0" max="100" value="0" step="1" aria-label="Position dans le titre"><div class="pn-times"><span id="pnCur">0:00</span><span id="pnDur">0:00</span></div>
+  <div class="pn-btns"><button class="ib ${S.shuffle ? 'act' : ''}" data-pc="shuffle" aria-label="Lecture aléatoire">${ic('shuffle')}</button><button class="ib" data-pc="prev" aria-label="Titre précédent">${ic('prev')}</button><button class="bigplay" data-pc="play" aria-label="Lecture">${ic(playing ? 'pause' : 'play')}</button><button class="ib" data-pc="next" aria-label="Titre suivant">${ic('next')}</button><button class="ib ${S.repeat !== 'off' ? 'act' : ''}" data-pc="repeat" aria-label="Répétition">${ic(S.repeat === 'one' ? 'repeat1' : 'repeat')}</button></div></div>`;
+$('#qdrawer').addEventListener('click', e => {
+  const b = e.target.closest('[data-pc]'); if (!b) return;
+  const k = b.dataset.pc;
+  if (k === 'play') togglePlay(); else if (k === 'next') next(false); else if (k === 'prev') prev();
+  else if (k === 'shuffle') $('#bShuffle').click(); else if (k === 'repeat') $('#bRepeat').click();
+  setTimeout(renderPanel, 60);
+});
+let pnSeeking = false;
+$('#qdrawer').addEventListener('input', e => { if (e.target.id === 'pnSeek') { pnSeeking = true; $('#pnCur').textContent = fmt(e.target.value); fill(e.target); } });
+$('#qdrawer').addEventListener('change', e => { if (e.target.id === 'pnSeek') { if (ready && current()) player.seekTo(+e.target.value, true); pnSeeking = false; } });
+setInterval(() => {
+  const s = $('#pnSeek'); if (!s || pnSeeking || !ready || !current()) return;
+  const d = player.getDuration() || 0, c = player.getCurrentTime() || 0;
+  s.max = Math.max(1, Math.floor(d)); s.value = Math.floor(c); fill(s); $('#pnCur').textContent = fmt(c); $('#pnDur').textContent = fmt(d);
+  const pb = document.querySelector('[data-pc="play"]'); if (pb && pb.dataset.p !== String(playing)) { pb.dataset.p = playing; pb.innerHTML = ic(playing ? 'pause' : 'play'); }
+}, 500);
+/* ---------- Page Paroles : pochette à gauche, paroles à droite, vidéo floue en fond (désactivable) ---------- */
+const lyVideoOn = () => S.settings.lyricsVideo !== false;
+function lyricsPageHtml(){
+  const t = current();
+  if (!t) return `<div class="pagehead"><p class="eyebrow">${L('Lyrics', 'Paroles')}</p><h1>${L('Nothing playing', 'Rien en lecture')}</h1><p class="sub">${L('Play a song to see its lyrics here.', 'Lance un titre pour voir ses paroles ici.')}</p></div>`;
+  return `<div class="lypage ${lyVideoOn() ? '' : 'novid'}" id="lypage"><div class="ly-left">
+      <div class="ly-art"><img src="https://i.ytimg.com/vi/${esc(t.id)}/maxresdefault.jpg" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='${esc(t.thumb)}'}"></div>
+      <div class="ly-meta"><b data-notr>${esc(t.title)}</b><span data-notr>${chLink(t)}</span></div>
+      <div class="ly-tools">${bmBtn(t)}<button class="chipb" data-do="lyvid" aria-pressed="${lyVideoOn()}">${ic('mini')}${L('Video background', 'Fond vidéo')} : ${lyVideoOn() ? L('on', 'oui') : L('off', 'non')}</button><button class="chipb" data-do="lyqueue">${ic('queue')}${L('Queue', 'File d’attente')}</button></div></div>
+    <div class="ly-right">${lyricsHtml(t)}</div></div>`;
+}
+/* La vidéo (le lecteur YouTube habituellement caché) est étirée sur la page, floutée et assombrie, derrière le contenu. */
+function placeBgVideo(){
+  const yb = document.querySelector('.ytbox'), m = document.querySelector('main'), root = document.documentElement;
+  const on = !!yb && !!m && S.view.type === 'now' && lyVideoOn() && !!current() && !$('#app').classList.contains('mini') && !S.settings.showPlayer;
+  if (!on) { if (yb && yb.classList.contains('bgvid')) { yb.classList.remove('bgvid'); yb.style.cssText = ''; } root.classList.remove('bgvid-active'); return false; }
+  const r = m.getBoundingClientRect(), w = Math.max(r.width, r.height * 16 / 9), h = w * 9 / 16;
+  yb.classList.add('bgvid'); root.classList.add('bgvid-active');
+  yb.style.cssText = `left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;right:auto;bottom:auto;--bgw:${w}px;--bgh:${h}px;--bgl:${(r.width - w) / 2}px;--bgt:${(r.height - h) / 2}px`;
+  return true;
+}
+new ResizeObserver(() => placeBgVideo()).observe(document.querySelector('main'));
+/* Couleur de fond quand la vidéo est désactivée : celle de la pochette. */
+function paintLyrics(){
+  const el = $('#lypage'), t = current(); if (!el || !t) return;
+  coverColor(`https://i.ytimg.com/vi/${t.id}/mqdefault.jpg`).then(c => { const e2 = $('#lypage'); if (e2 && c) e2.style.setProperty('--lyc', toneOf(c, 120)); });
+}
+$('#view').addEventListener('click', e => {
+  const fav = e.target.closest('.lypage [data-act="fav"]'); if (fav && current()) { toggleFav(current()); return; }
+  const b = e.target.closest('[data-do]'); if (!b) return;
+  if (b.dataset.do === 'lyvid') { S.settings.lyricsVideo = !lyVideoOn(); save(); renderView(); }
+  else if (b.dataset.do === 'lyqueue') setQueueOpen(true, 'queue');
+});
+$('#bLyrics').addEventListener('click', () => go({type:'now'}));
+
+/* ---------- Minuterie de sommeil : dans Réglages › Lecture (le bouton a quitté la barre) ---------- */
+const sleepRow = () => setRow(L('Sleep timer', 'Minuterie de sommeil'), L('Pauses playback after a delay, fading the volume. Also available in the Ctrl + K palette.', 'Met la lecture en pause après un délai, avec un fondu du volume. Aussi dans la palette Ctrl + K.'),
+  `<div style="display:grid;gap:8px;justify-items:end"><div class="seg" role="group" aria-label="${L('Sleep timer', 'Minuterie de sommeil')}">${[[15, '15 min'], [30, '30 min'], [45, '45 min'], [60, '1 h'], ['track', L('End of song', 'Fin du titre')], ['off', L('Off', 'Non')]].map(([v, n]) => `<button data-sleepset="${v}" class="${(v === 'off' && !S.sleep) || (v === 'track' && S.sleep && S.sleep.track) ? 'on' : ''}">${n}</button>`).join('')}</div><small style="color:var(--mute)">${sleepLabel()}</small></div>`);
+$('#view').addEventListener('click', e => { const b = e.target.closest('[data-sleepset]'); if (!b) return; setSleep(b.dataset.sleepset); renderView(); });
 /* ---------- Démarrage ---------- */
 applyTheme(); applyLang(detectLang());
 window.__booted = true; // le script principal a démarré : le filet de sécurité (index.html) ne s’affichera pas
