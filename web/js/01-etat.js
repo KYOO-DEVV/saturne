@@ -1,6 +1,6 @@
 /* ---------- État ---------- */
 const S = {
-  profile:{banner:'', bio:''}, follows:[], lyr:null, plv:{q:'', sort:'manual', sel:null}, clip:false, mix:null,
+  ptab:'queue', profile:{banner:'', bio:''}, follows:[], lyr:null, plv:{q:'', sort:'manual', sel:null}, clip:false, mix:null,
   plays:[], hv:'history', cap:{}, sleep:null, backups:null, mini:false,
   user:null, playlists:[], queue:[], cur:-1, shuffle:false, repeat:'off', volume:80, muted:false, history:[], cc:'JP', collapsed:false, defaultPrivacy:'private',
   settings:{autoplay:true, remember:true, toasts:true, accent:'violet', radius:'soft', heroAuto:true, reduceMotion:false, autoUpdate:true}, setTab:'account',

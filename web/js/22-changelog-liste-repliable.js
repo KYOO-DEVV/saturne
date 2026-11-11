@@ -1,6 +1,11 @@
 /* ---------- Changelog (liste repliable) ---------- */
 const TAGS = {new:'Nouveau', improved:'Amélioré', fixed:'Corrigé'};
 const CHANGELOG = [
+  {v:'0.7.2', date:'Nov 2026', title:'Nouvelle mise en page : barre, panneau et playlists', changes:[
+    ['new', 'Barre de lecture flottante : titre à gauche, commandes et progression au centre, outils à droite (paroles, file, minuterie, volume, plein écran).'],
+    ['new', 'Panneau latéral « En lecture / File d’attente / Récents » : grande image, bouton « Passer à la vidéo », aperçu des paroles, à propos de l’artiste, suite de la file.'],
+    ['new', 'Page Playlist : en-tête en dégradé aux couleurs de la pochette, grand bouton lecture, tableau (titre, chaîne, date d’ajout, durée), numéro qui devient lecture au survol.'],
+    ['improved', 'Le contenu et le panneau latéral sont des cartes arrondies ; la barre de navigation de gauche ne change pas.']]},
   {v:'0.7.1', date:'Nov 2026', title:'Personnalisation, Profil et Recherche', changes:[
     ['fixed', 'Boutons et cases blancs sans texte avec une couleur d\'accent claire : le texte s\'adapte maintenant à la couleur choisie (et un liseré apparaît si elle ressemble au fond).'],
     ['new', 'Page Profil : bannière, photo, nom, bio, statistiques, playlists publiques et artistes suivis.'],
@@ -76,6 +81,11 @@ const CHANGELOG = [
 ];
 const clOpen = new Set([CHANGELOG[0].v]);
 const CL_EN = {
+  '0.7.2': {title:'New layout: bar, panel and playlists', changes:[
+    'Floating player bar: title on the left, controls and progress in the center, tools on the right (lyrics, queue, sleep timer, volume, full screen).',
+    'Side panel “Now playing / Queue / Recent”: big picture, “Switch to video” button, lyrics preview, about the artist, next in queue.',
+    'Playlist page: gradient header in the cover’s colors, big play button, table (title, channel, date added, duration), number that turns into play on hover.',
+    'Content and the side panel are rounded cards; the left navigation bar is unchanged.']},
   '0.7.1': {title:'Customization, Profile and Search', changes:[
     'White buttons and checkboxes with no text with a light accent color: the text now adapts to the chosen color (and an outline appears if it looks like the background).',
     'Profile page: banner, photo, name, bio, stats, public playlists and followed artists.',

@@ -1,7 +1,7 @@
 /* ---------- Navigation (avec précédent / suivant) ---------- */
 function go(v, push = true){
   closeDrawer(); closeMenu();
-  S.plv = {q:'', sort:'manual', sel:null}; if (v.type !== 'now') setClip(false);
+  S.plv = {q:'', sort:'manual', sel:null};
   if (push) { S.hist = S.hist.slice(0, S.hpos + 1); S.hist.push(v); S.hpos = S.hist.length - 1; }
   S.view = v; render(); $('#view').scrollTop = 0;
   if (v.type === 'home') loadHome();
@@ -13,5 +13,5 @@ function go(v, push = true){
   else if (v.type === 'library' && S.lib.chip === 'community' && !S.community.loaded) loadCommunity();
 }
 function step(d){ const i = S.hpos + d; if (i < 0 || i >= S.hist.length) return; S.hpos = i; go(S.hist[i], false); }
-function setQueueOpen(open){ S.qopen = open; $('#qdrawer').classList.toggle('open', open); $('#bQueue').classList.toggle('act', open); }
+function setQueueOpen(open, tab){ S.qopen = open; if (tab) S.ptab = tab; $('#qdrawer').classList.toggle('open', open); $('#bQueue').classList.toggle('act', open && S.ptab === 'queue'); $('#bLyrics').classList.toggle('act', open && S.ptab === 'now'); if (open) renderPanel(); }
 

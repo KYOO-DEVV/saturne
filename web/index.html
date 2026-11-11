@@ -68,7 +68,7 @@
   </main>
 
   <aside class="qdrawer" id="qdrawer" data-dropq="1" aria-label="File d'attente">
-    <div class="nuhead"><b>Next Up</b><div class="r"><button class="clear" id="qSave" hidden>Save</button><button class="clear" id="qClear" hidden>Clear</button><button class="ib" id="qClose" data-ic="close" aria-label="Fermer"></button></div></div>
+    <div class="nuhead"><div class="ptabs" role="tablist"><button role="tab" data-ptab="now">Now playing</button><button role="tab" data-ptab="queue">Queue</button><button role="tab" data-ptab="recent">Recent</button></div><div class="r"><button class="clear" id="qSave" hidden>Save</button><button class="clear" id="qClear" hidden>Clear</button><button class="ib" id="qClose" data-ic="close" aria-label="Fermer"></button></div></div>
     <div class="scroll" id="qList" style="padding:0"></div>
   </aside>
 
@@ -78,7 +78,7 @@
       <div class="txt"><div class="tt" id="nowTitle">Rien en lecture</div><div class="ch" id="nowCh">Choisis un titre pour commencer</div></div>
       <button class="ib bmk" id="nowFav" aria-label="Ajouter aux bookmarks" hidden></button>
     </div>
-    <div class="seekbox"><input type="range" id="seek" min="0" max="100" value="0" step="1" aria-label="Position dans le titre"><span id="tTime">0:00 / 0:00</span></div>
+    <div class="center">
     <div class="ctrls">
       <button class="ib" id="bShuffle" data-ic="shuffle" aria-label="Lecture aléatoire" aria-pressed="false"></button>
       <button class="ib" id="bPrev" data-ic="prev" aria-label="Titre précédent"></button>
@@ -86,7 +86,9 @@
       <button class="ib" id="bNext" data-ic="next" aria-label="Titre suivant"></button>
       <button class="ib" id="bRepeat" aria-label="Répétition"></button>
     </div>
-    <div class="volume"><button class="ib" id="volBtn" aria-label="Couper le son"></button><input type="range" id="vol" min="0" max="100" value="80" aria-label="Volume"><button class="ib" id="bSleep" data-ic="moon" aria-label="Sleep timer" title="Sleep timer"></button><button class="ib" id="bMini" data-ic="mini" aria-label="Mini player" title="Mini player" aria-pressed="false" hidden></button><button class="ib" id="bQueue" data-ic="queue" aria-label="File d'attente" title="File d'attente"></button></div>
+    <div class="seekbox"><span id="tCur">0:00</span><input type="range" id="seek" min="0" max="100" value="0" step="1" aria-label="Position dans le titre"><span id="tDur">0:00</span></div>
+    </div>
+    <div class="volume"><button class="ib" id="bLyrics" data-ic="mic" aria-label="Now playing" title="Now playing"></button><button class="ib" id="bQueue" data-ic="queue" aria-label="File d'attente" title="File d'attente"></button><button class="ib" id="bSleep" data-ic="moon" aria-label="Sleep timer" title="Sleep timer"></button><button class="ib" id="bMini" data-ic="mini" aria-label="Mini player" title="Mini player" aria-pressed="false" hidden></button><button class="ib" id="volBtn" aria-label="Couper le son"></button><input type="range" id="vol" min="0" max="100" value="80" aria-label="Volume"><button class="ib" id="bFull" data-ic="expand" aria-label="Full screen" title="Full screen"></button></div>
   </footer>
 </div>
 

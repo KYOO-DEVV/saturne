@@ -38,7 +38,7 @@ function row(t, i, n){
 }
 const grid = (l, src) => `<ul class="grid" data-src="${src}">${l.slice(0, capOf(src)).map(card).join('')}</ul>${moreItems(l, src)}`;
 const shelf = (l, src) => `<div class="shelfwrap"><ul class="shelf" data-src="${src}">${l.map(card).join('')}</ul><button class="sarrow l" data-sh="-1" aria-label="Scroll left" hidden>${ic('left')}</button><button class="sarrow r" data-sh="1" aria-label="Scroll right">${ic('right')}</button></div>`;
-const rows = (l, src) => `<ul class="rows" data-src="${src}">${l.slice(0, capOf(src)).map((t, i) => row(t, i, l.length)).join('')}</ul>${moreItems(l, src)}`;
+const rows = (l, src) => `<ul class="rows" data-src="${src}">${l.slice(0, capOf(src)).map((t, i) => (src === 'pl' || src === 'pub') ? trow(t, i, l.length) : row(t, i, l.length)).join('')}</ul>${moreItems(l, src)}`;
 const skeleton = (n = 8, cls = 'grid', extra = '') => `<ul class="${cls}">${`<li><div class="sk ${extra}"></div></li>`.repeat(n)}</ul>`;
 const retry = (msg, act) => `<div class="errbox"><span class="err">${esc(msg)}</span><button class="ghost" data-act="${act}">${ic('refresh')}Réessayer</button></div>`;
 const avatarHtml = u => u.avatar ? `<img src="${esc(u.avatar)}" alt="">` : esc(initial(u.display || u.username));
@@ -173,22 +173,10 @@ function renderView(){
   } else if (v.type === 'library') {
     h = libHtml();
   } else if (v.type === 'pubpl') {
-    const P = S.pub, d = P.data;
-    h = `<button class="more back" data-go="library">${ic('left')}Playlists</button>`;
-    if (P.loading) h += skeleton(6, 'grid');
-    else if (P.error) h += `<div class="errbox"><span class="err">${esc(P.error)}</span></div>`;
-    else if (d) h += banner({p:{...d, tracks:d.tracks}, owner:d.ownerDisplay, readonly:true}) +
-      `<div class="head-actions" style="margin-bottom:20px">${d.tracks.length ? playActions() : ''}<button class="ghost" data-act="savepub">${ic('copy')}Save to library</button><button class="ghost" data-act="sharepub">${ic('share')}Share</button></div>` +
-      (d.tracks.length ? rows(d.tracks, 'pub') : '<p class="empty">Cette playlist est vide.</p>');
+    h = pubPageHtml();
   } else if (v.type === 'playlist') {
     const p = curPl(); if (!p) { S.view = {type:'library'}; return render(); }
-    const l = p.tracks;
-    h = `<button class="more back" data-go="library">${ic('left')}Playlists</button>` + banner({p, owner:S.user.display, readonly:false}) +
-      `<div class="head-actions" style="margin-bottom:6px">${l.length ? playActions() : ''}<button class="ghost" data-act="share">${ic('share')}Share</button>
-        ${p.system ? '' : `<div class="seg" role="group" aria-label="Confidentialité"><button data-act="setpriv" data-v="private" class="${!isPublic(p)?'on':''}">${ic('lock')}Private</button><button data-act="setpriv" data-v="public" class="${isPublic(p)?'on':''}">${ic('globe')}Public</button></div>`}
-        ${p.cover ? `<button class="ghost" data-act="pfp-clear">${ic('close')}Retirer la pochette</button>` : ''}${p.system ? '' : `<button class="ghost ${v.confirm?'warn':''}" data-act="delpl">${ic('trash')}${v.confirm ? 'Confirmer la suppression' : 'Supprimer'}</button>`}</div>
-      <p class="privacy-note">${p.system ? ic('lock') + 'Tes bookmarks sont toujours privés.' : isPublic(p) ? ic('globe') + 'Public : les autres comptes de cet ordinateur peuvent voir et écouter cette playlist (onglet Community).' : ic('lock') + 'Private : toi seul peux voir cette playlist.'}</p>
-      ${l.length ? plToolsHtml(p) + (plView().length ? rows(plView(), 'pl') : `<p class="empty">${L('No song matches this filter.', 'Aucun titre ne correspond à ce filtre.')}</p>`) : '<p class="empty">Cette playlist est vide. Glisse un titre sur elle dans la barre latérale, ou utilise le bouton « + ».</p>'}`;
+    h = playlistPageHtml(p);
   } else if (v.type === 'profile') {
     h = profileHtml();
   } else if (v.type === 'history') {
@@ -201,8 +189,8 @@ function renderView(){
     h = settingsHtml();
   }
   el.innerHTML = h;
-  if (v.type === 'playlist') { const p = curPl(), b = $('#banner'); if (p && p.banner) { b.style.backgroundImage = `url("${p.banner.replace(/"/g, '%22')}")`; b.style.backgroundPosition = `50% ${p.bannerY ?? 50}%`; } }
-  if (v.type === 'pubpl' && S.pub.data && S.pub.data.banner) { const b = $('#banner'); if (b) b.style.backgroundImage = `url("${S.pub.data.banner.replace(/"/g, '%22')}")`; }
+  if (v.type === 'playlist') { const p = curPl(), b = $('#banner'); if (p && p.banner && b) { b.style.setProperty('--bnr', `url("${p.banner.replace(/"/g, '%22')}")`); b.style.backgroundPosition = `50% ${p.bannerY ?? 50}%`; } }
+  if (v.type === 'pubpl' && S.pub.data && S.pub.data.banner) { const b = $('#banner'); if (b) { b.classList.add('hasbanner'); b.style.setProperty('--bnr', `url("${S.pub.data.banner.replace(/"/g, '%22')}")`); } }
   if (v.type === 'profile' && S.profile.banner) { const b = $('#pbanner'); if (b) b.style.backgroundImage = `url("${S.profile.banner.replace(/"/g, '%22')}")`; }
   if (v.type === 'artist' && S.artist.info && S.artist.info.banner) { const b = $('#abanner'); if (b) b.style.backgroundImage = `url("${S.artist.info.banner.replace(/"/g, '%22')}")`; }
   if (keepScroll && (v.type === 'home' || v.type === 'library')) el.scrollTop = keepScroll;
@@ -238,8 +226,8 @@ function renderBar(){
   const rr = $('#bRepeat'); rr.innerHTML = ic(S.repeat === 'one' ? 'repeat1' : 'repeat'); rr.classList.toggle('act', S.repeat !== 'off');
   rr.title = {off:'Répétition désactivée', all:'Répéter toute la file', one:'Répéter ce titre'}[S.repeat];
   $('#volBtn').innerHTML = ic(S.muted || S.volume === 0 ? 'mute' : 'vol');
-  $('#qClear').hidden = !S.queue.length; $('#qSave').hidden = !S.queue.length;
-  $('#qList').innerHTML = S.queue.length ? S.queue.map((q, i) => `<div class="nq ${i===S.cur?'on':''}" data-qi="${i}" draggable="true" title="${esc(q.title)}"><button class="qplay" data-act="qplay"><img src="${esc(q.thumb)}" alt=""><span class="qm"><b>${esc(q.title)}</b><small>${esc(q.channel)}</small></span></button><span class="qd">${q.duration ? fmt(q.duration) : ''}</span><button class="ib sm" data-act="qrm" aria-label="Retirer de la file">${ic('close')}</button></div>`).join('')
+
+  renderPanel(); if (0) $('#qList').innerHTML = S.queue.length ? S.queue.map((q, i) => `<div class="nq ${i===S.cur?'on':''}" data-qi="${i}" draggable="true" title="${esc(q.title)}"><button class="qplay" data-act="qplay"><img src="${esc(q.thumb)}" alt=""><span class="qm"><b>${esc(q.title)}</b><small>${esc(q.channel)}</small></span></button><span class="qd">${q.duration ? fmt(q.duration) : ''}</span><button class="ib sm" data-act="qrm" aria-label="Retirer de la file">${ic('close')}</button></div>`).join('')
     : '<p class="hint">La file est vide. Lance un titre, ou glisse-en un ici.</p>';
   syncMediaSession(); syncPresence(); updateSleepBtn();
 }

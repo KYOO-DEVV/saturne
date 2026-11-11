@@ -12,7 +12,7 @@ function setPrivacy(p, v){
 }
 function addToPlaylist(p, t){
   if (p.tracks.some(x => x.id === t.id)) return toast('Déjà dans « ' + p.name + ' »');
-  p.tracks.push(slim(t)); save(); render(); toast('Ajouté à « ' + p.name + ' »');
+  p.tracks.push({...slim(t), added:Date.now()}); save(); render(); toast('Ajouté à « ' + p.name + ' »');
 }
 let menuTrack = null;
 function placeMenu(btn){

@@ -19,6 +19,7 @@ async function loadLyrics(t){
     else S.lyr = {id:t.id, state:'none'};
   } catch (e) { if (!S.lyr || S.lyr.id !== t.id) return; S.lyr = {id:t.id, state:'error', msg:errText(e)}; }
   const box = $('#lyrics'); if (box && S.view.type === 'now') { box.outerHTML = lyricsHtml(t); lyrLine = -1; syncLyrics(); }
+  if (S.qopen && S.ptab === 'now') renderPanel();
 }
 function lyricsHtml(t){
   const Y = S.lyr && S.lyr.id === t.id ? S.lyr : {state:'loading'};
@@ -50,8 +51,8 @@ $('#view').addEventListener('click', e => {
 
 /* ---------- Clip vidéo (le lecteur YouTube, d'habitude caché, se place sur la pochette de Now playing) ---------- */
 function placeClip(){
-  const yb = document.querySelector('.ytbox'), art = document.querySelector('.np-art');
-  if (!S.clip || !art || S.view.type !== 'now') { yb.classList.remove('clip'); yb.style.cssText = ''; return; }
+  const yb = document.querySelector('.ytbox'), art = document.querySelector('.np-art') || (S.qopen && S.ptab === 'now' ? document.querySelector('.pn-art') : null);
+  if (!S.clip || !art) { yb.classList.remove('clip'); yb.style.cssText = ''; return; }
   const r = art.getBoundingClientRect(), h = Math.min(r.height, r.width * 9 / 16);
   yb.classList.add('clip');
   yb.style.left = r.left + 'px'; yb.style.top = (r.top + (r.height - h) / 2) + 'px'; yb.style.width = r.width + 'px'; yb.style.height = h + 'px'; yb.style.right = 'auto'; yb.style.bottom = 'auto';

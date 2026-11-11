@@ -9,7 +9,7 @@ document.addEventListener('keydown', e => {
   if (k === '?') { e.preventDefault(); helpModal(); }
   else if (k === '/') { e.preventDefault(); ($('#bigQ') || $('#q')).focus(); }
   else if (k === 'm' || k === 'M') $('#volBtn').click();
-  else if (k === 'q' || k === 'Q') setQueueOpen(!S.qopen);
+  else if (k === 'q' || k === 'Q') openPanel('queue');
   else if ((k === 'b' || k === 'B') && current()) toggleFav(current());
 });
 

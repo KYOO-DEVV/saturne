@@ -8,7 +8,7 @@ function setBookmarkUi(id, on, animate){
 }
 function toggleFav(t){
   const f = favs(), i = f.tracks.findIndex(x => x.id === t.id), on = i < 0;
-  if (on) f.tracks.unshift(slim(t)); else f.tracks.splice(i, 1);
+  if (on) f.tracks.unshift({...slim(t), added:Date.now()}); else f.tracks.splice(i, 1);
   save(); setBookmarkUi(t.id, on, true); renderSide();
   toast(on ? 'Ajouté aux bookmarks' : 'Retiré des bookmarks');
   if (S.view.type === 'playlist' && S.view.id === 'favs') setTimeout(() => { if (S.view.type === 'playlist' && S.view.id === 'favs') renderView(); }, 520);

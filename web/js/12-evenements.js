@@ -20,7 +20,7 @@ $('#accountBtn').addEventListener('click', e => { e.stopPropagation(); openAccou
 $('#avatarBtn').addEventListener('click', e => { e.stopPropagation(); openAccountMenu(e.currentTarget); });
 $('#qClear').addEventListener('click', clearQueue);
 $('#qClose').addEventListener('click', () => setQueueOpen(false));
-$('#bQueue').addEventListener('click', () => setQueueOpen(!S.qopen));
+$('#bQueue').addEventListener('click', () => openPanel('queue'));
 $('#qList').addEventListener('click', e => {
   const b = e.target.closest('[data-act]'), el = e.target.closest('[data-qi]'); if (!b || !el) return;
   const i = +el.dataset.qi; if (b.dataset.act === 'qplay') jump(i); else if (b.dataset.act === 'qrm') removeFromQueue(i);
@@ -77,7 +77,7 @@ $('#view').addEventListener('click', e => {
   else if (act === 'savepub') savePublicCopy();
   else if (act === 'qshuffle') { S.shuffle = !S.shuffle; rebuildOrder(); save(); renderBar(); renderView(); }
   else if (act === 'qrepeat') { S.repeat = {off:'all', all:'one', one:'off'}[S.repeat]; save(); renderBar(); renderView(); }
-  else if (act === 'qqueue') setQueueOpen(true);
+  else if (act === 'qqueue') setQueueOpen(true, 'queue');
   else if (act === 'pfp-pick') pickImage('cover');
   else if (act === 'banner-pick') pickImage('banner');
   else if (act === 'pfp-clear') { delete p.cover; save(); render(); }
@@ -142,7 +142,7 @@ $('#menu').addEventListener('submit', e => {
   e.preventDefault(); const t = menuTrack, name = $('#menuNewName').value.trim(); if (!name || !t) return;
   const p = {id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), name, description:'', tracks:[], visibility:S.defaultPrivacy, created:Date.now()}; S.playlists.push(p); closeMenu(); addToPlaylist(p, t);
 });
-document.addEventListener('click', e => { if (!$('#menu').hidden && !e.target.closest('#menu')) closeMenu(); if (S.qopen && !e.target.closest('#qdrawer,#bQueue,[data-act="qqueue"],.nq')) setQueueOpen(false); });
+document.addEventListener('click', e => { if (!$('#menu').hidden && !e.target.closest('#menu')) closeMenu(); if (S.qopen && innerWidth <= 900 && !e.target.closest('#qdrawer,#bQueue,#bLyrics,[data-act="qqueue"],.nq')) setQueueOpen(false); });
 
 $('#bPlay').addEventListener('click', togglePlay);
 $('#bNext').addEventListener('click', () => next(false));
@@ -155,7 +155,7 @@ $('#bMini').addEventListener('click', () => setMini(!S.mini));
 $('#menu').addEventListener('click', e => { const b = e.target.closest('[data-sleep]'); if (!b) return; closeMenu(); setSleep(b.dataset.sleep); });
 $('#volBtn').addEventListener('click', () => { S.muted = !S.muted; if (ready) { if (S.muted) player.mute(); else player.unMute(); } renderBar(); });
 
-seek.addEventListener('input', () => { seeking = true; $('#tTime').textContent = fmt(seek.value) + ' / ' + fmt(seek.max); fill(seek); });
+seek.addEventListener('input', () => { seeking = true; setTimes(seek.value, seek.max); fill(seek); });
 seek.addEventListener('change', () => { if (ready && current()) player.seekTo(+seek.value, true); seeking = false; });
 vol.value = S.volume; fill(vol);
 vol.addEventListener('input', () => { S.volume = +vol.value; fill(vol); S.muted = false; if (ready) { player.unMute(); player.setVolume(S.volume); } save(); renderBar(); });
@@ -163,7 +163,7 @@ setInterval(() => {
   if (!ready || !current() || seeking) return;
   const d = player.getDuration() || 0, c = player.getCurrentTime() || 0;
   seek.max = Math.max(1, Math.floor(d)); seek.value = Math.floor(c); fill(seek); seek.setAttribute('aria-valuetext', fmt(c) + ' / ' + fmt(d));
-  $('#tTime').textContent = fmt(c) + ' / ' + fmt(d);
+  setTimes(c, d);
 }, 500);
 
 document.addEventListener('keydown', e => {
