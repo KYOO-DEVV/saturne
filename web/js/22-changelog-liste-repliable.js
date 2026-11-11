@@ -1,6 +1,9 @@
 /* ---------- Changelog (liste repliable) ---------- */
 const TAGS = {new:'Nouveau', improved:'Amélioré', fixed:'Corrigé'};
 const CHANGELOG = [
+  {v:'0.7.7', date:'Nov 2026', title:'Icône de la barre des tâches et GIF de fond', changes:[
+    ['fixed', 'L’icône de Saturne avait disparu de la barre des tâches (0.6.2 à 0.7.6).'],
+    ['fixed', 'Les GIF animés fonctionnent maintenant aussi en image de fond.']]},
   {v:'0.7.6', date:'Nov 2026', title:'Toutes les listes en tableau', changes:[
     ['improved', 'Recherche, genres, artistes, historique et mixes utilisent le même tableau que les playlists.'],
     ['new', 'Cliquer sur le nom d’une chaîne dans le tableau filtre la liste (cliquer encore, ou sur la croix, retire le filtre).'],
@@ -95,6 +98,7 @@ const CHANGELOG = [
 ];
 const clOpen = new Set([CHANGELOG[0].v]);
 const CL_EN = {
+  '0.7.7': {title:'Taskbar icon and animated background GIFs', changes:['Saturne’s icon had disappeared from the taskbar (0.6.2 to 0.7.6).', 'Animated GIFs now also work as the background image.']},
   '0.7.6': {title:'Every list as a table', changes:['Search, genres, artists, history and mixes use the same table as playlists.', 'Clicking a channel name in the table filters the list (click again, or the cross, to clear the filter).', 'Playlist banner: light line and color streak at the bottom of the header fixed, title easier to read over a bright image.']},
   '0.7.5': {title:'Smooth lyrics and full-frame video', changes:['The lyrics preview scrolls smoothly, line by line.', 'Music video: it fills the whole area, without the YouTube title or buttons on top, and can be hovered normally.', 'Clicking the cover in the player bar opens the Now playing panel.']},
   '0.7.4': {title:'Phone interface', changes:['On phones: a tab bar at the bottom, a compact player, and a full-screen Now playing page with its controls.', 'No more two-line texts: titles end with “…”.']},

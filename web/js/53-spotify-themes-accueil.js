@@ -114,7 +114,7 @@ $('#view').addEventListener('change', e => { if (e.target.id === 'accentPick') r
 $('#bgPick').addEventListener('change', async e => {
   const f = e.target.files[0]; e.target.value = ''; if (!f) return;
   const url = URL.createObjectURL(f);
-  try { S.settings.bgImage = await toDataURL(url, 1280, 800, false); applyTheme(); save(); renderView(); toast(L('Background image updated', 'Image de fond mise à jour')); }
+  try { if (isGif(f) && f.size <= GIF_MAX) S.settings.bgImage = await fileDataUrl(f); else { S.settings.bgImage = await toDataURL(url, 1280, 800, false); if (isGif(f)) toast(L('This GIF is over 4 MB: it is shown without animation.', 'Ce GIF dépasse 4 Mo : il est affiché sans animation.')); } applyTheme(); save(); renderView(); toast(L('Background image updated', 'Image de fond mise à jour')); }
   catch { toast(L('Could not read this image', 'Impossible de lire cette image')); }
   finally { URL.revokeObjectURL(url); }
 });

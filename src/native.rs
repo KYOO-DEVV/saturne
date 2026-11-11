@@ -85,7 +85,7 @@ pub fn tray(proxy: EventLoopProxy<UserEvent>, rgba: Vec<u8>, size: u32) -> Optio
     TrayIconBuilder::new().with_menu(Box::new(menu)).with_menu_on_left_click(false).with_tooltip("Saturne").with_icon(tray_icon::Icon::from_rgba(rgba, size, size).ok()?).build().ok()
 }
 
-/// Barre de titre fondue dans l'application : couleur noire (celle du fond), sans icône ni titre ; les boutons de fenêtre restent.
+/// Barre de titre fondue dans l'application : couleur noire (celle du fond), sans titre ; les boutons de fenêtre restent.
 #[cfg(windows)]
 pub fn blend_title_bar(window: &tao::window::Window) {
     use tao::platform::windows::WindowExtWindows;
@@ -97,11 +97,6 @@ pub fn blend_title_bar(window: &tao::window::Window) {
     #[link(name = "dwmapi")]
     unsafe extern "system" {
         fn DwmSetWindowAttribute(hwnd: isize, attr: u32, value: *const u32, size: u32) -> i32;
-    }
-    #[link(name = "user32")]
-    unsafe extern "system" {
-        fn CreateIcon(inst: isize, w: i32, h: i32, planes: u8, bpp: u8, and_bits: *const u8, xor_bits: *const u8) -> isize;
-        fn SendMessageW(hwnd: isize, msg: u32, wp: usize, lp: isize) -> isize;
     }
     #[link(name = "uxtheme")]
     unsafe extern "system" {
@@ -115,12 +110,7 @@ pub fn blend_title_bar(window: &tao::window::Window) {
         // WTNCA_NODRAWCAPTION | WTNCA_NODRAWICON
         let w = Wta { flags: 1 | 2, mask: 1 | 2 };
         SetWindowThemeAttribute(hwnd, 1, &w, 8);
-        // Petite icône (celle de la barre de titre) transparente ; la grande, celle de la barre des tâches, reste le logo.
-        let (and_bits, xor_bits) = ([0xFFu8; 32], [0u8; 32]);
-        let blank = CreateIcon(0, 16, 16, 1, 1, and_bits.as_ptr(), xor_bits.as_ptr());
-        if blank != 0 {
-            SendMessageW(hwnd, 0x0080, 0, blank); // WM_SETICON, ICON_SMALL
-        }
+        // L'icône de la barre de titre reste : Windows utilise la même pour la barre des tâches, et la cacher la ferait disparaître aussi.
     }
 }
 #[cfg(not(windows))]
