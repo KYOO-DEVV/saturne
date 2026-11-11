@@ -51,6 +51,7 @@ $('#view').addEventListener('click', e => {
 
 /* ---------- Clip vidéo (le lecteur YouTube, d'habitude caché, se place sur la pochette de Now playing) ---------- */
 function placeClip(){
+  if (typeof placeBgVideo === 'function' && placeBgVideo()) return;
   const yb = document.querySelector('.ytbox'), art = document.querySelector('.np-art') || (S.qopen && S.ptab === 'now' ? document.querySelector('.pn-art') : null);
   if (!S.clip || !art) { yb.classList.remove('clip'); yb.style.cssText = ''; return; }
   const r = art.getBoundingClientRect(), h = Math.min(r.height, r.width * 9 / 16);

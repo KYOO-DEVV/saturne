@@ -87,7 +87,6 @@ $('#qdrawer').addEventListener('click', e => {
   else if (k === 'fulllyr') go({type:'now'});
   else if (k === 'followp' && t) { const A = S.artistInfo[t.channelId || t.channel]; if (A) { toggleFollow(A); renderPanel(); } }
 });
-$('#bLyrics').addEventListener('click', () => openPanel('now'));
 $('#bFull').addEventListener('click', () => go({type:'now'}));
 /* Aperçu des paroles : la ligne en cours suit la lecture. */
 let pvLine = -2;

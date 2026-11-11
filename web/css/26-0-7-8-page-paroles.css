@@ -1,0 +1,30 @@
+/* ---------- 0.7.8 : page Paroles ---------- */
+.lypage{position:relative;z-index:50;display:grid;grid-template-columns:minmax(240px,400px) minmax(0,1fr);gap:56px;align-items:center;min-height:calc(100dvh - var(--barh,84px) - 150px);padding:8px 8px 24px}
+.lypage.novid::before{content:"";position:absolute;inset:-12px -32px -24px;z-index:-1;background:linear-gradient(180deg,var(--lyc,#2a2250) 0,#000 100%)}
+.ly-left{display:grid;gap:16px;justify-items:start;min-width:0;width:100%}
+.ly-art{width:100%;aspect-ratio:1;border-radius:14px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.6);background:var(--raise)}
+.ly-art img{width:100%;height:100%;object-fit:cover;display:block}
+.ly-meta{min-width:0;width:100%;color:#fff}
+.ly-meta b{display:block;font-size:24px;font-weight:800;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ly-meta span{display:block;color:rgba(255,255,255,.72);font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ly-meta .alink:hover{color:#fff}
+.ly-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ly-tools .ib{color:#fff}
+.ly-right{min-width:0}
+.lypage .np-lyrics{margin:0}
+.lypage .np-lyrics .np-h{display:none}
+.lypage .ly-src{color:rgba(255,255,255,.5)}
+.lypage .ly-info{color:rgba(255,255,255,.7);font-size:20px}
+.lypage .ly-lines{max-height:calc(100dvh - var(--barh,84px) - 200px);padding:150px 0}
+.lypage .ly-lines p{font-size:clamp(24px,3.2vw,42px);font-weight:800;line-height:1.18;letter-spacing:-.02em;color:rgba(255,255,255,.38);padding:10px 0;transition:color .4s ease,transform .4s ease;transform-origin:left center}
+.lypage .ly-lines p:hover{color:rgba(255,255,255,.7)}
+.lypage .ly-lines p.on{color:#fff;transform:scale(1.03)}
+.lypage .ly-plain{font-size:24px;font-weight:700;line-height:1.5;color:rgba(255,255,255,.88);max-height:calc(100dvh - var(--barh,84px) - 200px);overflow-y:auto}
+/* Vidéo en fond : étirée sur la page, floue et assombrie, sous le contenu. */
+.ytbox.bgvid{opacity:1;pointer-events:none;z-index:40;overflow:hidden;border-radius:16px;background:#000}
+.ytbox.bgvid::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,.36);pointer-events:none}
+.ytbox.bgvid iframe,.ytbox.bgvid #yt{position:absolute!important;left:var(--bgl)!important;top:var(--bgt)!important;width:var(--bgw)!important;height:var(--bgh)!important;filter:blur(34px) saturate(1.3);transform:scale(1.18)}
+html.bgvid-active.has-bgimg main{isolation:auto}
+html.bgvid-active.has-bgimg main::before,html.bgvid-active.has-bgimg main::after{display:none}
+#app.lyricspage .topbar{position:relative;z-index:50}
+@media (max-width:900px){.lypage{grid-template-columns:minmax(0,1fr);gap:20px;align-items:start}.ly-art{max-width:300px}.lypage .ly-lines{max-height:none;padding:20px 0}}

@@ -191,7 +191,7 @@ function renderView(){
   } else if (v.type === 'mix') {
     h = mixHtml();
   } else if (v.type === 'now') {
-    h = nowHtml();
+    h = lyricsPageHtml();
   } else if (v.type === 'settings') {
     h = settingsHtml();
   }
@@ -203,7 +203,7 @@ function renderView(){
   if (keepScroll && (v.type === 'home' || v.type === 'library')) el.scrollTop = keepScroll;
   const busy = v.type === 'list' ? S.list.loading : v.type === 'search' ? S.search.loading : v.type === 'artist' ? S.artist.loading : v.type === 'artists' ? S.artists.loading && !S.artists.items.filter(Boolean).length : v.type === 'pubpl' ? S.pub.loading : false;
   const sig = [v.type, v.id || v.q || v.owner || '', busy ? 'L' : 'D', v.type === 'library' ? S.lib.chip : '', v.type === 'settings' ? S.setTab : ''].join('|');
-  settleImages(); document.querySelectorAll('.shelf').forEach(updShelf); afterRender(); afterRender2();
+  settleImages(); document.querySelectorAll('.shelf').forEach(updShelf); afterRender(); afterRender2(); paintLyrics();
   if (sig !== lastViewSig) { lastViewSig = sig; el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter'); clearTimeout(enterTimer); enterTimer = setTimeout(() => el.classList.remove('enter'), 800); }
 }
 function renderTop(){

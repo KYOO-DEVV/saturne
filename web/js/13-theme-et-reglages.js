@@ -7,7 +7,7 @@ const ACCENTS = {
   orange:['#c2410c','#fb923c','rgba(249,115,22,.15)','rgba(249,115,22,.2)']
 };
 const ACCENT_NAMES = {violet:'Violet', blue:'Bleu', green:'Vert', pink:'Rose', orange:'Orange'};
-const DEFAULT_SETTINGS = {seen:'', density:'comfortable', startMin:false, bgOverlay:80, bgTint:'bg', bgBlur:0, hideLogo:false, sideThumbs:true, bg:'oled', accentCustom:'', bgImage:'', homeGenre:'jpop', homeShelves:['Anime', 'City Pop'], lang:'', mediaKeys:true, tray:false, discord:false, discordId:'', onboarded:false, showPlayer:false, autoplay:true, remember:true, toasts:true, accent:'violet', radius:'soft', heroAuto:true, reduceMotion:false, autoUpdate:true};
+const DEFAULT_SETTINGS = {seen:'', density:'comfortable', lyricsVideo:true, startMin:false, bgOverlay:80, bgTint:'bg', bgBlur:0, hideLogo:false, sideThumbs:true, bg:'oled', accentCustom:'', bgImage:'', homeGenre:'jpop', homeShelves:['Anime', 'City Pop'], lang:'', mediaKeys:true, tray:false, discord:false, discordId:'', onboarded:false, showPlayer:false, autoplay:true, remember:true, toasts:true, accent:'violet', radius:'soft', heroAuto:true, reduceMotion:false, autoUpdate:true};
 function applyTheme(){
   const a = ACCENTS[S.settings.accent] || ACCENTS.violet, st = document.documentElement.style;
   st.setProperty('--accent', a[0]); st.setProperty('--accent-hi', a[1]); st.setProperty('--accent-soft', a[2]); st.setProperty('--accent-glow', a[3]);
@@ -58,7 +58,7 @@ function settingsHtml(){
       ${setRow('Lecture automatique', 'Passe au titre suivant quand un titre se termine. Désactivé, la lecture s\'arrête à la fin du titre.', swc('autoplay', T.autoplay, 'Lecture automatique'))}
       ${setRow('Reprendre la file d\'attente', 'Garde la file et le dernier titre au prochain lancement.', swc('remember', T.remember, 'Reprendre la file'))}
       ${setRow('Afficher le lecteur vidéo', 'Montre le lecteur YouTube dans un coin. Utile pour voir pourquoi un titre ne se lance pas (message de YouTube, âge, consentement…).', swc('showPlayer', T.showPlayer, 'Afficher le lecteur vidéo'))}
-      ${playerLogHtml()}
+      ${sleepRow()}${playerLogHtml()}
       <h4>Raccourcis clavier</h4>
       <div class="set"><p class="kv" style="width:100%">${shortcutsKv()}</p></div></div>`;
   else if (tab === 'appearance') b = `<h2>Appearance</h2><p class="lead">Couleur, arrondis et animations.</p><div class="setgroup">

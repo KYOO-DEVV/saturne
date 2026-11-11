@@ -43,6 +43,7 @@ const ICONS = {
   genres:'<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
   sidebar:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/>',
   history:'<path d="M4 6v6h6"/><path d="M5.2 12A8 8 0 1 0 8 6.1L4 10"/><path d="M12 8v4l3 2"/>',
+  lyrics:'<path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-4 3v-3H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M8 9.5h8M8 13h5"/>',
   mic:'<path d="M4 20c3-1 5-3 6-5"/><path d="m14 4 6 6-8 8-6-6z"/><path d="m12 8 4 4"/>',
   expand:'<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
   moon:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',

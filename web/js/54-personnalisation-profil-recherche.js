@@ -98,6 +98,6 @@ $('#view').addEventListener('submit', e => {
 /* À la fin de chaque rendu : état « recherche vide » de l'application (la barre du haut s'efface) et mise au point. */
 function afterRender2(){
   const empty = S.view.type === 'search' && !S.view.q;
-  $('#app').classList.toggle('searchhome', empty); colorizeHead();
+  $('#app').classList.toggle('searchhome', empty); $('#app').classList.toggle('lyricspage', S.view.type === 'now'); colorizeHead();
   if (empty) { const b = $('#bigQ'); if (b && !b.matches(':focus')) setTimeout(() => b.focus(), 30); }
 }

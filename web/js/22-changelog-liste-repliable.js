@@ -1,6 +1,9 @@
 /* ---------- Changelog (liste repliable) ---------- */
 const TAGS = {new:'Nouveau', improved:'Amélioré', fixed:'Corrigé'};
 const CHANGELOG = [
+  {v:'0.7.8', date:'Nov 2026', title:'Page Paroles', changes:[
+    ['new', 'Page Paroles façon Spotify : la pochette à gauche, les paroles à droite, avec la vidéo floutée en arrière-plan (désactivable).'],
+    ['improved', 'Barre de lecture : le bouton Paroles remplace « En lecture », la minuterie de sommeil et le plein écran en sortent. La minuterie est dans Réglages › Lecture et dans la palette Ctrl + K.']]},
   {v:'0.7.7', date:'Nov 2026', title:'Icône de la barre des tâches et GIF de fond', changes:[
     ['fixed', 'L’icône de Saturne avait disparu de la barre des tâches (0.6.2 à 0.7.6).'],
     ['fixed', 'Les GIF animés fonctionnent maintenant aussi en image de fond.']]},
@@ -98,6 +101,7 @@ const CHANGELOG = [
 ];
 const clOpen = new Set([CHANGELOG[0].v]);
 const CL_EN = {
+  '0.7.8': {title:'Lyrics page', changes:['Spotify-style Lyrics page: the cover on the left, the lyrics on the right, with the blurred video in the background (can be turned off).', 'Player bar: the Lyrics button replaces “Now playing”, and the sleep timer and full screen buttons are gone. The timer is in Settings › Playback and in the Ctrl + K palette.']},
   '0.7.7': {title:'Taskbar icon and animated background GIFs', changes:['Saturne’s icon had disappeared from the taskbar (0.6.2 to 0.7.6).', 'Animated GIFs now also work as the background image.']},
   '0.7.6': {title:'Every list as a table', changes:['Search, genres, artists, history and mixes use the same table as playlists.', 'Clicking a channel name in the table filters the list (click again, or the cross, to clear the filter).', 'Playlist banner: light line and color streak at the bottom of the header fixed, title easier to read over a bright image.']},
   '0.7.5': {title:'Smooth lyrics and full-frame video', changes:['The lyrics preview scrolls smoothly, line by line.', 'Music video: it fills the whole area, without the YouTube title or buttons on top, and can be hovered normally.', 'Clicking the cover in the player bar opens the Now playing panel.']},
