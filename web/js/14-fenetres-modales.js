@@ -22,7 +22,8 @@ function formModal({title, lead, fields, submit, danger, run}){
     catch (err) { $('#mErr').textContent = err.message || 'Erreur'; btn.disabled = false; }
   }));
 }
-function profileModal(draft){
+function profileModal(){ closeModal(); go({type:'profile'}); }
+function profileModalLegacy(draft){
   const u = S.user;
   openModal(`<h3>Edit profile</h3><p>Change ta photo et ton nom affiché. Tu peux aussi déposer une image sur la photo.</p>
     <form id="pf"><div class="avatar-edit"><button type="button" class="avatar-big" id="pfAvatar" data-drop="avatar" aria-label="Changer la photo">${avatarHtml(u)}</button>
@@ -43,7 +44,8 @@ function profileModal(draft){
 }
 async function uploadAvatar(f){
   try {
-    const url = URL.createObjectURL(f), data = await toDataURL(url, 192, 192, true); URL.revokeObjectURL(url);
+    let data; if (isGif(f) && f.size <= GIF_AVATAR_MAX) data = await fileDataUrl(f);
+    else { const url = URL.createObjectURL(f); data = await toDataURL(url, 192, 192, true); URL.revokeObjectURL(url); if (isGif(f)) toast(L('This GIF is over 1 MB: it is shown without animation.', 'Ce GIF dépasse 1 Mo : il est affiché sans animation.')); }
     S.user = (await send('/api/me', {avatar:data}, 'PUT')).user; render(); toast('Photo de profil mise à jour');
     if (!$('#modal').hidden && $('#pfAvatar')) profileModal($('#pfName') ? $('#pfName').value : undefined);
   } catch (e) { toast(e.message === 'image' ? 'Impossible de lire cette image' : e.message); }

@@ -8,7 +8,7 @@
   --font:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --sw:248px; --barh:84px;
   --r-btn:10px; --r-ctl:12px; --r-sm:8px;
-  --faint:#8a8a98; --hi:#fff; --fg2:#d0d0da; --veil:transparent; --bookmark:#fbbf24; --accent-glow:rgba(139,92,246,.2);
+  --faint:#8a8a98; --hi:#fff; --on-accent:#fff; --fg2:#d0d0da; --veil:transparent; --bookmark:#fbbf24; --accent-glow:rgba(139,92,246,.2);
 }
 html[data-radius="square"]{--r-btn:5px;--r-ctl:7px;--r-sm:4px}
 html[data-radius="round"]{--r-btn:999px;--r-ctl:16px;--r-sm:10px}

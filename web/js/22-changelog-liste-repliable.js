@@ -1,6 +1,13 @@
 /* ---------- Changelog (liste repliable) ---------- */
 const TAGS = {new:'Nouveau', improved:'Amélioré', fixed:'Corrigé'};
 const CHANGELOG = [
+  {v:'0.7.1', date:'Nov 2026', title:'Personnalisation, Profil et Recherche', changes:[
+    ['fixed', 'Boutons et cases blancs sans texte avec une couleur d\'accent claire : le texte s\'adapte maintenant à la couleur choisie (et un liseré apparaît si elle ressemble au fond).'],
+    ['new', 'Page Profil : bannière, photo, nom, bio, statistiques, playlists publiques et artistes suivis.'],
+    ['new', 'Page Recherche épurée : seulement la barre de recherche, au milieu.'],
+    ['new', 'GIF animés pour les pochettes et bannières de playlists, l\'image de fond, la photo et la bannière de profil.'],
+    ['new', 'Image de fond : opacité, couleur du voile (ou aucun voile) et flou réglables.'],
+    ['new', 'Masquer le logo Saturne, et masquer les images des playlists dans la barre latérale.']]},
   {v:'0.7.0', date:'Nov 2026', title:'Paroles, clip, suivis, mixes et thèmes', changes:[
     ['new', 'Paroles du titre en cours dans Now playing, synchronisées quand elles existent (clique une ligne pour y aller).'],
     ['new', 'Clip vidéo : le lecteur YouTube s’affiche sur la pochette de Now playing.'],
@@ -69,6 +76,13 @@ const CHANGELOG = [
 ];
 const clOpen = new Set([CHANGELOG[0].v]);
 const CL_EN = {
+  '0.7.1': {title:'Customization, Profile and Search', changes:[
+    'White buttons and checkboxes with no text with a light accent color: the text now adapts to the chosen color (and an outline appears if it looks like the background).',
+    'Profile page: banner, photo, name, bio, stats, public playlists and followed artists.',
+    'Clean Search page: just the search bar, in the middle.',
+    'Animated GIFs for playlist covers and banners, the background image, and the profile photo and banner.',
+    'Background image: adjustable opacity, overlay color (or no overlay) and blur.',
+    'Hide the Saturne logo, and hide playlist pictures in the sidebar.']},
   '0.7.0': {title:'Lyrics, music video, follows, mixes and themes', changes:[
     'Lyrics for the current song in Now playing, synced when available (click a line to jump to it).',
     'Music video: the YouTube player appears over the Now playing cover.',

@@ -141,8 +141,7 @@ function renderView(){
     });
   } else if (v.type === 'search') {
     const R = S.search;
-    if (!v.q) h = `<div class="pagehead"><p class="eyebrow">Search</p><h1>Browse all</h1><p class="sub">Cherche un titre ou un artiste dans la barre du haut, ou choisis un genre.</p></div>
-      <ul class="tiles">${GENRES.map((g, i) => `<li><button class="tile" data-genre="${i}">${esc(g.n)}</button></li>`).join('')}</ul>`;
+    if (!v.q) h = searchHomeHtml();
     else {
       h = `<div class="pagehead"><p class="eyebrow">Search</p><h1>« ${esc(v.q)} »</h1>`;
       if (R.loading) h += `<p class="sub" style="margin:0">Recherche en cours…</p></div>${skeleton(8)}`;
@@ -190,6 +189,8 @@ function renderView(){
         ${p.cover ? `<button class="ghost" data-act="pfp-clear">${ic('close')}Retirer la pochette</button>` : ''}${p.system ? '' : `<button class="ghost ${v.confirm?'warn':''}" data-act="delpl">${ic('trash')}${v.confirm ? 'Confirmer la suppression' : 'Supprimer'}</button>`}</div>
       <p class="privacy-note">${p.system ? ic('lock') + 'Tes bookmarks sont toujours privés.' : isPublic(p) ? ic('globe') + 'Public : les autres comptes de cet ordinateur peuvent voir et écouter cette playlist (onglet Community).' : ic('lock') + 'Private : toi seul peux voir cette playlist.'}</p>
       ${l.length ? plToolsHtml(p) + (plView().length ? rows(plView(), 'pl') : `<p class="empty">${L('No song matches this filter.', 'Aucun titre ne correspond à ce filtre.')}</p>`) : '<p class="empty">Cette playlist est vide. Glisse un titre sur elle dans la barre latérale, ou utilise le bouton « + ».</p>'}`;
+  } else if (v.type === 'profile') {
+    h = profileHtml();
   } else if (v.type === 'history') {
     h = historyHtml();
   } else if (v.type === 'mix') {
@@ -202,11 +203,12 @@ function renderView(){
   el.innerHTML = h;
   if (v.type === 'playlist') { const p = curPl(), b = $('#banner'); if (p && p.banner) { b.style.backgroundImage = `url("${p.banner.replace(/"/g, '%22')}")`; b.style.backgroundPosition = `50% ${p.bannerY ?? 50}%`; } }
   if (v.type === 'pubpl' && S.pub.data && S.pub.data.banner) { const b = $('#banner'); if (b) b.style.backgroundImage = `url("${S.pub.data.banner.replace(/"/g, '%22')}")`; }
+  if (v.type === 'profile' && S.profile.banner) { const b = $('#pbanner'); if (b) b.style.backgroundImage = `url("${S.profile.banner.replace(/"/g, '%22')}")`; }
   if (v.type === 'artist' && S.artist.info && S.artist.info.banner) { const b = $('#abanner'); if (b) b.style.backgroundImage = `url("${S.artist.info.banner.replace(/"/g, '%22')}")`; }
   if (keepScroll && (v.type === 'home' || v.type === 'library')) el.scrollTop = keepScroll;
   const busy = v.type === 'list' ? S.list.loading : v.type === 'search' ? S.search.loading : v.type === 'artist' ? S.artist.loading : v.type === 'artists' ? S.artists.loading && !S.artists.items.filter(Boolean).length : v.type === 'pubpl' ? S.pub.loading : false;
   const sig = [v.type, v.id || v.q || v.owner || '', busy ? 'L' : 'D', v.type === 'library' ? S.lib.chip : '', v.type === 'settings' ? S.setTab : ''].join('|');
-  settleImages(); document.querySelectorAll('.shelf').forEach(updShelf); afterRender();
+  settleImages(); document.querySelectorAll('.shelf').forEach(updShelf); afterRender(); afterRender2();
   if (sig !== lastViewSig) { lastViewSig = sig; el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter'); clearTimeout(enterTimer); enterTimer = setTimeout(() => el.classList.remove('enter'), 800); }
 }
 function renderTop(){

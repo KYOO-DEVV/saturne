@@ -6,7 +6,7 @@
 .chips{display:flex;gap:8px;flex-wrap:wrap}
 .chip{padding:8px 18px;border-radius:var(--r-btn);border:1px solid var(--line2);font-weight:600;color:var(--fg2)}
 .chip:hover{border-color:var(--hi);color:var(--hi)}
-.chip.on{background:var(--accent);border-color:var(--accent);color:var(--hi)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
 .sortbox{display:flex;align-items:center;gap:10px;color:var(--mute)}
 .select{background:var(--bg);border:1px solid var(--line2);border-radius:var(--r-btn);padding:8px 14px;min-width:150px;color:var(--hi)}
 .libwrap{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:26px;align-items:start}

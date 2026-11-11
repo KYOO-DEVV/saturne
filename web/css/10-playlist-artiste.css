@@ -32,7 +32,7 @@
 .seg{display:inline-flex;background:var(--raise);border:1px solid var(--line2);border-radius:var(--r-ctl);padding:3px}
 .seg button{display:flex;align-items:center;gap:8px;padding:7px 16px;border-radius:var(--r-btn);font-weight:600;color:var(--mute)}
 .seg button svg{width:16px;height:16px}
-.seg button.on{background:var(--accent);color:var(--hi)}
+.seg button.on{background:var(--accent);color:var(--on-accent)}
 .privacy-note{color:var(--mute);font-size:13px;margin:10px 0 18px;display:flex;gap:8px;align-items:center}
 .privacy-note svg{width:16px;height:16px;flex:none}
 .badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:var(--r-sm);border:1px solid rgba(255,255,255,.22);font-size:12px;font-weight:600;color:var(--fg2);margin-left:10px;vertical-align:middle}

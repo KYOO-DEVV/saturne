@@ -7,7 +7,7 @@ document.addEventListener('keydown', e => {
   if (!S.user || e.ctrlKey || e.metaKey || e.altKey || e.target.closest('input,textarea,select') || !$('#modal').hidden) return;
   const k = e.key;
   if (k === '?') { e.preventDefault(); helpModal(); }
-  else if (k === '/') { e.preventDefault(); $('#q').focus(); }
+  else if (k === '/') { e.preventDefault(); ($('#bigQ') || $('#q')).focus(); }
   else if (k === 'm' || k === 'M') $('#volBtn').click();
   else if (k === 'q' || k === 'Q') setQueueOpen(!S.qopen);
   else if ((k === 'b' || k === 'B') && current()) toggleFav(current());

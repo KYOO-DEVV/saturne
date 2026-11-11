@@ -2,7 +2,8 @@
 html[data-bg="dark"]{--bg:#0f0f13;--panel:#15151a;--raise:#1b1b22;--raise2:#24242d;--line:#26262f;--line2:#34343f}
 html[data-bg="light"]{color-scheme:light;--bg:#f4f4f7;--panel:#ffffff;--raise:#eaeaf0;--raise2:#dfdfe7;--line:#dcdce4;--line2:#c6c6d1;--fg:#15151b;--mute:#5a5a68;--faint:#6c6c7a;--hi:#0b0b10;--fg2:#30303a}
 /* Texte toujours blanc sur la couleur d'accent et sur les images. */
-.btn,.btn svg,.playbtn,.chip.on,.updbanner .btn,.pb,.ov,.sarrow,.hero-nav button,.btools button,.pov,.bhint,.swatch{color:#fff}
+.btn,.btn svg,.playbtn,.playbtn svg,.chip.on,.updbanner .btn,.selbox[aria-checked="true"]{color:var(--on-accent)}
+.pb,.ov,.sarrow,.hero-nav button,.btools button,.pov,.bhint,.swatch{color:#fff}
 .hero,.banner,.np-art,.thumb,.cover,.cacts{--hi:#fff;--fg:#f5f5f8;--fg2:#e2e2ea;--mute:#d0d0da}
 .banner .title-input,.banner .desc-input,.banner h1,.banner .sub,.sl-title,.sl-by{color:#fff}
 html[data-bg="light"] .toast{background:#15151b;color:#fff}

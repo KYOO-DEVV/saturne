@@ -60,6 +60,7 @@ function paletteItems(){
     nav(L('Your Library', 'Ma bibliothèque'), {type:'library'}, 'lib'), nav(L('History', 'Historique'), {type:'history'}, 'history'), nav(L('Now playing', 'En lecture'), {type:'now'}, 'note'),
     ...S.playlists.map(p => ({label:p.name, icon:p.id === 'favs' ? 'bookmarkf' : 'queue', kind:'Playlist', raw:true, run:() => go({type:'playlist', id:p.id})})),
     ...S.follows.map(a => ({label:a.name, icon:'person', kind:L('Artist', 'Artiste'), raw:true, run:() => go({type:'artist', id:a.id})})),
+    ...GENRES.map(g => ({label:g.n, icon:'genres', kind:L('Genre', 'Genre'), raw:true, run:() => go({type:'list', q:g.q, title:g.n, cc:g.cc, eyebrow:'Genre'})})),
     ...SET_TABS.map(([k, n]) => set(trText(n), k)),
     act(L('Play / pause', 'Lecture / pause'), 'play', togglePlay), act(L('Next song', 'Titre suivant'), 'next', () => next(false)), act(L('Previous song', 'Titre précédent'), 'prev', prev),
     act(L('Shuffle on/off', 'Aléatoire : activer / désactiver'), 'shuffle', () => $('#bShuffle').click()), act(L('Open the queue', 'Ouvrir la file d’attente'), 'queue', () => setQueueOpen(true)),

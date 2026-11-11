@@ -13,7 +13,7 @@ $('#fwdBtn').addEventListener('click', () => step(1));
 $('#collapse').addEventListener('click', () => setCollapsed(!S.collapsed));
 $('#nav').addEventListener('click', e => {
   const b = e.target.closest('[data-nav]'); if (!b) return;
-  if (b.dataset.nav === 'search') { $('#q').value = ''; go({type:'search', q:''}); $('#q').focus(); } else go({type:b.dataset.nav});
+  if (b.dataset.nav === 'search') { $('#q').value = ''; go({type:'search', q:''}); } else go({type:b.dataset.nav});
 });
 $('#plList').addEventListener('click', e => { const b = e.target.closest('[data-pl]'); if (b) go({type:'playlist', id:b.dataset.pl}); const n = e.target.closest('[data-act="newpl"]'); if (n) newPlaylist(); });
 $('#accountBtn').addEventListener('click', e => { e.stopPropagation(); openAccountMenu(e.currentTarget); });
@@ -86,7 +86,7 @@ $('#view').addEventListener('click', e => {
     if (!S.view.confirm) { S.view.confirm = true; render(); }
     else { deletePlaylist(p); go({type:'library'}); }
   }
-  else if (act === 'editprofile') profileModal();
+  else if (act === 'editprofile') go({type:'profile'});
   else if (act === 'changeusername') usernameModal();
   else if (act === 'changepass') passwordModal();
   else if (act === 'deleteacct') deleteModal();

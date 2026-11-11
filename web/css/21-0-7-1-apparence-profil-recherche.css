@@ -1,0 +1,18 @@
+/* ---------- 0.7.1 : image de fond (voile, flou), logo, profil, recherche ---------- */
+html.has-bgimg main{background:transparent;position:relative;isolation:isolate}
+html.has-bgimg main::before{content:"";position:absolute;inset:0;z-index:-2;background:var(--bgimg) center/cover no-repeat;filter:blur(var(--bgblur,0px));transform:scale(1.06)}
+html.has-bgimg main::after{content:"";position:absolute;inset:0;z-index:-1;background:var(--veil,transparent);pointer-events:none}
+html.no-logo .brand{display:none}
+html.no-logo .sidehead{height:28px}
+html.no-sidethumbs .pli:not(.create) .pthumb{display:none}
+html.no-sidethumbs .pli:not(.create){padding-left:16px}
+.btn,.playbtn,.chip.on,.seg button.on{box-shadow:inset 0 0 0 1px var(--accent-edge,transparent)}
+.profile-banner .pfp{cursor:pointer}
+.profile-banner .pfp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.profile-banner.has{background-size:cover;background-position:center}
+.search-hero{min-height:calc(100dvh - var(--barh,84px) - 150px);display:grid;place-items:center}
+.search.big{width:min(680px,92%);height:60px;border-radius:calc(var(--r-ctl) + 6px);padding:0 24px;gap:14px;font-size:18px}
+.search.big svg{width:24px;height:24px}
+.search.big input{font-size:18px}
+#app.searchhome .topbar .search{visibility:hidden;pointer-events:none}
+@media (max-width:900px){.search-hero{min-height:calc(100dvh - var(--barh,84px) - 120px)}}

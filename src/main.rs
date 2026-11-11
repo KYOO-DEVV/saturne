@@ -333,7 +333,7 @@ async fn update_me(State(app): State<App>, h: HeaderMap, Json(body): Json<Value>
     };
     let avatar = match body.get("avatar").and_then(Value::as_str) {
         Some(a) if a.is_empty() => Some(String::new()),
-        Some(a) if a.starts_with("data:image/") && a.len() <= 600_000 => Some(a.to_string()),
+        Some(a) if a.starts_with("data:image/") && a.len() <= 1_500_000 => Some(a.to_string()),
         Some(_) => return err(StatusCode::BAD_REQUEST, "Image de profil invalide ou trop lourde"),
         None => None,
     };

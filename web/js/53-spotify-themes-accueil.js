@@ -93,11 +93,14 @@ function applyThemeExtra(){
   if (hexRgb(T.accentCustom)) { st.setProperty('--accent', rgbHex(c)); st.setProperty('--accent-soft', `rgba(${c.join(',')},.15)`); st.setProperty('--accent-glow', `rgba(${c.join(',')},.2)`); }
   // Sur fond clair, la variante « texte » de l'accent doit être foncée ; sur fond sombre, claire.
   st.setProperty('--accent-hi', rgbHex(light ? mixRgb(c, [0, 0, 0], .15) : hexRgb(T.accentCustom) ? mixRgb(c, [255, 255, 255], .45) : hexRgb((ACCENTS[T.accent] || ACCENTS.violet)[1])));
-  if (T.bgImage) { st.setProperty('--bgimg', `url("${T.bgImage}")`); st.setProperty('--veil', light ? 'rgba(244,244,247,.86)' : 'rgba(0,0,0,.8)'); root.classList.add('has-bgimg'); }
-  else { st.removeProperty('--bgimg'); st.setProperty('--veil', 'transparent'); root.classList.remove('has-bgimg'); }
+  const acc = hexRgb(getComputedStyle(root).getPropertyValue('--accent').trim()) || c;
+  st.setProperty('--on-accent', (acc[0] * 299 + acc[1] * 587 + acc[2] * 114) / 1000 > 150 ? '#0b0b10' : '#ffffff'); // texte lisible quelle que soit la couleur d'accent
+  if (T.bgImage) { st.setProperty('--bgimg', `url("${T.bgImage}")`); root.classList.add('has-bgimg'); }
+  else { st.removeProperty('--bgimg'); root.classList.remove('has-bgimg'); }
+  applyLook();
   if (typeof native === 'function') native('titlebar:' + BG_THEMES[bg].slice(1));
 }
-const themeRows = () => { const T = S.settings; return setRow(L('Custom accent color', 'Couleur d’accent libre'), L('Pick any color instead of the five presets.', 'Choisis n’importe quelle couleur à la place des cinq proposées.'), `<input type="color" id="accentPick" value="${hexRgb(T.accentCustom) ? T.accentCustom : (ACCENTS[T.accent] || ACCENTS.violet)[0]}" aria-label="${L('Custom accent color', 'Couleur d’accent libre')}">`) +
+const themeRows = () => { const T = S.settings; return setRow(L('Custom accent color', 'Couleur d’accent libre'), L('Pick any color instead of the five presets.', 'Choisis n’importe quelle couleur à la place des cinq proposées.'), `<input type="color" id="accentPick" value="${hexRgb(T.accentCustom) ? T.accentCustom : (ACCENTS[T.accent] || ACCENTS.violet)[0]}" aria-label="${L('Custom accent color', 'Couleur d’accent libre')}">${hexRgb(T.accentCustom) ? `<button class="ghost" data-do2="accentreset" style="margin-left:8px">${L('Reset', 'Réinitialiser')}</button>` : ''}`) +
   setRow(L('Background', 'Fond'), L('Pure black for OLED screens, dark grey, or a light theme.', 'Noir pur pour les écrans OLED, gris sombre, ou thème clair.'), `<div class="seg" role="group" aria-label="${L('Background', 'Fond')}">${segBtn('data-bgset', 'oled', BG_THEMES[T.bg] ? T.bg : 'oled', '', L('OLED black', 'Noir OLED'))}${segBtn('data-bgset', 'dark', T.bg, '', L('Dark grey', 'Gris sombre'))}${segBtn('data-bgset', 'light', T.bg, '', L('Light', 'Clair'))}</div>`) +
   setRow(L('Background image', 'Image de fond'), L('Shown softly behind the pages.', 'Affichée en douceur derrière les pages.'), `<div style="display:flex;gap:8px"><button class="ghost" data-do2="bgpick">${ic('image')}${T.bgImage ? L('Change', 'Changer') : L('Choose an image', 'Choisir une image')}</button>${T.bgImage ? `<button class="ghost" data-do2="bgclear">${L('Remove', 'Retirer')}</button>` : ''}</div>`); };
 $('#view').addEventListener('click', e => {

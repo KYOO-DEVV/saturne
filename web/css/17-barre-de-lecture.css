@@ -6,7 +6,7 @@
 .seekbox{display:flex;align-items:center;gap:16px;min-width:0}
 .seekbox span{color:var(--mute);font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
 .ctrls{display:flex;align-items:center;gap:6px}
-.playbtn{width:44px;height:44px;border-radius:var(--r-ctl);background:var(--accent);color:var(--hi);display:grid;place-items:center;transition:background .15s,transform .12s}
+.playbtn{width:44px;height:44px;border-radius:var(--r-ctl);background:var(--accent);color:var(--on-accent);display:grid;place-items:center;transition:background .15s,transform .12s}
 .playbtn:hover{filter:brightness(1.12);transform:scale(1.06)}
 .playbtn svg{width:24px;height:24px}
 .volume{display:flex;align-items:center;gap:6px;min-width:0}

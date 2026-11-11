@@ -1,6 +1,6 @@
 /* ---------- Sauvegarde dans le compte ---------- */
 let saveTimer = 0, saveWarned = false;
-const payload = () => ({v:2, playlists:S.playlists, queue:S.queue, cur:S.cur, shuffle:S.shuffle, repeat:S.repeat, volume:S.volume, history:S.history, plays:S.plays, follows:S.follows, cc:S.cc, collapsed:S.collapsed, defaultPrivacy:S.defaultPrivacy, settings:S.settings});
+const payload = () => ({v:2, playlists:S.playlists, queue:S.queue, cur:S.cur, shuffle:S.shuffle, repeat:S.repeat, volume:S.volume, history:S.history, plays:S.plays, follows:S.follows, profile:S.profile, cc:S.cc, collapsed:S.collapsed, defaultPrivacy:S.defaultPrivacy, settings:S.settings});
 function save(){
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
@@ -18,6 +18,7 @@ function applyData(d){
   S.settings = {...DEFAULT_SETTINGS, ...(d.settings && typeof d.settings === 'object' ? d.settings : {})};
   S.plays = Array.isArray(d.plays) ? d.plays.filter(p => Array.isArray(p) && /^[\w-]{11}$/.test(p[0])).slice(-1000) : [];
   S.follows = Array.isArray(d.follows) ? d.follows.filter(a => a && /^UC[\w-]{22}$/.test(a.id)).slice(0, 60) : [];
+  S.profile = {banner:typeof (d.profile||{}).banner === 'string' && d.profile.banner.startsWith('data:image/') ? d.profile.banner : '', bio:typeof (d.profile||{}).bio === 'string' ? d.profile.bio.slice(0, 160) : ''};
   applyHomePrefs();
   applyLang(S.settings.lang || detectLang());
   if (!S.settings.remember) { S.queue = []; S.cur = -1; }
