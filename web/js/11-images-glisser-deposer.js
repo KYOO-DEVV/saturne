@@ -82,7 +82,7 @@ $('#view').addEventListener('pointerdown', e => {
 $('#view').addEventListener('pointermove', e => {
   if (!bd) return;
   bd.p.bannerY = Math.max(0, Math.min(100, bd.start - (e.clientY - bd.y) / bd.h * 160));
-  bd.el.style.backgroundPosition = `50% ${bd.p.bannerY}%`;
+  bd.el.style.setProperty('--bposy', `${bd.p.bannerY}%`);
 });
 const endBd = () => { if (bd) { bd.el.classList.remove('grab'); save(); bd = null; } };
 $('#view').addEventListener('pointerup', endBd); $('#view').addEventListener('pointercancel', endBd);

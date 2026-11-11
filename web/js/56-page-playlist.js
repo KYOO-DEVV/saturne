@@ -4,6 +4,7 @@ function fmtTotal(sec){
   return h ? `${h} h ${m % 60 ? String(m % 60).padStart(2, '0') + ' min' : ''}`.trim() : `${Math.max(1, m)} min`;
 }
 const fmtAdded = ts => ts ? new Date(ts).toLocaleDateString(dateLocale(), {day:'numeric', month:'short', year:'numeric'}) : '';
+const dateCell = t => t.added ? fmtAdded(t.added) : t.at ? new Date(t.at).toLocaleTimeString(dateLocale(), {hour:'2-digit', minute:'2-digit'}) : '';
 /* Ligne du tableau (playlists) : numéro, titre + chaîne, « album » (chaîne), date d'ajout, durée. */
 function trow(t, i, n){
   const c = current(), on = c && c.id === t.id, own = S.view.type === 'playlist', sel = own && S.plv.sel;
@@ -14,9 +15,10 @@ function trow(t, i, n){
     : `<span class="tnum"><span class="n">${on && playing ? ic('note') : i + 1}</span><button class="tplay" data-act="play" aria-label="Lire ${esc(t.title)}">${ic('play')}</button></span>`;
   return `<li class="trow ${on ? 'on' : ''} ${picked ? 'picked' : ''}" data-i="${i}" draggable="true" style="--d:${Math.min(i, 14)}">${first}
     <div class="tmain"><img src="${esc(t.thumb)}" alt="" loading="lazy"><div style="min-width:0"><div class="tt" title="${esc(t.title)}">${esc(t.title)}</div><div class="ch">${chLink(t)}</div></div></div>
-    <div class="talb" data-notr>${esc(t.channel)}</div><div class="tdate">${fmtAdded(t.added)}</div><div class="dur">${t.duration ? fmt(t.duration) : ''}</div><div class="acts">${acts}</div></li>`;
+    <button class="talb" data-filter="${esc(t.channel)}" data-notr title="${L('Filter by this channel', 'Filtrer par cette chaîne')}">${esc(t.channel)}</button><div class="tdate">${dateCell(t)}</div><div class="dur">${t.duration ? fmt(t.duration) : ''}</div><div class="acts">${acts}</div></li>`;
 }
-const theadHtml = () => `<div class="thead"><span>#</span><span>${L('Title', 'Titre')}</span><span>${L('Channel', 'Chaîne')}</span><span>${L('Date added', 'Date d’ajout')}</span><span class="r" aria-label="${L('Duration', 'Durée')}">${ic('history')}</span><span></span></div>`;
+const theadHtml = (src = '', hd = true) => `<div class="thead ${hd ? '' : 'nodate'}"><span>#</span><span>${L('Title', 'Titre')}</span><span>${L('Channel', 'Chaîne')}</span><span>${src === 'plays' ? L('Played at', 'Écouté à') : L('Date added', 'Date d’ajout')}</span><span class="r" aria-label="${L('Duration', 'Durée')}">${ic('history')}</span><span></span></div>`;
+const filterChip = src => S.plv.q && src !== 'pl' ? `<div class="fchip">${L('Filter', 'Filtre')} : <b data-notr>${esc(S.plv.q)}</b><button data-do="clearfilter" aria-label="${L('Clear the filter', 'Effacer le filtre')}">${ic('close')}</button></div>` : '';
 
 function plRightHtml(){
   return `<div class="plright"><label class="plsearch"><span>${ic('search')}</span><input id="plFilter" type="search" placeholder="${L('Filter', 'Filtrer')}" aria-label="${L('Filter this playlist', 'Filtrer cette playlist')}" value="${esc(S.plv.q)}" autocomplete="off"></label>${dd('plsort', L('Sort', 'Trier'))}</div>`;
@@ -43,7 +45,7 @@ function playlistPageHtml(p){
   const l = p.tracks, view = plView(), sel = S.plv.sel, n = sel ? sel.size : 0;
   const selbar = sel ? `<div class="selbar"><b>${n} ${n > 1 ? L('selected', 'sélectionnés') : L('selected', 'sélectionné')}</b><button class="ghost" data-do="selall">${L('Select all', 'Tout sélectionner')}</button><button class="ghost" data-do="selqueue" ${n ? '' : 'disabled'}>${ic('addq')}${L('Add to queue', 'Ajouter à la file')}</button><button class="ghost" data-do="seladd" ${n ? '' : 'disabled'}>${ic('plus')}${L('Add to playlist…', 'Ajouter à une playlist…')}</button><button class="ghost warn" data-do="selremove" ${n ? '' : 'disabled'}>${ic('trash')}${L('Remove', 'Retirer')}</button></div>` : '';
   return plHeroHtml({p, owner:S.user.display, readonly:false, avatar:avatarHtml(S.user)}) + selbar +
-    (l.length ? theadHtml() + (view.length ? rows(view, 'pl') : `<p class="empty">${L('No song matches this filter.', 'Aucun titre ne correspond à ce filtre.')}</p>`) : '<p class="empty">Cette playlist est vide. Glisse un titre sur elle dans la barre latérale, ou utilise le bouton « + ».</p>');
+    (l.length ? (view.length ? rows(view, 'pl') : `<p class="empty">${L('No song matches this filter.', 'Aucun titre ne correspond à ce filtre.')}</p>`) : '<p class="empty">Cette playlist est vide. Glisse un titre sur elle dans la barre latérale, ou utilise le bouton « + ».</p>');
 }
 function pubPageHtml(){
   const P = S.pub, d = P.data;
@@ -51,7 +53,7 @@ function pubPageHtml(){
   if (P.loading) return h + skeleton(6, 'grid');
   if (P.error) return h + `<div class="errbox"><span class="err">${esc(P.error)}</span></div>`;
   if (!d) return h;
-  return h + plHeroHtml({p:{...d, tracks:d.tracks}, owner:d.ownerDisplay, readonly:true}) + (d.tracks.length ? theadHtml() + rows(d.tracks, 'pub') : '<p class="empty">Cette playlist est vide.</p>');
+  return h + plHeroHtml({p:{...d, tracks:d.tracks}, owner:d.ownerDisplay, readonly:true}) + (d.tracks.length ? rows(d.tracks, 'pub') : '<p class="empty">Cette playlist est vide.</p>');
 }
 /* Couleur de l'en-tête : celle de la pochette (ou du premier titre). */
 function colorizeHead(){
@@ -67,3 +69,11 @@ $('#view').addEventListener('click', e => {
   else if (b.dataset.do === 'focustitle') { const t = $('#plTitle'); if (t) { t.focus(); t.select(); } }
 });
 $('#view').addEventListener('dblclick', e => { const li = e.target.closest('.trow'); if (li && !e.target.closest('button,a,input')) { const b = li.querySelector('[data-act="play"]'); if (b) b.click(); } });
+
+/* Clic sur une chaîne : filtre la liste (un second clic l'enlève). */
+$('#view').addEventListener('click', e => {
+  const f = e.target.closest('[data-filter]'), c = e.target.closest('[data-do="clearfilter"]');
+  if (c) { S.plv.q = ''; renderView(); return; }
+  if (!f) return;
+  const v = f.dataset.filter; S.plv.q = S.plv.q === v ? '' : v; renderView();
+});

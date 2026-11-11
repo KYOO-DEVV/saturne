@@ -18,13 +18,13 @@ function statsHtml(){
     <div class="twocol"><div class="box"><h3>${L('Top artists', 'Artistes les plus écoutés')}</h3>${top(tally(p => p[2]), k => k)}</div><div class="box"><h3>${L('Top songs', 'Titres les plus écoutés')}</h3>${top(tally(p => p[0]), k => (byId.get(k) || [])[1] || k)}</div></div>`;
 }
 function historyHtml(){
-  const tab = S.hv, list = playsTracks();
+  const tab = S.hv; let list = playsTracks();
   let h = `<div class="pagehead"><p class="eyebrow">${L('Activity', 'Activité')}</p><h1>${tab === 'stats' ? L('Listening stats', "Statistiques d'écoute") : L('Listening history', "Historique d'écoute")}</h1></div>
     <div class="toolbar"><div class="chips"><button class="chip ${tab === 'history' ? 'on' : ''}" data-hvtab="history">${L('History', 'Historique')}</button><button class="chip ${tab === 'stats' ? 'on' : ''}" data-hvtab="stats">${L('Stats', 'Statistiques')}</button></div>${list.length ? `<button class="ghost" data-act="clearhist">${ic('trash')}${L('Clear history', "Effacer l'historique")}</button>` : ''}</div>`;
   if (!list.length) return h + `<p class="empty">${L('Nothing played yet. Your listening history and stats will show up here.', "Rien d'écouté pour le moment. Ton historique et tes statistiques apparaîtront ici.")}</p>`;
   if (tab === 'stats') return h + statsHtml();
-  const cap = capOf('plays'); let last = '', out = '';
-  list.slice(0, cap).forEach((t, i) => { const d = dayLabel(t.at); if (d !== last) { last = d; out += `<li class="dayhead">${esc(d)}</li>`; } out += row(t, i, list.length); });
-  return h + `<ul class="rows" data-src="plays">${out}</ul>${moreItems(list, 'plays')}`;
+  const cap = capOf('plays'); let last = '', out = ''; list = filterList(list, 'plays');
+  list.slice(0, cap).forEach((t, i) => { const d = dayLabel(t.at); if (d !== last) { last = d; out += `<li class="dayhead">${esc(d)}</li>`; } out += trow(t, i, list.length); });
+  return h + `${filterChip('plays')}${theadHtml('plays', true)}<ul class="rows" data-src="plays">${out}</ul>${moreItems(list, 'plays')}`;
 }
 

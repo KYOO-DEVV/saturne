@@ -1,6 +1,10 @@
 /* ---------- Changelog (liste repliable) ---------- */
 const TAGS = {new:'Nouveau', improved:'Amélioré', fixed:'Corrigé'};
 const CHANGELOG = [
+  {v:'0.7.6', date:'Nov 2026', title:'Toutes les listes en tableau', changes:[
+    ['improved', 'Recherche, genres, artistes, historique et mixes utilisent le même tableau que les playlists.'],
+    ['new', 'Cliquer sur le nom d’une chaîne dans le tableau filtre la liste (cliquer encore, ou sur la croix, retire le filtre).'],
+    ['fixed', 'Bannière de playlist : filet clair et traînée de couleur en bas de l’en-tête corrigés, titre plus lisible sur une image claire.']]},
   {v:'0.7.5', date:'Nov 2026', title:'Paroles fluides et clip plein cadre', changes:[
     ['improved', 'L’aperçu des paroles défile en douceur, ligne par ligne.'],
     ['improved', 'Clip vidéo : il remplit toute la zone, sans titre YouTube ni boutons par-dessus, et se survole normalement.'],
@@ -91,6 +95,7 @@ const CHANGELOG = [
 ];
 const clOpen = new Set([CHANGELOG[0].v]);
 const CL_EN = {
+  '0.7.6': {title:'Every list as a table', changes:['Search, genres, artists, history and mixes use the same table as playlists.', 'Clicking a channel name in the table filters the list (click again, or the cross, to clear the filter).', 'Playlist banner: light line and color streak at the bottom of the header fixed, title easier to read over a bright image.']},
   '0.7.5': {title:'Smooth lyrics and full-frame video', changes:['The lyrics preview scrolls smoothly, line by line.', 'Music video: it fills the whole area, without the YouTube title or buttons on top, and can be hovered normally.', 'Clicking the cover in the player bar opens the Now playing panel.']},
   '0.7.4': {title:'Phone interface', changes:['On phones: a tab bar at the bottom, a compact player, and a full-screen Now playing page with its controls.', 'No more two-line texts: titles end with “…”.']},
   '0.7.3': {title:'Now playing panel: back to the song, and a gradient', changes:['“Switch to song” button to leave the music video in the Now playing panel.','The Now playing panel takes a gradient from the cover’s color.']},

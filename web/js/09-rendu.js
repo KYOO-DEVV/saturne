@@ -1,5 +1,5 @@
 /* ---------- Rendu ---------- */
-function tracksOf(src){
+function tracksOfRaw(src){
   if (src === 'main') return S.home.main.tracks;
   if (src === 'fresh') return S.home.fresh.tracks;
   if (src === 'recent') return S.history;
@@ -14,6 +14,13 @@ function tracksOf(src){
   if (src === 'pl') return plView();
   return [];
 }
+/* Listes en tableau : un filtre commun (clic sur une chaîne, ou champ de la playlist) ; tracksOf et rows voient la même liste filtrée, donc les index restent justes. */
+const TABLE_SRC = new Set(['search', 'list', 'artist', 'mix', 'plays', 'pub']);
+function filterList(l, src){
+  const q = (S.plv.q || '').trim().toLowerCase(); if (!q || !TABLE_SRC.has(src)) return l;
+  return l.filter(t => ((t.title || '') + ' ' + (t.channel || '')).toLowerCase().includes(q));
+}
+function tracksOf(src){ return filterList(tracksOfRaw(src), src); }
 const defaultSrc = () => ({home:'main', list:'list', search:'search', playlist:'pl', artist:'artist', pubpl:'pub'}[S.view.type]);
 const countText = l => plural(l.length, 'song');
 const playActions = () => `<button class="btn" data-act="playall">${ic('play')}Play</button><button class="ghost" data-act="shuffleall">${ic('shuffle')}Shuffle</button>`;
@@ -38,7 +45,7 @@ function row(t, i, n){
 }
 const grid = (l, src) => `<ul class="grid" data-src="${src}">${l.slice(0, capOf(src)).map(card).join('')}</ul>${moreItems(l, src)}`;
 const shelf = (l, src) => `<div class="shelfwrap"><ul class="shelf" data-src="${src}">${l.map(card).join('')}</ul><button class="sarrow l" data-sh="-1" aria-label="Scroll left" hidden>${ic('left')}</button><button class="sarrow r" data-sh="1" aria-label="Scroll right">${ic('right')}</button></div>`;
-const rows = (l, src) => `<ul class="rows" data-src="${src}">${l.slice(0, capOf(src)).map((t, i) => (src === 'pl' || src === 'pub') ? trow(t, i, l.length) : row(t, i, l.length)).join('')}</ul>${moreItems(l, src)}`;
+const rows = (l, src) => { const v = filterList(l, src), hd = src === 'plays' || v.some(t => t.added); return `${filterChip(src)}${theadHtml(src, hd)}<ul class="rows ${hd ? '' : 'nodate'}" data-src="${src}">${v.slice(0, capOf(src)).map((t, i) => trow(t, i, v.length)).join('')}</ul>${moreItems(v, src)}`; };
 const skeleton = (n = 8, cls = 'grid', extra = '') => `<ul class="${cls}">${`<li><div class="sk ${extra}"></div></li>`.repeat(n)}</ul>`;
 const retry = (msg, act) => `<div class="errbox"><span class="err">${esc(msg)}</span><button class="ghost" data-act="${act}">${ic('refresh')}Réessayer</button></div>`;
 const avatarHtml = u => u.avatar ? `<img src="${esc(u.avatar)}" alt="">` : esc(initial(u.display || u.username));
@@ -153,7 +160,7 @@ function renderView(){
     h = `<div class="pagehead"><p class="eyebrow">${esc(L.eyebrow)}</p><h1>${esc(L.title)}</h1>`;
     if (L.loading) h += `<p class="sub" style="margin:0">Recherche en cours…</p></div>${skeleton(10)}`;
     else if (L.error) h += `</div>${retry(L.error, 'retrylist')}`;
-    else h += `<p class="sub">${countText(l)}</p>${l.length ? `<div class="head-actions">${playActions()}</div>` : ''}</div>` + (l.length ? grid(l, 'list') + moreBtn(L, 'list') : '<p class="empty">Aucun titre trouvé.</p>');
+    else h += `<p class="sub">${countText(l)}</p>${l.length ? `<div class="head-actions">${playActions()}</div>` : ''}</div>` + (l.length ? rows(l, 'list') + moreBtn(L, 'list') : '<p class="empty">Aucun titre trouvé.</p>');
   } else if (v.type === 'artists') {
     const A = S.artists, got = A.items.filter(Boolean);
     h = `<div class="pagehead"><p class="eyebrow">Artists</p><h1>Artists</h1><p class="sub">${A.mode === 'search' ? `Résultats pour « ${esc(A.query)} ».` : 'Une sélection d\'artistes à découvrir. Cherche un nom pour en trouver d\'autres.'}</p></div>
@@ -189,7 +196,7 @@ function renderView(){
     h = settingsHtml();
   }
   el.innerHTML = h;
-  if (v.type === 'playlist') { const p = curPl(), b = $('#banner'); if (p && p.banner && b) { b.style.setProperty('--bnr', `url("${p.banner.replace(/"/g, '%22')}")`); b.style.backgroundPosition = `50% ${p.bannerY ?? 50}%`; } }
+  if (v.type === 'playlist') { const p = curPl(), b = $('#banner'); if (p && p.banner && b) { b.style.setProperty('--bnr', `url("${p.banner.replace(/"/g, '%22')}")`); b.style.setProperty('--bposy', `${p.bannerY ?? 50}%`); } }
   if (v.type === 'pubpl' && S.pub.data && S.pub.data.banner) { const b = $('#banner'); if (b) { b.classList.add('hasbanner'); b.style.setProperty('--bnr', `url("${S.pub.data.banner.replace(/"/g, '%22')}")`); } }
   if (v.type === 'profile' && S.profile.banner) { const b = $('#pbanner'); if (b) b.style.backgroundImage = `url("${S.profile.banner.replace(/"/g, '%22')}")`; }
   if (v.type === 'artist' && S.artist.info && S.artist.info.banner) { const b = $('#abanner'); if (b) b.style.backgroundImage = `url("${S.artist.info.banner.replace(/"/g, '%22')}")`; }
