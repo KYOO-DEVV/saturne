@@ -2,8 +2,5 @@
   "bg": "dark",
   "accentCustom": "#5eead4",
   "radius": "round",
-  "bgImage": "aurora.gif",
-  "bgOverlay": 30,
-  "bgTint": "black",
-  "bgBlur": 8
+  "bgImage": ""
 }

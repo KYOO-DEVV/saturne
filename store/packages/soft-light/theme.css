@@ -1,5 +1,9 @@
-/* Clair doux : palette chaude et ombres légères. */
+/* Clair doux : trois palettes selon l'option « tone » (data-x-soft-light-tone). */
 html:root[data-bg="light"]{--bg:#fbf7f4;--panel:#ffffff;--raise:#f1ebe6;--raise2:#e8e0da;--line:#e6ddd6;--line2:#d4c9c1;--fg:#2a2420;--mute:#6b5f57;--faint:#7a6d64;--hi:#1a1512;--fg2:#3d352f}
-html:root[data-bg="light"] .bar{box-shadow:0 10px 34px -16px rgba(80,50,30,.3)}
+html:root[data-bg="light"][data-x-soft-light-tone="neutral"]{--bg:#f6f6f7;--panel:#ffffff;--raise:#ececee;--raise2:#e1e1e5;--line:#dfdfe3;--line2:#cbcbd1;--fg:#222226;--mute:#5f5f68;--faint:#70707a;--hi:#111114;--fg2:#38383e}
+html:root[data-bg="light"][data-x-soft-light-tone="cool"]{--bg:#f2f7fb;--panel:#ffffff;--raise:#e6eef5;--raise2:#d9e5ef;--line:#d7e2ec;--line2:#c1d0de;--fg:#1c2530;--mute:#566474;--faint:#66758a;--hi:#0e151d;--fg2:#2f3b49}
+html:root[data-bg="light"] :is(.side,main,.bar){background:var(--bg)}
+html:root[data-bg="light"] .bar{background:var(--panel);box-shadow:0 12px 36px -18px rgba(60,40,30,.35)}
 html:root[data-bg="light"] .side{border-right:1px solid var(--line)}
+html:root[data-bg="light"] .card,html:root[data-bg="light"] .stcard{box-shadow:0 8px 24px -16px rgba(60,40,30,.3)}
 html:root[data-bg="light"] .playbtn{background:var(--accent);color:var(--on-accent)}

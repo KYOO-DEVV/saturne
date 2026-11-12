@@ -34,13 +34,13 @@ macro_rules! pack {
     };
 }
 pub const BUILTIN: &[Pack] = &[
-    pack!("neon-oled", ["manifest.json", "settings.json", "theme.css"]),
-    pack!("soft-light", ["manifest.json", "settings.json", "theme.css"]),
-    pack!("sunset-glass", ["manifest.json", "settings.json", "theme.css", "sunset.png"]),
+    pack!("neon-oled", ["manifest.json", "settings.json", "theme.css", "thumb.png"]),
+    pack!("soft-light", ["manifest.json", "settings.json", "theme.css", "thumb.png"]),
+    pack!("sunset-glass", ["manifest.json", "settings.json", "theme.css", "thumb.png"]),
     pack!("pomodoro", ["manifest.json", "app.js", "app.css", "icon.png", "thumb.png"]),
-    pack!("runner-bar", ["manifest.json", "theme.css", "run.gif", "thumb.png"]),
+    pack!("runner-bar", ["manifest.json", "theme.css", "planet.png", "thumb.png"]),
     pack!("album-glow", ["manifest.json", "theme.css", "thumb.png"]),
-    pack!("aurora", ["manifest.json", "settings.json", "theme.css", "aurora.gif", "thumb.png"]),
+    pack!("aurora", ["manifest.json", "settings.json", "theme.css", "thumb.png"]),
 ];
 pub const SDK_JS: &str = include_str!("../store/sdk.js");
 
@@ -295,8 +295,8 @@ fn check_extras(m: &Value, kind: &str) -> Result<(), String> {
                     return Err(format!("Décor : « {k} » entre -400 et 400"));
                 }
             }
-            if it.get("opacity").is_some_and(|v| num(v, 0.0, 1.0).is_none()) || it.get("when").is_some_and(|v| !matches!(v.as_str(), Some("always" | "playing"))) || it.get("layer").is_some_and(|v| !matches!(v.as_str(), Some("above" | "below"))) || it.get("flip").is_some_and(|v| !v.is_boolean()) {
-                return Err("Décor : opacity 0 à 1, when always|playing, layer above|below, flip vrai/faux".into());
+            if it.get("opacity").is_some_and(|v| num(v, 0.0, 1.0).is_none()) || it.get("when").is_some_and(|v| !matches!(v.as_str(), Some("always" | "playing"))) || it.get("layer").is_some_and(|v| !matches!(v.as_str(), Some("above" | "below"))) || it.get("flip").is_some_and(|v| !v.is_boolean()) || it.get("valign").is_some_and(|v| !matches!(v.as_str(), Some("sit" | "center"))) {
+                return Err("Décor : opacity 0 à 1, when always|playing, layer above|below, flip vrai/faux, valign sit|center".into());
             }
         }
     }

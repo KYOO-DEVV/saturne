@@ -153,8 +153,9 @@ Dans `theme.css` : `html:root[data-x-ma-creation-trail="1"] .bar { … }` ou `wi
 | `x`, `y` | décalage en px (-400 à 400). Sur `seekbar`, le décor est *posé* sur la barre |
 | `opacity`, `flip`, `when` | 0 à 1 ; `true` pour retourner ; `"always"` ou `"playing"` |
 | `layer` | `above` (par défaut) ou `below` |
+| `valign` | `sit` (par défaut : posé sur la barre de progression) ou `center` (centré sur la barre) |
 
-Jusqu'à 6 décors. Ils ne captent jamais la souris. Voir `store/packages/runner-bar/` : un GIF de planète qui avance sur la barre, plus un sprite au choix de l'utilisateur au-dessus du bouton lecture.
+Jusqu'à 6 décors. Ils ne captent jamais la souris. Voir `store/packages/runner-bar/` : une planète animée (un PNG animé, APNG) qui avance sur la barre, plus un sprite au choix de l'utilisateur au-dessus du bouton lecture. Les **PNG animés (APNG)** et les GIF sont tous deux animés ; l'APNG garde une vraie transparence douce (pas de bords en escalier), ce que le GIF ne sait pas faire.
 
 ### Repères pour `theme.css`
 

@@ -103,7 +103,7 @@ function placeDecor(){
     const s = decorSize(m, d), r = anchorRect(d.anchor), hide = !r || (d.when === 'playing' && !playing) || !!$('#app').hidden;
     img.style.display = hide ? 'none' : ''; if (hide) continue;
     const dx = d.x || 0, dy = d.y || 0; let left, top;
-    if (d.anchor === 'seekbar') { left = r.left + r.width * (d.behavior === 'follow' ? pct : .5) - s / 2 + dx; top = r.top + r.height / 2 - s + dy; } // posé sur la barre
+    if (d.anchor === 'seekbar') { left = r.left + r.width * (d.behavior === 'follow' ? pct : .5) - s / 2 + dx; top = r.top + r.height / 2 - (d.valign === 'center' ? s / 2 : s) + dy; } // « sit » (défaut) : posé sur la barre ; « center » : centré sur la barre
     else if (d.anchor === 'corner') { const b = $('#bar').getBoundingClientRect(); left = r.width - s - 20 + dx; top = (b.height ? b.top : r.height) - s - 10 + dy; }
     else { left = r.left + r.width / 2 - s / 2 + dx; top = r.top + r.height / 2 - s / 2 + dy; }
     img.style.width = img.style.height = s + 'px'; img.style.transform = ''; img.style.left = Math.round(left) + 'px'; img.style.top = Math.round(top) + 'px';

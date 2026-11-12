@@ -2,14 +2,15 @@
   "id": "album-glow",
   "name": "Lueur de l'album",
   "author": "Saturne",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "extension",
-  "description": "La barre de lecture (et si tu veux la page) prennent la couleur dominante de la pochette en cours.",
-  "tags": ["couleur", "pochette", "exemple"],
-  "preview": ["#0c0c12", "#7c3aed"],
+  "description": "La pochette en cours baigne toute l'application dans sa lumière : fond flou, halo sous la barre de lecture, couleurs qui changent d'un titre à l'autre.",
+  "tags": ["pochette", "ambiance"],
+  "preview": ["#0a0a10", "#7a2a9a", "#d86bff"],
   "thumb": "thumb.png",
   "options": [
-    {"id": "power", "type": "range", "label": "Intensité", "min": 0, "max": 100, "step": 5, "default": 45},
-    {"id": "mode", "type": "choice", "label": "Où", "choices": [{"value": "bar", "label": "Barre"}, {"value": "page", "label": "Page"}, {"value": "both", "label": "Les deux"}], "default": "both"}
+    {"id": "power", "type": "range", "label": "Intensité", "min": 0, "max": 100, "step": 5, "default": 55},
+    {"id": "blur", "type": "range", "label": "Flou du fond", "min": 40, "max": 180, "step": 10, "unit": "px", "default": 130},
+    {"id": "mode", "type": "choice", "label": "Où", "choices": [{"value": "bar", "label": "Barre"}, {"value": "page", "label": "Fond"}, {"value": "both", "label": "Les deux"}], "default": "both"}
   ]
 }

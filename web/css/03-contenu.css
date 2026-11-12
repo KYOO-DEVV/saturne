@@ -18,7 +18,7 @@ main{grid-area:main;min-width:0;min-height:0;display:flex;flex-direction:column;
 .btn{background:var(--accent);color:var(--on-accent);font-weight:700;border-radius:var(--r-btn);padding:11px 22px;white-space:nowrap;display:inline-flex;align-items:center;gap:10px;transition:background .15s,transform .12s}
 .btn:hover{filter:brightness(1.12);transform:translateY(-1px)}
 .btn svg{width:18px;height:18px}
-.btn.alt{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)}
+.btn.alt{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#fff} /* sur l'image du hero : toujours blanc, même avec un accent clair */
 .btn.alt:hover{background:rgba(255,255,255,.14)}
 .ghost{border:1px solid var(--line2);border-radius:var(--r-btn);padding:9px 18px;font-weight:600;white-space:nowrap;display:inline-flex;align-items:center;gap:8px}
 .ghost svg{width:18px;height:18px}

@@ -6,16 +6,16 @@
       "name": "Lueur de l'album",
       "author": "Saturne",
       "type": "extension",
-      "version": "1.0.0",
-      "description": "La barre de lecture (et si tu veux la page) prennent la couleur dominante de la pochette en cours.",
+      "version": "1.1.0",
+      "description": "La pochette en cours baigne toute l'application dans sa lumière : fond flou, halo sous la barre de lecture, couleurs qui changent d'un titre à l'autre.",
       "tags": [
-        "couleur",
         "pochette",
-        "exemple"
+        "ambiance"
       ],
       "preview": [
-        "#0c0c12",
-        "#7c3aed"
+        "#0a0a10",
+        "#7a2a9a",
+        "#d86bff"
       ],
       "permissions": [],
       "icon": null,
@@ -23,18 +23,18 @@
       "files": [
         {
           "path": "manifest.json",
-          "size": 675,
-          "sha256": "e59b45f91c0a385ddb631a6657e236381d241a318318525e32e10915eb4b7d48"
+          "size": 858,
+          "sha256": "62920ce656338b24ae295706a4ff72a55517abc106c2159d8c9c848ba6deb0e5"
         },
         {
           "path": "theme.css",
-          "size": 717,
-          "sha256": "7259c3e7efd5ffa7c5d7cd04156ad3147fee7f044939f15b0c07267703bee5be"
+          "size": 1585,
+          "sha256": "253894ce97c2f9d6c5b7c0d6298cb4c462ae30ed2066fa714b2a6e479ed28585"
         },
         {
           "path": "thumb.png",
-          "size": 12399,
-          "sha256": "af2d9d38df94d3f8fae9177b4955f393ba6852d4985eb63a3c81ab20eac18331"
+          "size": 25218,
+          "sha256": "1e5cbe9759f9ffbbdf045461419abf4e4fc479e1b5c0d620572bd9b0218de05e"
         }
       ]
     },
@@ -43,46 +43,41 @@
       "name": "Aurore",
       "author": "Saturne",
       "type": "theme",
-      "version": "1.0.0",
-      "description": "Un fond animé (GIF) d'aurore boréale, avec des panneaux en verre dépoli qu'on peut désactiver.",
+      "version": "1.1.0",
+      "description": "Une aurore boréale douce qui ondule derrière l'interface : fond animé fluide, verre dépoli, teintes réglables.",
       "tags": [
-        "gif",
-        "fond animé",
-        "verre"
+        "animé",
+        "verre",
+        "nuit"
       ],
       "preview": [
-        "#06101f",
+        "#050d1c",
         "#1fb6a6",
-        "#a78bfa"
+        "#8b5cf6"
       ],
       "permissions": [],
       "icon": null,
       "thumb": "thumb.png",
       "files": [
         {
-          "path": "aurora.gif",
-          "size": 78417,
-          "sha256": "bfff917ad11ca4eb16e98cc827f82edc1a9feb7b6e836b63c113d7f45fe49c7f"
-        },
-        {
           "path": "manifest.json",
-          "size": 539,
-          "sha256": "56dff37f81c69b2e8174283dab43dee3359c30d15a98928babf5d908a66dcf63"
+          "size": 916,
+          "sha256": "a9dc9b88a72b38eeb230e1de2d4252dbb5d4c7f30f2eee16923a631ae783ce50"
         },
         {
           "path": "settings.json",
-          "size": 151,
-          "sha256": "a96fa4e96859215e75069e8a406a25d80e0aa112d48294285d8bdd60044bc001"
+          "size": 86,
+          "sha256": "e4340095d175117eadd4052d5451b504f25b0342f164c733653ef60fff6bdeea"
         },
         {
           "path": "theme.css",
-          "size": 463,
-          "sha256": "9612bf6535992d67977257808cdfd15b20bdd771a38262d2c7c113e1140db9f0"
+          "size": 2020,
+          "sha256": "c941a5d336421e91effa92dafdbb608fc6eb02bf1df680000b04eba10127ae85"
         },
         {
           "path": "thumb.png",
-          "size": 2275,
-          "sha256": "38106020eb029829aed086247b412877210cc1b078d620ecf4c19acabe90ce4e"
+          "size": 38555,
+          "sha256": "36290ef345f8600bf2434bdddf1cdcdb9d95905ad682d8af24bbe194552118d9"
         }
       ]
     },
@@ -91,8 +86,8 @@
       "name": "Néon OLED",
       "author": "Saturne",
       "type": "theme",
-      "version": "1.0.0",
-      "description": "Noir pur, accent rose néon et lueur autour des éléments actifs.",
+      "version": "1.1.0",
+      "description": "Noir pur pour écrans OLED, accent rose néon, lueur autour de ce qui est actif. L'intensité se règle.",
       "tags": [
         "sombre",
         "néon",
@@ -104,12 +99,12 @@
       ],
       "permissions": [],
       "icon": null,
-      "thumb": null,
+      "thumb": "thumb.png",
       "files": [
         {
           "path": "manifest.json",
-          "size": 275,
-          "sha256": "a7494bdd376e175fcc1b58024fb8d5f1a3494c211c7e9fdffc62e118d6929b96"
+          "size": 579,
+          "sha256": "e9583839480cd467277b01b749934d0262258f4f90c94c1326374cee25e9bc07"
         },
         {
           "path": "settings.json",
@@ -118,25 +113,30 @@
         },
         {
           "path": "theme.css",
-          "size": 556,
-          "sha256": "7c10149c26e29b60f71b17e3f9e304baacbc4544bb34cf0d78f2f3c91fcc6acf"
+          "size": 1325,
+          "sha256": "1041d61b49cca4f8e7f0f33b8548db36f07c2115865d091d0dd108980d69a73a"
+        },
+        {
+          "path": "thumb.png",
+          "size": 8939,
+          "sha256": "e374099e218fba64d2d403d994ffc18975af53ca6ac22bb7d6203c34d65f4ba1"
         }
       ]
     },
     {
       "id": "pomodoro",
-      "name": "Minuteur Pomodoro",
+      "name": "Pomodoro",
       "author": "Saturne",
       "type": "app",
-      "version": "1.0.0",
-      "description": "Concentration 25 min, pause 5 min. Peut mettre la musique en pause pendant la pause.",
+      "version": "1.1.0",
+      "description": "Concentration 25 min, pauses courtes et longue, cycle de 4 sessions. Peut mettre la musique en pause pendant les pauses.",
       "tags": [
         "productivité",
         "exemple"
       ],
       "preview": [
         "#101015",
-        "#7c3aed"
+        "#ff6b57"
       ],
       "permissions": [
         "storage",
@@ -147,28 +147,28 @@
       "files": [
         {
           "path": "app.css",
-          "size": 812,
-          "sha256": "f02021a1af16156f59d744ea4349ccd90ccfe746caf3923e7329382d6040e359"
+          "size": 1904,
+          "sha256": "dbc867f9a9176ae92df378643fd050dccd916aff59bc6031af243891ab9a7be9"
         },
         {
           "path": "app.js",
-          "size": 2429,
-          "sha256": "ccc0bc42f5d18014b406edf4373b158e8def221518ba9916b6d7a99f9d72b1af"
+          "size": 4106,
+          "sha256": "acbc084a1c2072599315af45f277a8b061e883222e9bd358c146743a271f0c5e"
         },
         {
           "path": "icon.png",
-          "size": 1893,
-          "sha256": "6ede6d8065d5a0f8dfd3cc6a4322c91dc44435f521179a4c471643eb2a5bcd9d"
+          "size": 6332,
+          "sha256": "07a112a6e8851ae0108840853791e967a766cf15569242f7ee75eb005fea7efe"
         },
         {
           "path": "manifest.json",
-          "size": 428,
-          "sha256": "a3b8d560e9357998c36eb409c75c5e2a09d25cc22411460edc7fcc9d3a0c3b55"
+          "size": 455,
+          "sha256": "a88f23c4a236b36f22943584fae6f39e3659ac22551e3024534093a6b046eb8a"
         },
         {
           "path": "thumb.png",
-          "size": 2241,
-          "sha256": "d67eaffecf56ed27a9f52ec4bfdc8a46660ff0b6c6edef95fb170b1ff9ba8639"
+          "size": 7061,
+          "sha256": "2e47b6bf3adf84d3b4ba2e3117e2646de12ec1aa7e959fd676f265d743451e47"
         }
       ]
     },
@@ -177,16 +177,16 @@
       "name": "Planète sur la barre",
       "author": "Saturne",
       "type": "extension",
-      "version": "1.0.0",
-      "description": "Un GIF qui avance sur la barre de progression, plus un sprite à toi (n'importe quelle image ou GIF) qui rebondit au-dessus du bouton lecture.",
+      "version": "1.1.0",
+      "description": "Une planète animée avance sur la barre de progression. Ajoute ton propre sprite (image ou GIF) qui rebondit au-dessus du bouton lecture.",
       "tags": [
-        "gif",
-        "barre de progression",
-        "exemple"
+        "animé",
+        "barre de progression"
       ],
       "preview": [
-        "#0b0b14",
-        "#ff6fb1"
+        "#090912",
+        "#ff7ab8",
+        "#ffb86b"
       ],
       "permissions": [],
       "icon": null,
@@ -194,13 +194,13 @@
       "files": [
         {
           "path": "manifest.json",
-          "size": 1167,
-          "sha256": "23f38538751d974b464b631af075ce107fa20df52b3480e1972bdab707bf7d3a"
+          "size": 1181,
+          "sha256": "0a45ec5f5acbe3625e16679e1bafe2f2f8419bead38dd8fc0f57121578ed2d0b"
         },
         {
-          "path": "run.gif",
-          "size": 10641,
-          "sha256": "965824d3ce210ac8e22bddb7a84dca921dedb4905c4dbf54fb02f1f8c980a57f"
+          "path": "planet.png",
+          "size": 189920,
+          "sha256": "06b5d4851345b67ec874a0b67a588ddcd14ea18b8a88b41e43169fe8d451c300"
         },
         {
           "path": "theme.css",
@@ -209,8 +209,8 @@
         },
         {
           "path": "thumb.png",
-          "size": 1908,
-          "sha256": "1bb10f27375248123e33db6f89cda2b8ab8c831659784b50a850ed721713937d"
+          "size": 14660,
+          "sha256": "ab785b40628f60fdba85ae9cf11a305ceb33906f3fa09c243fa36f385070f68b"
         }
       ]
     },
@@ -219,11 +219,11 @@
       "name": "Clair doux",
       "author": "Saturne",
       "type": "theme",
-      "version": "1.0.0",
-      "description": "Thème clair chaud, coins arrondis et ombres douces.",
+      "version": "1.1.0",
+      "description": "Un thème clair reposant, en trois ambiances (chaude, neutre, fraîche), coins arrondis et ombres douces.",
       "tags": [
         "clair",
-        "chaud"
+        "doux"
       ],
       "preview": [
         "#fbf7f4",
@@ -231,12 +231,12 @@
       ],
       "permissions": [],
       "icon": null,
-      "thumb": null,
+      "thumb": "thumb.png",
       "files": [
         {
           "path": "manifest.json",
-          "size": 253,
-          "sha256": "845a5e5dab9649b03c1ece4ce3e63b26f18e7e1f386c587da124bad06672c33e"
+          "size": 558,
+          "sha256": "1999a4a863ff4289fb3da6df0c7fda81fead33b76585e216123cc2325e1cb4fe"
         },
         {
           "path": "settings.json",
@@ -245,50 +245,56 @@
         },
         {
           "path": "theme.css",
-          "size": 481,
-          "sha256": "a7302570b0ce0eb026fbeb72add2198eb03c1382ffa262e9611794a3942f719b"
+          "size": 1171,
+          "sha256": "e78d9e3973ca9337c3ce4e2000aee9007e114e532cda89a8e05bc3d3d45c13bb"
+        },
+        {
+          "path": "thumb.png",
+          "size": 7532,
+          "sha256": "ad7ff2543651bde560362247c9b6d040a8f8587cb06383ba3604fda5d0f412e4"
         }
       ]
     },
     {
       "id": "sunset-glass",
-      "name": "Coucher de soleil",
+      "name": "Crépuscule",
       "author": "Saturne",
       "type": "theme",
-      "version": "1.0.0",
-      "description": "Dégradé de coucher de soleil en fond, panneaux de verre dépoli.",
+      "version": "1.1.0",
+      "description": "Un ciel de crépuscule qui dérive lentement, des panneaux de verre dépoli, des accents orange.",
       "tags": [
-        "image de fond",
-        "verre"
+        "dégradé",
+        "verre",
+        "animé"
       ],
       "preview": [
-        "#2a0f3a",
-        "#ff7a59",
-        "#ffbe6e"
+        "#1a0b2e",
+        "#7a2848",
+        "#ff8a4c"
       ],
       "permissions": [],
       "icon": null,
-      "thumb": null,
+      "thumb": "thumb.png",
       "files": [
         {
           "path": "manifest.json",
-          "size": 295,
-          "sha256": "b3ecadfbafcb49ede283409ea4be51926a81199c6116a82598da7ca7a7b430bf"
+          "size": 663,
+          "sha256": "babf67fd1840a0d12b42df53589fc80986ea094caa5d339478b9472636db2061"
         },
         {
           "path": "settings.json",
-          "size": 172,
-          "sha256": "19bc2fad136f97ab830c9999c8e82e701850fb25916149c95cbd59f197aecb9e"
-        },
-        {
-          "path": "sunset.png",
-          "size": 1241,
-          "sha256": "86630d5e125c5823a9a4f81c2673204c36347a4029ef4425be5d28feac72ae16"
+          "size": 107,
+          "sha256": "16c4f231ff6243ba0d3b210e81d2ddb0ec7015af756cd724153b0b0096aad9a4"
         },
         {
           "path": "theme.css",
-          "size": 392,
-          "sha256": "26c0a99d0de94abd3f585963e833920bb4c63ed9a3f0bdce3ad02a68f4028faa"
+          "size": 1762,
+          "sha256": "616dc6ba6f72479acdf4f7ed3efb1e40b8ba109fc690f22a8a0ca179db06f2e8"
+        },
+        {
+          "path": "thumb.png",
+          "size": 14353,
+          "sha256": "8568ce27f5b893ef3ef9429b42a40d8b786b04d0ea6c48f31bb2cb912c4e4872"
         }
       ]
     }

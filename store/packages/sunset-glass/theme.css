@@ -1,4 +1,24 @@
-/* Coucher de soleil : panneaux de verre dépoli sur l'image de fond (sunset.png, réglée dans settings.json). */
-html:root .side,html:root .bar,html:root .qdrawer{background:rgba(18,8,24,.5);-webkit-backdrop-filter:blur(18px) saturate(1.2);backdrop-filter:blur(18px) saturate(1.2)}
-html:root .bar{border-color:rgba(255,255,255,.14)}
-html:root .nav button.on{background:rgba(255,122,89,.2)}
+/* Crépuscule : ciel en dégradé (body), soleil qui dérive (body::before), verre dépoli.
+   Options : data-x-sunset-glass-drift / -glass (1 ou 0), --x-sunset-glass-warmth (0 à 100). */
+html:root[data-bg="dark"]{
+  --bg:#1a0b2e;--panel:rgba(26,10,46,.62);--raise:rgba(255,255,255,.07);--raise2:rgba(255,255,255,.12);--line:rgba(255,255,255,.1);--line2:rgba(255,255,255,.18);
+  --fg:#fff4ec;--fg2:#f3dccd;--mute:#c9a9b8;--faint:#c9a9b8;
+}
+html:root body{
+  background:
+    linear-gradient(180deg,#1a0b2e 0%,#35124f 38%,#6b2450 68%,color-mix(in srgb,#d4572a calc(var(--x-sunset-glass-warmth, 70) * 1%),#7a2848) 100%);
+}
+html:root body::before{
+  content:"";position:fixed;left:-25%;right:-25%;bottom:-45%;height:95%;z-index:0;pointer-events:none;
+  background:radial-gradient(closest-side,color-mix(in srgb,#ffb36b calc(var(--x-sunset-glass-warmth, 70) * .9%),transparent),color-mix(in srgb,#ff6a3d calc(var(--x-sunset-glass-warmth, 70) * .5%),transparent) 45%,transparent 72%);
+  filter:blur(18px);
+}
+html:root[data-x-sunset-glass-drift="1"] body::before{animation:sunsetdrift 26s ease-in-out infinite alternate}
+@keyframes sunsetdrift{from{transform:translate3d(-6%,0,0) scale(1)}to{transform:translate3d(6%,-4%,0) scale(1.12)}}
+html:root #app{position:relative;z-index:1}
+html:root :is(main,.topbar){background:transparent}
+html:root[data-x-sunset-glass-glass="1"] :is(.side,.bar,.qdrawer){
+  background:rgba(26,10,46,.55);-webkit-backdrop-filter:blur(20px) saturate(1.3);backdrop-filter:blur(20px) saturate(1.3);border-color:rgba(255,255,255,.12)}
+html:root[data-x-sunset-glass-glass="0"] :is(.side,.bar,.qdrawer){background:rgba(26,10,46,.92)}
+html:root .nav button.on{background:rgba(255,138,76,.22)}
+html:root .playbtn{background:#fff4ec;color:#3a1450}

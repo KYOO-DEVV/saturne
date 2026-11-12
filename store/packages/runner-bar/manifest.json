@@ -2,20 +2,20 @@
   "id": "runner-bar",
   "name": "Planète sur la barre",
   "author": "Saturne",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "extension",
-  "description": "Un GIF qui avance sur la barre de progression, plus un sprite à toi (n'importe quelle image ou GIF) qui rebondit au-dessus du bouton lecture.",
-  "tags": ["gif", "barre de progression", "exemple"],
-  "preview": ["#0b0b14", "#ff6fb1"],
+  "description": "Une planète animée avance sur la barre de progression. Ajoute ton propre sprite (image ou GIF) qui rebondit au-dessus du bouton lecture.",
+  "tags": ["animé", "barre de progression"],
+  "preview": ["#090912", "#ff7ab8", "#ffb86b"],
   "thumb": "thumb.png",
   "options": [
-    {"id": "size", "type": "range", "label": "Taille de la planète", "min": 20, "max": 64, "step": 1, "unit": "px", "default": 36},
+    {"id": "size", "type": "range", "label": "Taille de la planète", "min": 28, "max": 80, "step": 1, "unit": "px", "default": 48},
     {"id": "trail", "type": "toggle", "label": "Lueur sur la barre", "default": true},
     {"id": "sprite", "type": "image", "label": "Mon sprite au-dessus du bouton lecture"},
     {"id": "spritesize", "type": "range", "label": "Taille du sprite", "min": 20, "max": 96, "step": 2, "unit": "px", "default": 44}
   ],
   "decor": [
-    {"id": "planet", "anchor": "seekbar", "image": "run.gif", "size": "option:size", "behavior": "follow", "y": 2, "when": "always"},
+    {"id": "planet", "anchor": "seekbar", "image": "planet.png", "size": "option:size", "behavior": "follow", "valign": "center", "when": "always"},
     {"id": "mine", "anchor": "playbtn", "image": "option:sprite", "size": "option:spritesize", "behavior": "bounce", "y": -34, "when": "playing"}
   ]
 }

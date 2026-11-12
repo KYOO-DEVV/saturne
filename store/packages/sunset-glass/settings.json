@@ -1,10 +1,7 @@
 {
   "bg": "dark",
-  "accentCustom": "#ff7a59",
+  "accentCustom": "#ff8a4c",
   "radius": "soft",
-  "bgImage": "sunset.png",
-  "bgOverlay": 30,
-  "bgTint": "black",
-  "bgBlur": 0,
+  "bgImage": "",
   "sideThumbs": true
 }

@@ -2,9 +2,14 @@
   "id": "neon-oled",
   "name": "Néon OLED",
   "author": "Saturne",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "theme",
-  "description": "Noir pur, accent rose néon et lueur autour des éléments actifs.",
+  "description": "Noir pur pour écrans OLED, accent rose néon, lueur autour de ce qui est actif. L'intensité se règle.",
   "tags": ["sombre", "néon", "oled"],
-  "preview": ["#000000", "#ff2e93"]
+  "preview": ["#000000", "#ff2e93"],
+  "thumb": "thumb.png",
+  "options": [
+    {"id": "glow", "type": "range", "label": "Intensité de la lueur", "min": 0, "max": 100, "step": 5, "default": 60},
+    {"id": "pulse", "type": "toggle", "label": "Le bouton lecture pulse en musique", "default": true}
+  ]
 }

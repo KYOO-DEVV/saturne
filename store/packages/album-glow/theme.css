@@ -1,7 +1,22 @@
-/* Lueur de l'album : --track-color (couleur dominante de la pochette) est posée par Saturne ; --x-album-glow-power vient de l'option « Intensité ». */
+/* Lueur de l'album.
+   Saturne pose --cover-img (la pochette en cours) et --track-color (sa couleur dominante) sur <html> ; les options viennent de manifest.json
+   (--x-album-glow-power 0-100, --x-album-glow-blur en px, data-x-album-glow-mode = bar | page | both). */
+
+/* Fond : la pochette, énorme et floue, derrière toute l'application */
+html:root:is([data-x-album-glow-mode="page"],[data-x-album-glow-mode="both"]) body::before{
+  content:"";position:fixed;inset:-12%;z-index:0;pointer-events:none;
+  background:var(--cover-img) center/cover no-repeat;
+  filter:blur(calc(var(--x-album-glow-blur, 130) * 1px)) saturate(1.8) brightness(.85);
+  opacity:calc(var(--x-album-glow-power, 55) * .0085);
+  transition:opacity .8s ease, background-image .8s ease;
+}
+html:root:is([data-x-album-glow-mode="page"],[data-x-album-glow-mode="both"]) #app{position:relative;z-index:1}
+html:root:is([data-x-album-glow-mode="page"],[data-x-album-glow-mode="both"]) :is(main,.side){background:transparent}
+html:root:is([data-x-album-glow-mode="page"],[data-x-album-glow-mode="both"]) .side{background:color-mix(in srgb, var(--bg) 55%, transparent)}
+
+/* Barre de lecture : halo de la couleur de la pochette */
 html:root:is([data-x-album-glow-mode="bar"],[data-x-album-glow-mode="both"]) .bar{
-  box-shadow:0 0 calc(var(--x-album-glow-power, 45) * 1px) calc(var(--x-album-glow-power, 45) * -.3px) var(--track-color, transparent);
-  transition:box-shadow .8s ease}
-html:root:is([data-x-album-glow-mode="page"],[data-x-album-glow-mode="both"]) main{
-  background-image:radial-gradient(120% 70% at 50% 110%, color-mix(in srgb, var(--track-color, transparent) calc(var(--x-album-glow-power, 45) * .55%), transparent), transparent 70%);
-  transition:background-image .8s ease}
+  box-shadow:0 10px 60px -6px color-mix(in srgb, var(--track-color, transparent) calc(var(--x-album-glow-power, 55) * 1%), transparent),
+             0 0 0 1px color-mix(in srgb, var(--track-color, transparent) calc(var(--x-album-glow-power, 55) * .45%), var(--line));
+  transition:box-shadow .8s ease;
+}

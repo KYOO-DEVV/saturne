@@ -2,14 +2,16 @@
   "id": "aurora",
   "name": "Aurore",
   "author": "Saturne",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "theme",
-  "description": "Un fond animé (GIF) d'aurore boréale, avec des panneaux en verre dépoli qu'on peut désactiver.",
-  "tags": ["gif", "fond animé", "verre"],
-  "preview": ["#06101f", "#1fb6a6", "#a78bfa"],
+  "description": "Une aurore boréale douce qui ondule derrière l'interface : fond animé fluide, verre dépoli, teintes réglables.",
+  "tags": ["animé", "verre", "nuit"],
+  "preview": ["#050d1c", "#1fb6a6", "#8b5cf6"],
   "thumb": "thumb.png",
   "options": [
-    {"id": "glass", "type": "toggle", "label": "Panneaux en verre dépoli", "default": true},
-    {"id": "tint", "type": "color", "label": "Teinte du verre", "default": "#06101f"}
+    {"id": "speed", "type": "range", "label": "Durée d'un cycle", "min": 12, "max": 90, "step": 2, "unit": "s", "default": 36},
+    {"id": "power", "type": "range", "label": "Intensité", "min": 20, "max": 100, "step": 5, "default": 80},
+    {"id": "palette", "type": "choice", "label": "Couleurs", "choices": [{"value": "teal", "label": "Boréale"}, {"value": "violet", "label": "Violette"}, {"value": "rose", "label": "Rose"}], "default": "teal"},
+    {"id": "glass", "type": "toggle", "label": "Panneaux en verre dépoli", "default": true}
   ]
 }

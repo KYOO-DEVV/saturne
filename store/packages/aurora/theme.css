@@ -1,5 +1,31 @@
-/* Aurore : le fond animé est aurora.gif (settings.json). Le verre dépoli suit l'option « glass » ; sa couleur, l'option « tint ». */
+/* Aurore : des nappes de lumière floues (body::before) qui ondulent doucement.
+   Options : --x-aurora-speed (durée d'un cycle, s), --x-aurora-power (0-100), data-x-aurora-palette = teal | violet | rose, data-x-aurora-glass = 1 | 0. */
+html:root[data-bg="dark"]{
+  --bg:#050d1c;--panel:rgba(6,16,31,.6);--raise:rgba(255,255,255,.06);--raise2:rgba(255,255,255,.11);--line:rgba(255,255,255,.09);--line2:rgba(255,255,255,.17);
+  --fg:#eafffb;--fg2:#cfeee9;--mute:#8fb5b3;--faint:#8fb5b3;
+}
+html:root{--aur-a:#1fb6a6;--aur-b:#8b5cf6;--aur-c:#34d399}
+html:root[data-x-aurora-palette="violet"]{--aur-a:#8b5cf6;--aur-b:#ec4899;--aur-c:#38bdf8}
+html:root[data-x-aurora-palette="rose"]{--aur-a:#f472b6;--aur-b:#fb923c;--aur-c:#a78bfa}
+html:root body{background:#050d1c}
+html:root body::before{
+  content:"";position:fixed;inset:-35%;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(38% 30% at 22% 38%,var(--aur-a),transparent 70%),
+    radial-gradient(34% 28% at 70% 30%,var(--aur-b),transparent 70%),
+    radial-gradient(40% 26% at 52% 72%,var(--aur-c),transparent 72%),
+    radial-gradient(30% 24% at 86% 78%,var(--aur-a),transparent 70%);
+  filter:blur(46px);opacity:calc(var(--x-aurora-power, 80) * .0095);
+  animation:aurorawave calc(var(--x-aurora-speed, 36) * 1s) ease-in-out infinite alternate;
+}
+@keyframes aurorawave{
+  0%{transform:translate3d(-5%,2%,0) rotate(-4deg) scale(1)}
+  50%{transform:translate3d(4%,-3%,0) rotate(3deg) scale(1.12)}
+  100%{transform:translate3d(-2%,4%,0) rotate(7deg) scale(1.04)}
+}
+html:root #app{position:relative;z-index:1}
+html:root :is(main,.topbar){background:transparent}
 html:root[data-x-aurora-glass="1"] :is(.side,.bar,.qdrawer){
-  background:color-mix(in srgb, var(--x-aurora-tint, #06101f) 55%, transparent);
-  -webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3)}
-html:root .nav button.on{background:color-mix(in srgb, var(--accent) 22%, transparent)}
+  background:rgba(6,16,31,.5);-webkit-backdrop-filter:blur(18px) saturate(1.35);backdrop-filter:blur(18px) saturate(1.35);border-color:rgba(255,255,255,.1)}
+html:root[data-x-aurora-glass="0"] :is(.side,.bar,.qdrawer){background:rgba(6,16,31,.94)}
+html:root .nav button.on{background:color-mix(in srgb,var(--accent) 24%,transparent)}

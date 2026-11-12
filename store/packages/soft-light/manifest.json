@@ -2,9 +2,13 @@
   "id": "soft-light",
   "name": "Clair doux",
   "author": "Saturne",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "theme",
-  "description": "Thème clair chaud, coins arrondis et ombres douces.",
-  "tags": ["clair", "chaud"],
-  "preview": ["#fbf7f4", "#e0603a"]
+  "description": "Un thème clair reposant, en trois ambiances (chaude, neutre, fraîche), coins arrondis et ombres douces.",
+  "tags": ["clair", "doux"],
+  "preview": ["#fbf7f4", "#e0603a"],
+  "thumb": "thumb.png",
+  "options": [
+    {"id": "tone", "type": "choice", "label": "Ambiance", "choices": [{"value": "warm", "label": "Chaude"}, {"value": "neutral", "label": "Neutre"}, {"value": "cool", "label": "Fraîche"}], "default": "warm"}
+  ]
 }

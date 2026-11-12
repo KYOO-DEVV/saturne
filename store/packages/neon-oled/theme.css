@@ -1,6 +1,11 @@
-/* Néon OLED : lueur autour des éléments actifs. `html:root` donne priorité sur les styles de base. */
-html:root .nav button.on{box-shadow:inset 0 0 0 1px var(--accent),0 0 22px -6px var(--accent)}
-html:root .bar{border-color:color-mix(in srgb,var(--accent) 45%,var(--line));box-shadow:0 0 44px -20px var(--accent)}
-html:root .playbtn{background:var(--accent);color:var(--on-accent);box-shadow:0 0 26px var(--accent-glow)}
+/* Néon OLED : lueur autour des éléments actifs. `html:root` donne priorité sur les styles de base.
+   Options : --x-neon-oled-glow (0 à 100), data-x-neon-oled-pulse (1 ou 0). */
+html:root .nav button.on{box-shadow:inset 0 0 0 1px var(--accent),0 0 calc(var(--x-neon-oled-glow, 60) * .4px) calc(var(--x-neon-oled-glow, 60) * -.1px) var(--accent)}
+html:root .nav button.on svg{filter:drop-shadow(0 0 calc(var(--x-neon-oled-glow, 60) * .08px) var(--accent))}
+html:root .bar{border-color:color-mix(in srgb,var(--accent) 45%,var(--line));box-shadow:0 0 calc(var(--x-neon-oled-glow, 60) * .8px) calc(var(--x-neon-oled-glow, 60) * -.3px) var(--accent)}
+html:root .playbtn{background:var(--accent);color:var(--on-accent);box-shadow:0 0 calc(var(--x-neon-oled-glow, 60) * .5px) var(--accent)}
+html:root[data-x-neon-oled-pulse="1"][data-playing="1"] .playbtn{animation:neonpulse 1.6s ease-in-out infinite}
+@keyframes neonpulse{0%,100%{box-shadow:0 0 calc(var(--x-neon-oled-glow, 60) * .3px) var(--accent)}50%{box-shadow:0 0 calc(var(--x-neon-oled-glow, 60) * .75px) var(--accent)}}
 html:root .pli.on{box-shadow:inset 3px 0 0 var(--accent)}
+html:root .seekbox input[type=range]{filter:drop-shadow(0 0 calc(var(--x-neon-oled-glow, 60) * .06px) var(--accent))}
 html:root ::selection{background:var(--accent);color:var(--on-accent)}

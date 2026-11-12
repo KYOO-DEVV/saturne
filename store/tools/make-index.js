@@ -75,7 +75,7 @@ function extrasProblem(m) {
       const b = d.behavior === undefined ? 'none' : d.behavior;
       if (!BEHAVIORS.includes(b) || (b === 'follow' && d.anchor !== 'seekbar')) return 'décor : comportement inconnu (« follow » seulement sur seekbar)';
       for (const k of ['x', 'y']) if (d[k] !== undefined && !num(d[k], -400, 400)) return `décor : « ${k} » entre -400 et 400`;
-      if ((d.opacity !== undefined && !num(d.opacity, 0, 1)) || (d.when !== undefined && !['always', 'playing'].includes(d.when)) || (d.layer !== undefined && !['above', 'below'].includes(d.layer)) || (d.flip !== undefined && typeof d.flip !== 'boolean')) return 'décor : opacity, when, layer ou flip invalide';
+      if ((d.opacity !== undefined && !num(d.opacity, 0, 1)) || (d.when !== undefined && !['always', 'playing'].includes(d.when)) || (d.layer !== undefined && !['above', 'below'].includes(d.layer)) || (d.flip !== undefined && typeof d.flip !== 'boolean') || (d.valign !== undefined && !['sit', 'center'].includes(d.valign))) return 'décor : opacity, when, layer, flip ou valign invalide';
     }
   }
   return '';
