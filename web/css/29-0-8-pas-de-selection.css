@@ -1,0 +1,9 @@
+/* ---------- 0.8.0 : l'interface n'est pas un document ---------- */
+/* Pas de sélection de texte (sauf dans les champs de saisie) et pas d'images qu'on traîne hors de l'application. */
+html,body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea,[contenteditable="true"],.selectable{-webkit-user-select:text;user-select:text}
+img,svg,a{-webkit-user-drag:none;user-drag:none}
+/* Les éléments qu'on glisse exprès (titres vers la file, réorganisation) restent glissables. */
+[draggable="true"]{-webkit-user-drag:element}
+::selection{background:var(--accent-soft)}
+input::selection,textarea::selection{background:var(--accent);color:var(--on-accent)}

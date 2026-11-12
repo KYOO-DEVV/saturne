@@ -1,0 +1,15 @@
+{
+  "id": "album-glow",
+  "name": "Lueur de l'album",
+  "author": "Saturne",
+  "version": "1.0.0",
+  "type": "extension",
+  "description": "La barre de lecture (et si tu veux la page) prennent la couleur dominante de la pochette en cours.",
+  "tags": ["couleur", "pochette", "exemple"],
+  "preview": ["#0c0c12", "#7c3aed"],
+  "thumb": "thumb.png",
+  "options": [
+    {"id": "power", "type": "range", "label": "Intensité", "min": 0, "max": 100, "step": 5, "default": 45},
+    {"id": "mode", "type": "choice", "label": "Où", "choices": [{"value": "bar", "label": "Barre"}, {"value": "page", "label": "Page"}, {"value": "both", "label": "Les deux"}], "default": "both"}
+  ]
+}

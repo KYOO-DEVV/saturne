@@ -1,0 +1,10 @@
+{
+  "id": "soft-light",
+  "name": "Clair doux",
+  "author": "Saturne",
+  "version": "1.0.0",
+  "type": "theme",
+  "description": "Thème clair chaud, coins arrondis et ombres douces.",
+  "tags": ["clair", "chaud"],
+  "preview": ["#fbf7f4", "#e0603a"]
+}

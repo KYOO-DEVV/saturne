@@ -1,0 +1,15 @@
+{
+  "id": "aurora",
+  "name": "Aurore",
+  "author": "Saturne",
+  "version": "1.0.0",
+  "type": "theme",
+  "description": "Un fond animé (GIF) d'aurore boréale, avec des panneaux en verre dépoli qu'on peut désactiver.",
+  "tags": ["gif", "fond animé", "verre"],
+  "preview": ["#06101f", "#1fb6a6", "#a78bfa"],
+  "thumb": "thumb.png",
+  "options": [
+    {"id": "glass", "type": "toggle", "label": "Panneaux en verre dépoli", "default": true},
+    {"id": "tint", "type": "color", "label": "Teinte du verre", "default": "#06101f"}
+  ]
+}

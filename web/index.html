@@ -39,10 +39,12 @@
     </div>
     <nav class="nav" id="nav" aria-label="Navigation">
       <button data-nav="home" data-ic="home" title="Home"><span class="lbl">Home</span></button>
+      <button data-nav="store" data-ic="store" title="Store"><span class="lbl">Store</span></button>
       <button data-nav="search" data-ic="search" title="Search"><span class="lbl">Search</span></button>
       <button data-nav="artists" data-ic="person" title="Artists"><span class="lbl">Artists</span></button>
       <button data-nav="library" data-ic="lib" title="Your Library"><span class="lbl">Your Library</span></button>
       <button data-nav="history" data-ic="history" title="History"><span class="lbl">History</span></button>
+      <span id="appNav" style="display:contents"></span>
       <button data-nav="settings" data-ic="settings" title="Settings"><span class="lbl">Settings</span></button>
     </nav>
     <div class="sep"></div>
@@ -116,6 +118,7 @@
   <div style="max-width:520px;text-align:center"><h2 style="margin:0 0 10px">Saturne n’a pas pu démarrer · Saturne could not start</h2>
   <p id="bootmsg" style="color:#8b8b99;word-break:break-word;margin:0 0 18px"></p>
   <button onclick="location.reload()" style="background:#7c3aed;color:#fff;border:0;border-radius:10px;padding:11px 20px;font:inherit;font-weight:700;cursor:pointer">Recharger · Reload</button>
+  <p style="margin:12px 0 0"><button onclick="try{localStorage.setItem('saturne.safe','1')}catch(e){};location.reload()" style="background:transparent;color:#a78bfa;border:1px solid #3b2f63;border-radius:10px;padding:9px 16px;font:inherit;font-weight:600;cursor:pointer">Redémarrer sans mods · Restart without mods</button></p>
   <p style="margin:18px 0 0"><a href="https://github.com/KYOO-DEVV/saturne/releases/latest" target="_blank" rel="noopener" style="color:#a78bfa">Télécharger la dernière version · Download the latest version</a></p></div>
 </div>
 <script>

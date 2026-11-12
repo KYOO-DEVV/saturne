@@ -1,0 +1,30 @@
+/* ---------- 0.8.0 : extensions (décors, options) ---------- */
+#decor{position:fixed;inset:0;z-index:45;pointer-events:none;overflow:hidden}
+.dc{position:fixed;left:0;top:0;pointer-events:none;-webkit-user-select:none;user-select:none;-webkit-user-drag:none;transform:scaleX(var(--fx,1));object-fit:contain;will-change:left,top}
+.dc-below{z-index:0}
+.dc-follow{transition:left .3s linear}
+.dc-spin{animation:dcspin 6s linear infinite}
+.dc-bounce{animation:dcbounce .7s ease-in-out infinite alternate}
+.dc-float{animation:dcfloat 4s ease-in-out infinite}
+.dc-pulse{animation:dcpulse 1.2s ease-in-out infinite}
+html[data-playing="0"] .dc-spin,html[data-playing="0"] .dc-bounce,html[data-playing="0"] .dc-float,html[data-playing="0"] .dc-pulse{animation-play-state:paused}
+@keyframes dcspin{from{transform:scaleX(var(--fx,1)) rotate(0)}to{transform:scaleX(var(--fx,1)) rotate(360deg)}}
+@keyframes dcbounce{from{transform:scaleX(var(--fx,1)) translateY(0)}to{transform:scaleX(var(--fx,1)) translateY(-9px)}}
+@keyframes dcfloat{0%,100%{transform:scaleX(var(--fx,1)) translate(0,0)}25%{transform:scaleX(var(--fx,1)) translate(5px,-6px)}50%{transform:scaleX(var(--fx,1)) translate(0,-10px)}75%{transform:scaleX(var(--fx,1)) translate(-5px,-5px)}}
+@keyframes dcpulse{0%,100%{transform:scaleX(var(--fx,1)) scale(1)}50%{transform:scaleX(var(--fx,1)) scale(1.14)}}
+html.no-motion .dc{animation:none!important}
+/* Store : vignettes et icônes */
+.stprev{overflow:hidden}
+.stthumb{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.sttype,.stbuilt{position:relative;z-index:1}
+.stic{width:22px;height:22px;border-radius:6px;object-fit:cover;vertical-align:-5px;margin-right:8px}
+.mod-ic{width:20px;height:20px;border-radius:5px;object-fit:cover;flex:none}
+/* fenêtre d'options */
+.optlist{display:grid;gap:14px;margin:16px 0}
+.optrow{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}
+.optrow label{font-weight:700;min-width:0}
+.optr{display:flex;gap:10px;align-items:center}
+.optr input{width:150px}
+.optr b{min-width:52px;text-align:right}
+.optimg{display:flex;gap:8px;align-items:center}
+.optimg img{width:38px;height:38px;border-radius:8px;object-fit:cover;border:1px solid var(--line2)}

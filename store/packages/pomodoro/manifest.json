@@ -1,0 +1,22 @@
+{
+  "id": "pomodoro",
+  "name": "Minuteur Pomodoro",
+  "author": "Saturne",
+  "version": "1.0.0",
+  "type": "app",
+  "description": "Concentration 25 min, pause 5 min. Peut mettre la musique en pause pendant la pause.",
+  "tags": [
+    "productivité",
+    "exemple"
+  ],
+  "preview": [
+    "#101015",
+    "#7c3aed"
+  ],
+  "permissions": [
+    "storage",
+    "player.control"
+  ],
+  "icon": "icon.png",
+  "thumb": "thumb.png"
+}

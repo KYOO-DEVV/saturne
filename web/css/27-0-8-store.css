@@ -1,0 +1,41 @@
+/* ---------- 0.8.0 : Store ---------- */
+.sttabs{display:flex;gap:6px;margin:6px 0 18px;border-bottom:1px solid var(--line)}
+.sttabs button{padding:10px 16px;font-weight:700;color:var(--mute);border-bottom:2px solid transparent;margin-bottom:-1px}
+.sttabs button:hover{color:var(--fg)}
+.sttabs button.on{color:var(--hi);border-bottom-color:var(--accent)}
+.stbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.stbar .search{flex:1 1 260px;max-width:460px}
+.stbanner{display:flex;gap:12px;align-items:center;padding:12px 16px;margin:0 0 16px;border-radius:var(--r-ctl);background:var(--accent-soft);border:1px solid var(--line2)}
+.stbanner>span{flex:1;min-width:0}
+.stbanner small{display:block;color:var(--mute);word-break:break-word}
+.stbanner.soft{background:var(--raise)}
+.stgrid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.stcard{display:flex;flex-direction:column;background:var(--raise);border:1px solid var(--line);border-radius:calc(var(--r-ctl) + 4px);overflow:hidden;transition:border-color .15s,transform .15s}
+.stcard:hover{border-color:var(--line2);transform:translateY(-2px)}
+.stcard.on{border-color:var(--accent)}
+.stprev{position:relative;height:96px;display:flex;align-items:flex-start;justify-content:space-between;padding:10px}
+.sttype,.stbuilt{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff}
+.stbuilt{background:rgba(255,255,255,.22)}
+.stbody{padding:14px 16px 6px;display:grid;gap:4px;flex:1;min-width:0}
+.stbody b{font-size:16px;color:var(--hi)}
+.stbody small{color:var(--mute)}
+.stbody p{margin:4px 0 0;color:var(--fg2);font-size:13px}
+.stperms{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.stperms span{font-size:11px;padding:3px 8px;border-radius:999px;background:var(--raise2);color:var(--mute)}
+.stact{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px 16px}
+.stact .on{background:var(--accent-soft);color:var(--accent-hi);border-color:transparent}
+.stlegal{margin-top:26px;max-width:720px}
+.stcreate{display:grid;gap:16px;max-width:760px}
+.stsec{background:var(--raise);border:1px solid var(--line);border-radius:calc(var(--r-ctl) + 4px);padding:18px 20px;display:grid;gap:10px}
+.stsec h4{margin:0;font-size:15px;color:var(--hi)}
+.stsec .hint{margin:0}
+.stcss{min-height:160px;font:13px/1.5 ui-monospace,Consolas,monospace;resize:vertical;width:100%}
+.stperm-list{list-style:none;margin:12px 0;padding:0;display:grid;gap:8px}
+.stperm-list li{display:flex;gap:10px;align-items:center}
+.stperm-list svg{color:var(--accent-hi)}
+.apphead{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px}
+.apphead h1{margin:0;font-size:26px}
+.apphead small{color:var(--mute)}
+.appframe{width:100%;height:calc(100dvh - var(--barh,84px) - 190px);min-height:360px;border:1px solid var(--line);border-radius:calc(var(--r-ctl) + 4px);background:var(--bg)}
+.chip.sm{font-size:11px;padding:3px 9px;border-radius:999px;background:var(--raise2);color:var(--mute)}
+@media (max-width:900px){.stgrid{grid-template-columns:1fr}.appframe{height:calc(100dvh - 300px)}.sttabs button{padding:10px 12px}}

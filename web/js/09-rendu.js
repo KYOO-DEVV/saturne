@@ -49,7 +49,8 @@ const rows = (l, src) => { const v = filterList(l, src), hd = src === 'plays' ||
 const skeleton = (n = 8, cls = 'grid', extra = '') => `<ul class="${cls}">${`<li><div class="sk ${extra}"></div></li>`.repeat(n)}</ul>`;
 const retry = (msg, act) => `<div class="errbox"><span class="err">${esc(msg)}</span><button class="ghost" data-act="${act}">${ic('refresh')}Réessayer</button></div>`;
 const avatarHtml = u => u.avatar ? `<img src="${esc(u.avatar)}" alt="">` : esc(initial(u.display || u.username));
-const artistTile = a => `<li><button class="artist" data-artist="${esc(a.id)}"><span class="avatar">${a.thumb ? `<img src="${esc(a.thumb)}" alt="" loading="lazy">` : esc(initial(a.name))}</span><span style="min-width:0;max-width:100%"><b>${esc(a.name)}</b><small>${esc(a.subsText || '')}</small></span></button></li>`;
+const artistTile = a => { const on = typeof isFollowed === 'function' && isFollowed(a.id); return `<li class="acard ${on ? 'fol' : ''}"><button class="artist" data-artist="${esc(a.id)}"><span class="avatar">${a.thumb ? `<img src="${esc(a.thumb)}" alt="" loading="lazy">` : esc(initial(a.name))}</span><span class="ameta"><b>${esc(a.name)}</b><small>${esc(a.subsText || '')}</small></span></button>
+  <button class="afollow ${on ? 'on' : ''}" data-afollow="${esc(a.id)}" aria-pressed="${on}" aria-label="${esc((on ? L('Unfollow ', 'Ne plus suivre ') : L('Follow ', 'Suivre ')) + a.name)}">${ic(on ? 'check' : 'plus')}<span>${on ? L('Following', 'Suivi') : L('Follow', 'Suivre')}</span></button></li>`; };
 const greeting = () => { const h = new Date().getHours(); return h < 5 ? 'Good night' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; };
 const privIcon = p => isPublic(p) ? ic('globe') : ic('lock');
 const covInner = p => p.cover ? `<img src="${esc(p.cover)}" alt="">` : p.id === 'favs' ? ic('bookmarkf') : (mosaic(p) || esc(initial(p.name)));
@@ -194,6 +195,10 @@ function renderView(){
     h = lyricsPageHtml();
   } else if (v.type === 'settings') {
     h = settingsHtml();
+  } else if (v.type === 'store') {
+    h = storeHtml();
+  } else if (v.type === 'app') {
+    h = appPageHtml(v.id);
   }
   el.innerHTML = h;
   if (v.type === 'playlist') { const p = curPl(), b = $('#banner'); if (p && p.banner && b) { b.style.setProperty('--bnr', `url("${p.banner.replace(/"/g, '%22')}")`); b.style.setProperty('--bposy', `${p.bannerY ?? 50}%`); } }
@@ -203,7 +208,7 @@ function renderView(){
   if (keepScroll && (v.type === 'home' || v.type === 'library')) el.scrollTop = keepScroll;
   const busy = v.type === 'list' ? S.list.loading : v.type === 'search' ? S.search.loading : v.type === 'artist' ? S.artist.loading : v.type === 'artists' ? S.artists.loading && !S.artists.items.filter(Boolean).length : v.type === 'pubpl' ? S.pub.loading : false;
   const sig = [v.type, v.id || v.q || v.owner || '', busy ? 'L' : 'D', v.type === 'library' ? S.lib.chip : '', v.type === 'settings' ? S.setTab : ''].join('|');
-  settleImages(); document.querySelectorAll('.shelf').forEach(updShelf); afterRender(); afterRender2(); paintLyrics();
+  settleImages(); document.querySelectorAll('.shelf').forEach(updShelf); afterRender(); afterRender2(); paintLyrics(); if (typeof afterStore === 'function') afterStore();
   if (sig !== lastViewSig) { lastViewSig = sig; el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter'); clearTimeout(enterTimer); enterTimer = setTimeout(() => el.classList.remove('enter'), 800); }
 }
 function renderTop(){
@@ -216,7 +221,7 @@ function renderSide(){
   $('#app').classList.toggle('collapsed', S.collapsed);
   const cb = $('#collapse');
   cb.setAttribute('aria-label', S.collapsed ? 'Agrandir la barre latérale' : 'Réduire la barre latérale'); cb.title = cb.getAttribute('aria-label');
-  const navOn = v.type === 'artist' ? 'artists' : (v.type === 'list' || v.type === 'search') ? 'search' : (v.type === 'playlist' || v.type === 'pubpl') ? 'library' : v.type;
+  const navOn = v.type === 'app' ? 'app:' + v.id : v.type === 'artist' ? 'artists' : (v.type === 'list' || v.type === 'search') ? 'search' : (v.type === 'playlist' || v.type === 'pubpl') ? 'library' : v.type;
   document.querySelectorAll('#nav button,#tabbar button').forEach(b => { b.classList.toggle('on', b.dataset.nav === navOn); b.setAttribute('aria-current', b.dataset.nav === navOn ? 'page' : 'false'); if (!b.querySelector('svg')) b.insertAdjacentHTML('afterbegin', ic(b.dataset.ic)); });
   $('#plList').innerHTML = S.playlists.map(p => `<button class="pli ${v.type==='playlist'&&v.id===p.id?'on':''}" ${v.type==='playlist'&&v.id===p.id?'aria-current="page"':''} data-pl="${p.id}" title="${esc(p.name)}">${pthumb(p)}<b>${esc(p.name)}</b>${p.system ? '' : isPublic(p) ? ic('globe', 'lk') : ic('lock', 'lk')}</button>`).join('') +
     `<button class="pli create" data-act="newpl" title="Create Playlist"><span class="pthumb">${ic('plus')}</span><b>Create Playlist</b></button>`;

@@ -57,7 +57,8 @@ function paletteItems(){
   const act = (label, icon, run) => ({label, icon, kind:'Action', run});
   return [
     nav(L('Home', 'Accueil'), {type:'home'}, 'home'), nav(L('Search', 'Recherche'), {type:'search', q:''}, 'search'), nav(L('Artists', 'Artistes'), {type:'artists'}, 'person'),
-    nav(L('Your Library', 'Ma bibliothèque'), {type:'library'}, 'lib'), nav(L('History', 'Historique'), {type:'history'}, 'history'), nav(L('Lyrics', 'Paroles'), {type:'now'}, 'lyrics'),
+    nav(L('Your Library', 'Ma bibliothèque'), {type:'library'}, 'lib'), nav(L('History', 'Historique'), {type:'history'}, 'history'), nav(L('Lyrics', 'Paroles'), {type:'now'}, 'lyrics'), nav('Store', {type:'store'}, 'store'),
+    ...(typeof S.store !== 'undefined' ? S.store.installed.filter(m => m.type === 'app' && modOn(m.id)).map(m => ({label:m.name, icon:'apps', kind:'App', raw:true, run:() => go({type:'app', id:m.id})})) : []),
     ...S.playlists.map(p => ({label:p.name, icon:p.id === 'favs' ? 'bookmarkf' : 'queue', kind:'Playlist', raw:true, run:() => go({type:'playlist', id:p.id})})),
     ...S.follows.map(a => ({label:a.name, icon:'person', kind:L('Artist', 'Artiste'), raw:true, run:() => go({type:'artist', id:a.id})})),
     ...GENRES.map(g => ({label:g.n, icon:'genres', kind:L('Genre', 'Genre'), raw:true, run:() => go({type:'list', q:g.q, title:g.n, cc:g.cc, eyebrow:'Genre'})})),

@@ -21,6 +21,7 @@ Application de streaming musical pour Windows, écrite en Rust. Noir OLED, un se
 - **Historique** par jour et **statistiques** d'écoute, **Discord Rich Presence** (optionnel).
 - **Import d'un export** (fusionner ou remplacer) et **sauvegardes automatiques** restaurables (*Settings › Data*).
 - **0.7** : paroles (lrclib.net), clip vidéo, artistes suivis, mixes automatiques, palette Ctrl+K, outils de playlist, import Spotify CSV, thèmes (accent libre, fond clair, image), accueil personnalisable, mémoire de la fenêtre.
+- **0.8 : le Store** (sous Accueil) : thèmes et Apps de la communauté, App isolée dans un cadre sans réseau avec des autorisations validées à l'installation, CSS personnalisé, export/import de thèmes `.saturne`, mode sans mods. Guide pour créer et publier : [STORE.md](STORE.md). Le dossier `store/` est le contenu de départ du dépôt public `saturne-store` (catalogue).
 - Barres de défilement masquées (flèches sur les étagères), accessibilité clavier et lecteur d'écran soignée.
 
 ## Installer (Windows 10/11)
@@ -87,6 +88,8 @@ Les *Bookmarks* sont toujours privés. Le serveur n'expose que les playlists mar
 Changer de mot de passe, d'identifiant ou supprimer le compte demande le mot de passe actuel ; les essais ratés sont limités.
 
 ## Développement
+
+`node tests/ui-smoke.js` (lancé par `cargo test`) démarre l'interface dans un faux navigateur pour détecter les erreurs au chargement ; `node store/tools/make-index.js --check` vérifie les paquets du Store.
 
 ```bash
 cargo test                      # tests unitaires (YouTube, playlists publiques, mises à jour)

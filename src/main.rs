@@ -7,6 +7,7 @@
 mod bundle;
 mod discord;
 mod icon;
+mod modstore;
 mod native;
 mod public;
 mod store;
@@ -21,7 +22,7 @@ use axum::{
     http::{HeaderMap, HeaderValue, Request, StatusCode, header},
     middleware::{self, Next},
     response::{Html, IntoResponse, Response},
-    routing::{get, post},
+    routing::{delete, get, post},
 };
 use serde_json::{Value, json};
 use std::{
@@ -57,6 +58,8 @@ struct App {
     warming: Arc<std::sync::atomic::AtomicBool>,
     presence: Arc<Mutex<Option<std::sync::mpsc::Sender<discord::Msg>>>>,
     artists: Arc<Mutex<Vec<Option<Value>>>>,
+    /// Vignettes du catalogue déjà téléchargées et vérifiées (id → octets).
+    thumbs: Arc<Mutex<HashMap<String, Vec<u8>>>>,
 }
 
 fn err(code: StatusCode, msg: &str) -> Response {
@@ -914,6 +917,175 @@ async fn api_new(State(app): State<App>, Query(q): Q) -> Response {
     }
 }
 
+/* ---------- Store : thèmes et Apps de la communauté ---------- */
+const MOD_CSP: &str = "sandbox allow-scripts; default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.ytimg.com; font-src 'self'; connect-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'";
+
+/// Catalogue : créations intégrées + dépôt public (si joignable). L'échec du dépôt n'empêche pas d'utiliser les créations intégrées.
+async fn store_catalog(app: &App) -> (Vec<Value>, Option<String>) {
+    let remote = app.cached("store|index".into(), Duration::from_secs(3600), || async { modstore::fetch_index(&app.gh).await.map(|v| json!(v)) }).await;
+    let mut items = modstore::builtin_entries();
+    let ids: HashSet<String> = items.iter().filter_map(|e| e["id"].as_str().map(str::to_string)).collect();
+    match remote {
+        Ok(v) => {
+            items.extend(v.as_array().into_iter().flatten().filter(|e| e["id"].as_str().is_some_and(|i| !ids.contains(i))).cloned());
+            (items, None)
+        }
+        Err(e) => (items, Some(e)),
+    }
+}
+
+async fn store_index(State(app): State<App>, h: HeaderMap) -> Response {
+    if app.user(&h).is_none() {
+        return err(StatusCode::UNAUTHORIZED, "Connexion requise");
+    }
+    let (items, remote_error) = store_catalog(&app).await;
+    Json(json!({ "items": items, "remoteError": remote_error, "registry": modstore::registry(), "safe": modstore::safe(), "permissions": modstore::PERMISSIONS })).into_response()
+}
+
+async fn store_installed(State(app): State<App>, h: HeaderMap) -> Response {
+    if app.user(&h).is_none() {
+        return err(StatusCode::UNAUTHORIZED, "Connexion requise");
+    }
+    Json(json!({ "items": modstore::installed(&app.data_dir), "safe": modstore::safe() })).into_response()
+}
+
+async fn store_install(State(app): State<App>, h: HeaderMap, Json(body): Json<Value>) -> Response {
+    if app.user(&h).is_none() {
+        return err(StatusCode::UNAUTHORIZED, "Connexion requise");
+    }
+    let id = body["id"].as_str().unwrap_or("").to_string();
+    if !modstore::valid_id(&id) {
+        return err(StatusCode::BAD_REQUEST, "Identifiant invalide");
+    }
+    let files = match modstore::builtin_files(&id) {
+        Some(f) => f,
+        None => {
+            let (items, _) = store_catalog(&app).await;
+            let Some(entry) = items.iter().find(|e| e["id"] == id.as_str()) else { return err(StatusCode::NOT_FOUND, "Création introuvable dans le catalogue") };
+            match modstore::download(&app.gh, entry).await {
+                Ok(f) => f,
+                Err(e) => return fail(e),
+            }
+        }
+    };
+    if let Err(e) = modstore::check_package(&files).and_then(|_| modstore::write_package(&app.data_dir, &id, &files)) {
+        return err(StatusCode::BAD_REQUEST, &e);
+    }
+    Json(json!({ "ok": true, "items": modstore::installed(&app.data_dir) })).into_response()
+}
+
+/// Importe un paquet depuis un fichier `.saturne` (JSON : `{ "files": { "manifest.json": "…", "theme.css": "…" } }`).
+async fn store_import(State(app): State<App>, h: HeaderMap, Json(body): Json<Value>) -> Response {
+    if app.user(&h).is_none() {
+        return err(StatusCode::UNAUTHORIZED, "Connexion requise");
+    }
+    let Some(map) = body["files"].as_object() else { return err(StatusCode::BAD_REQUEST, "Fichier .saturne invalide") };
+    let files: Vec<(String, Vec<u8>)> = map.iter().filter_map(|(p, t)| t.as_str().map(|t| (p.clone(), t.as_bytes().to_vec()))).collect();
+    if files.len() != map.len() {
+        return err(StatusCode::BAD_REQUEST, "Fichier .saturne invalide : seuls les fichiers texte sont permis");
+    }
+    let meta = match modstore::check_package(&files) {
+        Ok(m) => m,
+        Err(e) => return err(StatusCode::BAD_REQUEST, &e),
+    };
+    if let Err(e) = modstore::write_package(&app.data_dir, &meta.id, &files) {
+        return err(StatusCode::BAD_REQUEST, &e);
+    }
+    Json(json!({ "ok": true, "id": meta.id, "items": modstore::installed(&app.data_dir) })).into_response()
+}
+
+async fn store_remove(State(app): State<App>, h: HeaderMap, axum::extract::Path(id): axum::extract::Path<String>) -> Response {
+    if app.user(&h).is_none() {
+        return err(StatusCode::UNAUTHORIZED, "Connexion requise");
+    }
+    if !modstore::remove(&app.data_dir, &id) {
+        return err(StatusCode::NOT_FOUND, "Création introuvable");
+    }
+    Json(json!({ "ok": true, "items": modstore::installed(&app.data_dir) })).into_response()
+}
+
+/// Vignette d'une création du catalogue (image du paquet, vérifiée) : l'interface ne charge jamais d'image depuis un autre site.
+async fn store_thumb(State(app): State<App>, h: HeaderMap, axum::extract::Path(id): axum::extract::Path<String>) -> Response {
+    if app.user(&h).is_none() {
+        return err(StatusCode::UNAUTHORIZED, "Connexion requise");
+    }
+    if !modstore::valid_id(&id) {
+        return StatusCode::NOT_FOUND.into_response();
+    }
+    let (items, _) = store_catalog(&app).await;
+    let Some(entry) = items.iter().find(|e| e["id"] == id.as_str()) else { return StatusCode::NOT_FOUND.into_response() };
+    let Some(path) = entry["thumb"].as_str().filter(|p| modstore::valid_path(p)).map(str::to_string) else { return StatusCode::NOT_FOUND.into_response() };
+    let key = format!("{id}|{}|{path}", entry["version"].as_str().unwrap_or(""));
+    let cached = app.thumbs.lock().unwrap().get(&key).cloned();
+    let bytes = match cached {
+        Some(b) => b,
+        None => {
+            let b = if entry["builtin"] == true {
+                modstore::builtin_files(&id).and_then(|f| f.into_iter().find(|(p, _)| *p == path)).map(|(_, b)| b)
+            } else {
+                match modstore::fetch_verified(&app.gh, entry, &path).await {
+                    Ok(b) => Some(b),
+                    Err(_) => None,
+                }
+            };
+            let Some(b) = b.filter(|b| modstore::media_ext(b).is_some()) else { return StatusCode::NOT_FOUND.into_response() };
+            let mut c = app.thumbs.lock().unwrap();
+            if c.len() > 80 {
+                c.clear();
+            }
+            c.insert(key, b.clone());
+            b
+        }
+    };
+    ([(header::CONTENT_TYPE, modstore::content_type(&path)), (header::X_CONTENT_TYPE_OPTIONS, "nosniff"), (header::CACHE_CONTROL, "private, max-age=3600"), (header::CONTENT_SECURITY_POLICY, "default-src 'none'; sandbox")], bytes).into_response()
+}
+
+fn mod_headers(ct: &'static str) -> [(header::HeaderName, &'static str); 4] {
+    [(header::CONTENT_TYPE, ct), (header::X_CONTENT_TYPE_OPTIONS, "nosniff"), (header::CACHE_CONTROL, "no-cache"), (header::CONTENT_SECURITY_POLICY, MOD_CSP)]
+}
+
+/// Fichiers d'un mod installé. La page d'une App (`_frame.html`) est fabriquée ici : l'App n'écrit pas de HTML.
+async fn mod_file(State(app): State<App>, axum::extract::Path((id, path)): axum::extract::Path<(String, String)>) -> Response {
+    if modstore::safe() {
+        return StatusCode::NOT_FOUND.into_response();
+    }
+    if path == "_frame.html" {
+        let is_app = modstore::installed(&app.data_dir).iter().any(|m| m["id"] == id.as_str() && m["type"] == "app");
+        if !is_app {
+            return StatusCode::NOT_FOUND.into_response();
+        }
+        let css = if modstore::read_file(&app.data_dir, &id, "app.css").is_some() { "<link rel=\"stylesheet\" href=\"app.css\">" } else { "" };
+        let html = format!("<!doctype html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>html,body{{margin:0;background:var(--bg,#000);color:var(--fg,#f5f5f8);font:14px/1.45 var(--font,system-ui,sans-serif)}}</style>{css}</head><body><script src=\"/modsdk.js\"></script><script src=\"app.js\"></script></body></html>");
+        return (mod_headers("text/html; charset=utf-8"), html).into_response();
+    }
+    match modstore::read_file(&app.data_dir, &id, &path) {
+        Some(b) => (mod_headers(modstore::content_type(&path)), b).into_response(),
+        None => StatusCode::NOT_FOUND.into_response(),
+    }
+}
+
+async fn mod_sdk() -> Response {
+    (mod_headers("text/javascript; charset=utf-8"), modstore::SDK_JS).into_response()
+}
+
+/// Images de l'utilisateur (GIF de fond, bannières) gardées dans des fichiers plutôt que dans le fichier de données.
+async fn media_upload(State(app): State<App>, h: HeaderMap, body: axum::body::Bytes) -> Response {
+    if app.user(&h).is_none() {
+        return err(StatusCode::UNAUTHORIZED, "Connexion requise");
+    }
+    match modstore::store_media(&app.data_dir, &body) {
+        Ok(name) => Json(json!({ "url": format!("/media/{name}") })).into_response(),
+        Err(e) => err(StatusCode::BAD_REQUEST, &e),
+    }
+}
+
+async fn media_file(State(app): State<App>, axum::extract::Path(name): axum::extract::Path<String>) -> Response {
+    match modstore::read_media(&app.data_dir, &name) {
+        Some(b) => ([(header::CONTENT_TYPE, modstore::content_type(&name)), (header::X_CONTENT_TYPE_OPTIONS, "nosniff"), (header::CACHE_CONTROL, "public, max-age=31536000, immutable"), (header::CONTENT_SECURITY_POLICY, "default-src 'none'; sandbox")], b).into_response(),
+        None => StatusCode::NOT_FOUND.into_response(),
+    }
+}
+
 fn router(app: App) -> Router {
     Router::new()
         .route("/", get(index))
@@ -944,6 +1116,16 @@ fn router(app: App) -> Router {
         .route("/api/lyrics", get(api_lyrics))
         .route("/api/follows/new", get(api_follows_new))
         .route("/api/match", get(api_match))
+        .route("/api/store/index", get(store_index))
+        .route("/api/store/installed", get(store_installed))
+        .route("/api/store/install", post(store_install))
+        .route("/api/store/import", post(store_import))
+        .route("/api/store/thumb/{id}", get(store_thumb))
+        .route("/api/store/{id}", delete(store_remove))
+        .route("/mods/{id}/{*path}", get(mod_file))
+        .route("/modsdk.js", get(mod_sdk))
+        .route("/api/media", post(media_upload))
+        .route("/media/{name}", get(media_file))
         .route("/assets/{name}", get(font))
         .route("/api/public", get(api_public))
         .route("/api/public/playlist", get(api_public_playlist))
@@ -979,6 +1161,7 @@ fn open_in_browser(url: &str) {
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let serve_only = args.iter().any(|a| a == "--serve");
+    modstore::SAFE.store(args.iter().any(|a| a == "--safe"), std::sync::atomic::Ordering::Relaxed);
     let want_port: u16 = args.iter().position(|a| a == "--port").and_then(|i| args.get(i + 1)).and_then(|p| p.parse().ok()).unwrap_or(8787);
 
     // Après une mise à jour, l'ancienne instance a besoin d'un instant pour libérer le port.
@@ -1019,7 +1202,7 @@ fn main() {
     let port = listener.local_addr().unwrap().port();
     let dev_html = std::env::var("SATURNE_WEB").ok().map(PathBuf::from);
     let ext = reqwest::Client::builder().user_agent(format!("Saturne/{} (https://github.com/KYOO-DEVV/saturne)", update::CURRENT)).timeout(Duration::from_secs(12)).redirect(reqwest::redirect::Policy::none()).build().expect("client HTTP paroles");
-    let app = App { store, http, gh, ext, data_dir: dir.clone(), emb: Arc::new(Mutex::new(HashMap::new())), sem: Arc::new(tokio::sync::Semaphore::new(8)), cache: Arc::new(Mutex::new(HashMap::new())), port, dev_html, warming: Arc::new(std::sync::atomic::AtomicBool::new(false)), presence: Arc::new(Mutex::new(None)), artists: Arc::new(Mutex::new(vec![None; ARTISTS.len()])) };
+    let app = App { store, http, gh, ext, data_dir: dir.clone(), emb: Arc::new(Mutex::new(HashMap::new())), sem: Arc::new(tokio::sync::Semaphore::new(8)), cache: Arc::new(Mutex::new(HashMap::new())), port, dev_html, warming: Arc::new(std::sync::atomic::AtomicBool::new(false)), presence: Arc::new(Mutex::new(None)), artists: Arc::new(Mutex::new(vec![None; ARTISTS.len()])), thumbs: Arc::new(Mutex::new(HashMap::new())) };
 
     let server = std::thread::spawn(move || {
         let rt = tokio::runtime::Builder::new_multi_thread().enable_all().build().expect("runtime");
@@ -1231,6 +1414,25 @@ mod web_tests {
             Ok(o) => assert!(o.status.success(), "JavaScript invalide :
 {}", String::from_utf8_lossy(&o.stderr)),
             Err(_) => eprintln!("node introuvable : vérification de syntaxe ignorée"),
+        }
+    }
+
+    /// Démarre l'interface dans un faux navigateur (`tests/ui-smoke.js`) : détecte les exceptions au chargement, les pages qui plantent
+    /// au rendu, le filtre CSS du Store et la lecture sans fin. Ignoré si Node.js n'est pas installé.
+    #[test]
+    fn ui_smoke() {
+        let html = crate::bundle::assemble(std::path::Path::new("web")).expect("assemblage");
+        let start = html.rfind("<script>
+").expect("script") + 9;
+        let end = html.rfind("</script>").expect("fin du script");
+        let file = std::env::temp_dir().join(format!("saturne-smoke-{}.js", std::process::id()));
+        std::fs::write(&file, &html[start..end]).unwrap();
+        let out = std::process::Command::new("node").arg("tests/ui-smoke.js").arg(&file).output();
+        let _ = std::fs::remove_file(&file);
+        match out {
+            Ok(o) => assert!(o.status.success(), "test de fumée de l'interface :
+{}", String::from_utf8_lossy(&o.stderr)),
+            Err(_) => eprintln!("node introuvable : test de fumée ignoré"),
         }
     }
 }

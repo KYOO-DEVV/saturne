@@ -1,0 +1,5 @@
+/* Aurore : le fond animé est aurora.gif (settings.json). Le verre dépoli suit l'option « glass » ; sa couleur, l'option « tint ». */
+html:root[data-x-aurora-glass="1"] :is(.side,.bar,.qdrawer){
+  background:color-mix(in srgb, var(--x-aurora-tint, #06101f) 55%, transparent);
+  -webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3)}
+html:root .nav button.on{background:color-mix(in srgb, var(--accent) 22%, transparent)}

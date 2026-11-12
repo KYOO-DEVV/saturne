@@ -1,0 +1,296 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "album-glow",
+      "name": "Lueur de l'album",
+      "author": "Saturne",
+      "type": "extension",
+      "version": "1.0.0",
+      "description": "La barre de lecture (et si tu veux la page) prennent la couleur dominante de la pochette en cours.",
+      "tags": [
+        "couleur",
+        "pochette",
+        "exemple"
+      ],
+      "preview": [
+        "#0c0c12",
+        "#7c3aed"
+      ],
+      "permissions": [],
+      "icon": null,
+      "thumb": "thumb.png",
+      "files": [
+        {
+          "path": "manifest.json",
+          "size": 675,
+          "sha256": "e59b45f91c0a385ddb631a6657e236381d241a318318525e32e10915eb4b7d48"
+        },
+        {
+          "path": "theme.css",
+          "size": 717,
+          "sha256": "7259c3e7efd5ffa7c5d7cd04156ad3147fee7f044939f15b0c07267703bee5be"
+        },
+        {
+          "path": "thumb.png",
+          "size": 12399,
+          "sha256": "af2d9d38df94d3f8fae9177b4955f393ba6852d4985eb63a3c81ab20eac18331"
+        }
+      ]
+    },
+    {
+      "id": "aurora",
+      "name": "Aurore",
+      "author": "Saturne",
+      "type": "theme",
+      "version": "1.0.0",
+      "description": "Un fond animé (GIF) d'aurore boréale, avec des panneaux en verre dépoli qu'on peut désactiver.",
+      "tags": [
+        "gif",
+        "fond animé",
+        "verre"
+      ],
+      "preview": [
+        "#06101f",
+        "#1fb6a6",
+        "#a78bfa"
+      ],
+      "permissions": [],
+      "icon": null,
+      "thumb": "thumb.png",
+      "files": [
+        {
+          "path": "aurora.gif",
+          "size": 78417,
+          "sha256": "bfff917ad11ca4eb16e98cc827f82edc1a9feb7b6e836b63c113d7f45fe49c7f"
+        },
+        {
+          "path": "manifest.json",
+          "size": 539,
+          "sha256": "56dff37f81c69b2e8174283dab43dee3359c30d15a98928babf5d908a66dcf63"
+        },
+        {
+          "path": "settings.json",
+          "size": 151,
+          "sha256": "a96fa4e96859215e75069e8a406a25d80e0aa112d48294285d8bdd60044bc001"
+        },
+        {
+          "path": "theme.css",
+          "size": 463,
+          "sha256": "9612bf6535992d67977257808cdfd15b20bdd771a38262d2c7c113e1140db9f0"
+        },
+        {
+          "path": "thumb.png",
+          "size": 2275,
+          "sha256": "38106020eb029829aed086247b412877210cc1b078d620ecf4c19acabe90ce4e"
+        }
+      ]
+    },
+    {
+      "id": "neon-oled",
+      "name": "Néon OLED",
+      "author": "Saturne",
+      "type": "theme",
+      "version": "1.0.0",
+      "description": "Noir pur, accent rose néon et lueur autour des éléments actifs.",
+      "tags": [
+        "sombre",
+        "néon",
+        "oled"
+      ],
+      "preview": [
+        "#000000",
+        "#ff2e93"
+      ],
+      "permissions": [],
+      "icon": null,
+      "thumb": null,
+      "files": [
+        {
+          "path": "manifest.json",
+          "size": 275,
+          "sha256": "a7494bdd376e175fcc1b58024fb8d5f1a3494c211c7e9fdffc62e118d6929b96"
+        },
+        {
+          "path": "settings.json",
+          "size": 86,
+          "sha256": "65c9c4aa0282250458c13c4a67942dc493c74f2e0482f74d40aff6cbd4e983a8"
+        },
+        {
+          "path": "theme.css",
+          "size": 556,
+          "sha256": "7c10149c26e29b60f71b17e3f9e304baacbc4544bb34cf0d78f2f3c91fcc6acf"
+        }
+      ]
+    },
+    {
+      "id": "pomodoro",
+      "name": "Minuteur Pomodoro",
+      "author": "Saturne",
+      "type": "app",
+      "version": "1.0.0",
+      "description": "Concentration 25 min, pause 5 min. Peut mettre la musique en pause pendant la pause.",
+      "tags": [
+        "productivité",
+        "exemple"
+      ],
+      "preview": [
+        "#101015",
+        "#7c3aed"
+      ],
+      "permissions": [
+        "storage",
+        "player.control"
+      ],
+      "icon": "icon.png",
+      "thumb": "thumb.png",
+      "files": [
+        {
+          "path": "app.css",
+          "size": 812,
+          "sha256": "f02021a1af16156f59d744ea4349ccd90ccfe746caf3923e7329382d6040e359"
+        },
+        {
+          "path": "app.js",
+          "size": 2429,
+          "sha256": "ccc0bc42f5d18014b406edf4373b158e8def221518ba9916b6d7a99f9d72b1af"
+        },
+        {
+          "path": "icon.png",
+          "size": 1893,
+          "sha256": "6ede6d8065d5a0f8dfd3cc6a4322c91dc44435f521179a4c471643eb2a5bcd9d"
+        },
+        {
+          "path": "manifest.json",
+          "size": 428,
+          "sha256": "a3b8d560e9357998c36eb409c75c5e2a09d25cc22411460edc7fcc9d3a0c3b55"
+        },
+        {
+          "path": "thumb.png",
+          "size": 2241,
+          "sha256": "d67eaffecf56ed27a9f52ec4bfdc8a46660ff0b6c6edef95fb170b1ff9ba8639"
+        }
+      ]
+    },
+    {
+      "id": "runner-bar",
+      "name": "Planète sur la barre",
+      "author": "Saturne",
+      "type": "extension",
+      "version": "1.0.0",
+      "description": "Un GIF qui avance sur la barre de progression, plus un sprite à toi (n'importe quelle image ou GIF) qui rebondit au-dessus du bouton lecture.",
+      "tags": [
+        "gif",
+        "barre de progression",
+        "exemple"
+      ],
+      "preview": [
+        "#0b0b14",
+        "#ff6fb1"
+      ],
+      "permissions": [],
+      "icon": null,
+      "thumb": "thumb.png",
+      "files": [
+        {
+          "path": "manifest.json",
+          "size": 1167,
+          "sha256": "23f38538751d974b464b631af075ce107fa20df52b3480e1972bdab707bf7d3a"
+        },
+        {
+          "path": "run.gif",
+          "size": 10641,
+          "sha256": "965824d3ce210ac8e22bddb7a84dca921dedb4905c4dbf54fb02f1f8c980a57f"
+        },
+        {
+          "path": "theme.css",
+          "size": 335,
+          "sha256": "49b0e043daa277fdd7e29dda1a07d3fec24d8f49da5c8a8cc19777a9c7a61524"
+        },
+        {
+          "path": "thumb.png",
+          "size": 1908,
+          "sha256": "1bb10f27375248123e33db6f89cda2b8ab8c831659784b50a850ed721713937d"
+        }
+      ]
+    },
+    {
+      "id": "soft-light",
+      "name": "Clair doux",
+      "author": "Saturne",
+      "type": "theme",
+      "version": "1.0.0",
+      "description": "Thème clair chaud, coins arrondis et ombres douces.",
+      "tags": [
+        "clair",
+        "chaud"
+      ],
+      "preview": [
+        "#fbf7f4",
+        "#e0603a"
+      ],
+      "permissions": [],
+      "icon": null,
+      "thumb": null,
+      "files": [
+        {
+          "path": "manifest.json",
+          "size": 253,
+          "sha256": "845a5e5dab9649b03c1ece4ce3e63b26f18e7e1f386c587da124bad06672c33e"
+        },
+        {
+          "path": "settings.json",
+          "size": 87,
+          "sha256": "1ba72aced21a169560b29204a28063694b1fb021af670283cddff1f724d4dbc9"
+        },
+        {
+          "path": "theme.css",
+          "size": 481,
+          "sha256": "a7302570b0ce0eb026fbeb72add2198eb03c1382ffa262e9611794a3942f719b"
+        }
+      ]
+    },
+    {
+      "id": "sunset-glass",
+      "name": "Coucher de soleil",
+      "author": "Saturne",
+      "type": "theme",
+      "version": "1.0.0",
+      "description": "Dégradé de coucher de soleil en fond, panneaux de verre dépoli.",
+      "tags": [
+        "image de fond",
+        "verre"
+      ],
+      "preview": [
+        "#2a0f3a",
+        "#ff7a59",
+        "#ffbe6e"
+      ],
+      "permissions": [],
+      "icon": null,
+      "thumb": null,
+      "files": [
+        {
+          "path": "manifest.json",
+          "size": 295,
+          "sha256": "b3ecadfbafcb49ede283409ea4be51926a81199c6116a82598da7ca7a7b430bf"
+        },
+        {
+          "path": "settings.json",
+          "size": 172,
+          "sha256": "19bc2fad136f97ab830c9999c8e82e701850fb25916149c95cbd59f197aecb9e"
+        },
+        {
+          "path": "sunset.png",
+          "size": 1241,
+          "sha256": "86630d5e125c5823a9a4f81c2673204c36347a4029ef4425be5d28feac72ae16"
+        },
+        {
+          "path": "theme.css",
+          "size": 392,
+          "sha256": "26c0a99d0de94abd3f585963e833920bb4c63ed9a3f0bdce3ad02a68f4028faa"
+        }
+      ]
+    }
+  ]
+}

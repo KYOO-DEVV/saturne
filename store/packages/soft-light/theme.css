@@ -1,0 +1,5 @@
+/* Clair doux : palette chaude et ombres légères. */
+html:root[data-bg="light"]{--bg:#fbf7f4;--panel:#ffffff;--raise:#f1ebe6;--raise2:#e8e0da;--line:#e6ddd6;--line2:#d4c9c1;--fg:#2a2420;--mute:#6b5f57;--faint:#7a6d64;--hi:#1a1512;--fg2:#3d352f}
+html:root[data-bg="light"] .bar{box-shadow:0 10px 34px -16px rgba(80,50,30,.3)}
+html:root[data-bg="light"] .side{border-right:1px solid var(--line)}
+html:root[data-bg="light"] .playbtn{background:var(--accent);color:var(--on-accent)}

@@ -2,6 +2,11 @@
 const isGif = f => f instanceof Blob && f.type === 'image/gif';
 const fileDataUrl = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(new Error('image')); r.readAsDataURL(f); });
 const GIF_MAX = 4 * 1024 * 1024, GIF_AVATAR_MAX = 1100 * 1024;
+/* Un GIF est gardé dans un fichier du dossier de données (adresse /media/…), pas dans le fichier de données : sauvegardes et synchronisation restent légères. Repli : data URL. */
+async function storeGif(f){
+  try { const r = await fetch('/api/media', {method:'POST', headers:{'Content-Type':'application/octet-stream'}, body:f}); if (r.ok) { const j = await r.json(); if (j && /^\/media\/[\w.]+$/.test(j.url)) return j.url; } } catch {}
+  return fileDataUrl(f);
+}
 const hexOk = h => /^#[0-9a-f]{6}$/i.test(h || '');
 const lum = c => (c[0] * 299 + c[1] * 587 + c[2] * 114) / 1000;
 const TINTS = () => [['bg', L('Background color', 'Couleur du fond')], ['black', L('Black', 'Noir')], ['white', L('White', 'Blanc')], ['accent', L('Accent', 'Accent')], ['none', L('None', 'Aucun')]];
@@ -66,7 +71,7 @@ $('#view').addEventListener('keydown', e => { if ((e.target.id === 'pfName' || e
 async function setProfileBanner(src){
   if (!(src instanceof Blob)) return toast(L('Drop an image file', 'Dépose un fichier image'));
   try {
-    if (isGif(src) && src.size <= GIF_MAX) S.profile.banner = await fileDataUrl(src);
+    if (isGif(src) && src.size <= GIF_MAX) S.profile.banner = await storeGif(src);
     else { const url = URL.createObjectURL(src); try { S.profile.banner = await toDataURL(url, 1280, 720, false); } finally { URL.revokeObjectURL(url); } if (isGif(src)) toast(L('This GIF is over 4 MB: it is shown without animation.', 'Ce GIF dépasse 4 Mo : il est affiché sans animation.')); }
     save(); renderView();
   } catch { toast(L('Could not read this image', 'Impossible de lire cette image')); }

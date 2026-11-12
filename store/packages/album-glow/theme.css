@@ -1,0 +1,7 @@
+/* Lueur de l'album : --track-color (couleur dominante de la pochette) est posée par Saturne ; --x-album-glow-power vient de l'option « Intensité ». */
+html:root:is([data-x-album-glow-mode="bar"],[data-x-album-glow-mode="both"]) .bar{
+  box-shadow:0 0 calc(var(--x-album-glow-power, 45) * 1px) calc(var(--x-album-glow-power, 45) * -.3px) var(--track-color, transparent);
+  transition:box-shadow .8s ease}
+html:root:is([data-x-album-glow-mode="page"],[data-x-album-glow-mode="both"]) main{
+  background-image:radial-gradient(120% 70% at 50% 110%, color-mix(in srgb, var(--track-color, transparent) calc(var(--x-album-glow-power, 45) * .55%), transparent), transparent 70%);
+  transition:background-image .8s ease}

@@ -1,0 +1,10 @@
+{
+  "id": "sunset-glass",
+  "name": "Coucher de soleil",
+  "author": "Saturne",
+  "version": "1.0.0",
+  "type": "theme",
+  "description": "Dégradé de coucher de soleil en fond, panneaux de verre dépoli.",
+  "tags": ["image de fond", "verre"],
+  "preview": ["#2a0f3a", "#ff7a59", "#ffbe6e"]
+}

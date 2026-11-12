@@ -32,7 +32,7 @@ async function enter(user){
   S.home = {main:{tracks:[], loading:false, error:''}, fresh:{tracks:[], loading:false, error:''}, shelves:{}};
   S.community = {items:[], loading:false, error:'', loaded:false};
   $('#auth').hidden = true; $('#app').hidden = false;
-  vol.value = S.volume; fill(vol); rebuildOrder(); render(); loadHome(); loadYT(); afterEnter();
+  vol.value = S.volume; fill(vol); rebuildOrder(); render(); loadHome(); loadYT(); afterEnter(); loadMods();
   S.update = {checking:false, info:null, error:'', installing:false}; renderUpdateBanner(); setTimeout(announceVersion, 2500); if (S.settings.autoUpdate) setTimeout(() => checkUpdate(true), 4000);
 }
 async function logout(){ try { await send('/api/auth/logout', {}); } catch {} location.reload(); }

@@ -1,5 +1,7 @@
 /* Icônes : une seule famille, en trait (1.8 px, extrémités arrondies). Les icônes de transport (lecture, pause, suivant, précédent) restent pleines, comme partout. « F: » = tracé plein. */
 const ICONS = {
+  store:'<path d="M4 8l1.6-3.6h12.8L20 8"/><path d="M4 8h16v1.6a3 3 0 0 1-5.3 1.9 3 3 0 0 1-5.4 0A3 3 0 0 1 4 9.6z"/><path d="M5.5 13v7h13v-7"/>',
+  apps:'<rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/>',
   home:'<path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h5v-6h4v6h5V10"/>',
   search:'<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/>',
   person:'<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c1-3.6 4-5.5 7.5-5.5s6.5 1.9 7.5 5.5"/>',

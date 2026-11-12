@@ -9,7 +9,12 @@ function toggleFollow(info){
   save(); S.home.follow = null; renderView();
   toast(i >= 0 ? L('Unfollowed ', 'Tu ne suis plus ') + (info.name || '') : L('Following ', 'Tu suis ') + (info.name || ''));
 }
-const followsHtml = () => S.follows.length ? `<section class="block"><div class="sechd"><h2 class="sh">${L('Following', 'Suivis')}</h2></div><ul class="artists">${S.follows.map(artistTile).join('')}</ul></section><div class="sechd"><h2 class="sh">${L('Discover', 'À découvrir')}</h2></div>` : '';
+const followChip = a => `<button class="fa" data-artist="${esc(a.id)}" title="${esc(a.name)}"><span class="avatar">${a.thumb ? `<img src="${esc(a.thumb)}" alt="" loading="lazy">` : esc(initial(a.name))}</span><b>${esc(a.name)}</b></button>`;
+const followsHtml = () => S.follows.length ? `<section class="block"><div class="sechd"><h2 class="sh">${L('Following', 'Suivis')}</h2><span class="sub">${S.follows.length}</span></div><div class="fstrip">${S.follows.map(followChip).join('')}</div></section><div class="sechd"><h2 class="sh">${L('Discover', 'À découvrir')}</h2></div>` : '';
+$('#view').addEventListener('click', e => {
+  const b = e.target.closest('[data-afollow]'); if (!b) return; e.stopPropagation();
+  const a = [...S.artists.items.filter(Boolean), ...S.follows].find(x => x.id === b.dataset.afollow); if (a) toggleFollow(a);
+});
 /* Derniers titres des artistes suivis : chargés après le reste de l'accueil, pour ne pas le ralentir. */
 let followSeq = 0;
 async function loadFollowNew(){

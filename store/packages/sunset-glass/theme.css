@@ -1,0 +1,4 @@
+/* Coucher de soleil : panneaux de verre dépoli sur l'image de fond (sunset.png, réglée dans settings.json). */
+html:root .side,html:root .bar,html:root .qdrawer{background:rgba(18,8,24,.5);-webkit-backdrop-filter:blur(18px) saturate(1.2);backdrop-filter:blur(18px) saturate(1.2)}
+html:root .bar{border-color:rgba(255,255,255,.14)}
+html:root .nav button.on{background:rgba(255,122,89,.2)}

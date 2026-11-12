@@ -1,0 +1,10 @@
+{
+  "bg": "dark",
+  "accentCustom": "#ff7a59",
+  "radius": "soft",
+  "bgImage": "sunset.png",
+  "bgOverlay": 30,
+  "bgTint": "black",
+  "bgBlur": 0,
+  "sideThumbs": true
+}

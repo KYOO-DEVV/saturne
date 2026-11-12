@@ -18,7 +18,7 @@ function toDataURL(src, w, maxH, square){
 async function setImage(p, kind, src){
   const isFile = src instanceof Blob, url = isFile ? URL.createObjectURL(src) : src;
   let data;
-  if (isFile && isGif(src) && src.size <= GIF_MAX) { try { data = await fileDataUrl(src); } catch { URL.revokeObjectURL(url); return toast(L('Could not read this image', 'Impossible de lire cette image')); } URL.revokeObjectURL(url); p[kind] = data; if (kind === 'banner') p.bannerY = 50; save(); render(); return toast(L('GIF kept animated', 'GIF conservé animé')); }
+  if (isFile && isGif(src) && src.size <= GIF_MAX) { try { data = await storeGif(src); } catch { URL.revokeObjectURL(url); return toast(L('Could not read this image', 'Impossible de lire cette image')); } URL.revokeObjectURL(url); p[kind] = data; if (kind === 'banner') p.bannerY = 50; save(); render(); return toast(L('GIF kept animated', 'GIF conservé animé')); }
   try { data = kind === 'cover' ? await toDataURL(url, 360, 360, true) : await toDataURL(url, 1280, 720, false); }
   catch { if (isFile) { toast('Impossible de lire cette image'); return; } data = src; }
   finally { if (isFile) URL.revokeObjectURL(url); }
