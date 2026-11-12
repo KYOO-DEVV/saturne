@@ -1,5 +1,5 @@
 /* ---------- Historique et statistiques ---------- */
-const playTrack = p => ({id:p[0], title:p[1], channel:p[2], channelId:p[3], thumb:`https://i.ytimg.com/vi/${p[0]}/mqdefault.jpg`, duration:p[5] || null, at:p[4]});
+const playTrack = p => ({id:p[0], title:p[1], channel:p[2], channelId:p[3], thumb:p[6] || `https://i.ytimg.com/vi/${p[0]}/mqdefault.jpg`, duration:p[5] || null, at:p[4], ...(String(p[0]).startsWith('sc:') ? {src:'sc', url:p[7] || ''} : {})});
 const playsTracks = () => S.plays.map(playTrack).reverse();
 const dateLocale = () => LANG === 'fr' ? 'fr-FR' : 'en-GB';
 function dayLabel(ts){

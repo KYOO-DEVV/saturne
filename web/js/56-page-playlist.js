@@ -14,7 +14,7 @@ function trow(t, i, n){
   const first = sel ? `<button class="selbox" data-do="pick" role="checkbox" aria-checked="${picked}" aria-label="${esc(t.title)}">${picked ? ic('check') : ''}</button>`
     : `<span class="tnum"><span class="n">${on && playing ? ic('note') : i + 1}</span><button class="tplay" data-act="play" aria-label="Lire ${esc(t.title)}">${ic('play')}</button></span>`;
   return `<li class="trow ${on ? 'on' : ''} ${picked ? 'picked' : ''}" data-i="${i}" draggable="true" style="--d:${Math.min(i, 14)}">${first}
-    <div class="tmain"><img src="${esc(t.thumb)}" alt="" loading="lazy"><div style="min-width:0"><div class="tt" title="${esc(t.title)}">${esc(t.title)}</div><div class="ch">${chLink(t)}</div></div></div>
+    <div class="tmain"><img src="${esc(t.thumb)}" alt="" loading="lazy"><div style="min-width:0"><div class="tt" title="${esc(t.title)}">${srcBadge(t)}${esc(t.title)}</div><div class="ch">${chLink(t)}</div></div></div>
     <button class="talb" data-filter="${esc(t.channel)}" data-notr title="${L('Filter by this channel', 'Filtrer par cette chaîne')}">${esc(t.channel)}</button><div class="tdate">${dateCell(t)}</div><div class="dur">${t.duration ? fmt(t.duration) : ''}</div><div class="acts">${acts}</div></li>`;
 }
 const theadHtml = (src = '', hd = true) => `<div class="thead ${hd ? '' : 'nodate'}"><span>#</span><span>${L('Title', 'Titre')}</span><span>${L('Channel', 'Chaîne')}</span><span>${src === 'plays' ? L('Played at', 'Écouté à') : L('Date added', 'Date d’ajout')}</span><span class="r" aria-label="${L('Duration', 'Durée')}">${ic('history')}</span><span></span></div>`;

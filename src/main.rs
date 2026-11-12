@@ -10,10 +10,12 @@ mod icon;
 mod modstore;
 mod native;
 mod public;
+mod soundcloud;
 mod store;
 mod update;
 mod yt;
 mod ytmore;
+mod ytmusic;
 
 use axum::{
     Json, Router,
@@ -1086,6 +1088,56 @@ async fn media_file(State(app): State<App>, axum::extract::Path(name): axum::ext
     }
 }
 
+/* ---------- Autres sources : YouTube Music, SoundCloud ---------- */
+fn query_text(q: &HashMap<String, String>) -> String {
+    q.get("q").map(|s| s.trim().chars().take(200).collect::<String>()).unwrap_or_default()
+}
+
+/// Recherche de morceaux sur YouTube Music (identifiants YouTube ordinaires, jouables par le lecteur existant).
+async fn api_music_search(State(app): State<App>, Query(q): Q) -> Response {
+    let text = query_text(&q);
+    if text.is_empty() {
+        return err(StatusCode::BAD_REQUEST, "Recherche vide");
+    }
+    let gl = region(&q);
+    let res = app
+        .cached(format!("ytm|{gl}|{text}"), Duration::from_secs(1800), || async {
+            let list = ytmusic::search_songs(&app.http, &text, &gl).await?;
+            Ok(json!({ "items": filter_embeddable(&app, list).await }))
+        })
+        .await;
+    match res {
+        Ok(v) => Json(v).into_response(),
+        Err(e) => fail(e),
+    }
+}
+
+/// Titre SoundCloud à partir de son lien (oEmbed officiel, sans clé).
+async fn api_sc_resolve(State(app): State<App>, Query(q): Q) -> Response {
+    let url = q.get("url").cloned().unwrap_or_default();
+    let Some(clean) = soundcloud::clean_url(&url) else { return err(StatusCode::BAD_REQUEST, "Ce n'est pas un lien SoundCloud (https://soundcloud.com/…)") };
+    match app.cached(format!("scr|{clean}"), Duration::from_secs(3600), || async { soundcloud::resolve(&app.ext, &clean).await }).await {
+        Ok(t) => Json(json!({ "items": [t] })).into_response(),
+        Err(e) => fail(e),
+    }
+}
+
+/// Recherche SoundCloud par l'API officielle, avec le Client ID de l'utilisateur.
+async fn api_sc_search(State(app): State<App>, Query(q): Q) -> Response {
+    let text = query_text(&q);
+    let cid = q.get("cid").cloned().unwrap_or_default();
+    if text.is_empty() {
+        return err(StatusCode::BAD_REQUEST, "Recherche vide");
+    }
+    if !soundcloud::valid_cid(&cid) {
+        return err(StatusCode::BAD_REQUEST, "Client ID SoundCloud manquant ou invalide (Réglages › Général › SoundCloud).");
+    }
+    match app.cached(format!("scs|{cid}|{text}"), Duration::from_secs(600), || async { Ok(json!(soundcloud::search(&app.ext, &text, &cid).await?)) }).await {
+        Ok(items) => Json(json!({ "items": items })).into_response(),
+        Err(e) => fail(e),
+    }
+}
+
 fn router(app: App) -> Router {
     Router::new()
         .route("/", get(index))
@@ -1107,6 +1159,9 @@ fn router(app: App) -> Router {
         .route("/api/new", get(api_new))
         .route("/api/alt", get(api_alt))
         .route("/api/more", get(api_more))
+        .route("/api/music/search", get(api_music_search))
+        .route("/api/sc/resolve", get(api_sc_resolve))
+        .route("/api/sc/search", get(api_sc_search))
         .route("/api/playlist", get(api_playlist))
         .route("/api/radio", get(api_radio))
         .route("/api/artists", get(api_artists))

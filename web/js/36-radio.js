@@ -11,7 +11,7 @@ async function endlessNext(){
   if (endlessBusy) return; endlessBusy = true;
   const q0 = S.queue, last = q0[q0.length - 1];
   let again = false, items = null;
-  try { items = (await api('radio', {id:last.id})).items; } catch {}
+  if (!isSc(last)) { try { items = (await api('radio', {id:last.id})).items; } catch {} }
   endlessBusy = false;
   // Pendant l'attente, l'utilisateur a pu lancer autre chose : on ne touche pas à sa nouvelle file.
   if (S.queue !== q0 || S.pos + 1 < S.order.length) return;

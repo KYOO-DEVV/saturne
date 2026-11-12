@@ -21,6 +21,7 @@ Application de streaming musical pour Windows, écrite en Rust. Noir OLED, un se
 - **Historique** par jour et **statistiques** d'écoute, **Discord Rich Presence** (optionnel).
 - **Import d'un export** (fusionner ou remplacer) et **sauvegardes automatiques** restaurables (*Settings › Data*).
 - **0.7** : paroles (lrclib.net), clip vidéo, artistes suivis, mixes automatiques, palette Ctrl+K, outils de playlist, import Spotify CSV, thèmes (accent libre, fond clair, image), accueil personnalisable, mémoire de la fenêtre.
+- **0.9 : autres sources** : onglets de recherche YouTube · YouTube Music · SoundCloud. YouTube Music passe par l'interface web de music.youtube.com (pas d'API officielle) ; SoundCloud se lit par le widget officiel : colle un lien de titre, ou ajoute ton propre Client ID pour chercher.
 - **0.8 : le Store** (sous Accueil) : thèmes et Apps de la communauté, App isolée dans un cadre sans réseau avec des autorisations validées à l'installation, CSS personnalisé, export/import de thèmes `.saturne`, mode sans mods. Guide pour créer et publier : [STORE.md](STORE.md). Le dossier `store/` est le contenu de départ du dépôt public `saturne-store` (catalogue).
 - Barres de défilement masquées (flèches sur les étagères), accessibilité clavier et lecteur d'écran soignée.
 

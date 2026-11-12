@@ -38,7 +38,7 @@ function nowPanelHtml(t){
   const Y = S.lyr && S.lyr.id === t.id ? S.lyr : null, ctxPl = S.view.type === 'playlist' ? curPl() : null;
   const ni = S.order[S.pos + 1], nx = ni != null ? S.queue[ni] : null, lp = lyricsPreviewHtml(Y);
   return `<div class="pn"><p class="pn-ctx" data-notr>${esc(ctxPl ? ctxPl.name : t.channel)}</p>
-    <div class="pn-art"><img src="https://i.ytimg.com/vi/${esc(t.id)}/maxresdefault.jpg" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='${esc(t.thumb)}'}">${S.clip ? '' : `<button class="pn-vid" data-do="clip" aria-pressed="false">${ic('play')}${L('Switch to video', 'Passer à la vidéo')}</button>`}</div>
+    <div class="pn-art"><img src="${esc(bigArt(t))}" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='${esc(t.thumb)}'}">${S.clip || isSc(t) ? '' : `<button class="pn-vid" data-do="clip" aria-pressed="false">${ic('play')}${L('Switch to video', 'Passer à la vidéo')}</button>`}</div>
     ${S.clip ? `<button class="pn-toggle" data-do="clip" aria-pressed="true">${ic('note')}${L('Switch to song', 'Passer au titre')}</button>` : ''}
     <div class="pn-meta"><div style="min-width:0"><b class="tt" data-notr>${esc(t.title)}</b><span class="ch" data-notr>${chLink(t)}</span></div>${bmBtn(t)}</div>
     ${pnCtrlHtml()}
@@ -68,7 +68,7 @@ function renderPanel(){
     if (!S.lyr || S.lyr.id !== t.id) loadLyrics(t);
     loadArtistInfo(t);
     $('#qdrawer').classList.add('tint');
-    coverColor(`https://i.ytimg.com/vi/${t.id}/mqdefault.jpg`).then(c => { const el = $('#pnLyr'); if (el && c) el.style.setProperty('--pc', toneOf(c, 130)); if (c) $('#qdrawer').style.setProperty('--pt', toneOf(c, 150)); });
+    coverColor(smallArt(t)).then(c => { const el = $('#pnLyr'); if (el && c) el.style.setProperty('--pc', toneOf(c, 130)); if (c) $('#qdrawer').style.setProperty('--pt', toneOf(c, 150)); });
     placeClip();
   }
 }

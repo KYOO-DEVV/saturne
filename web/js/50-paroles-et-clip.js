@@ -53,13 +53,13 @@ $('#view').addEventListener('click', e => {
 function placeClip(){
   if (typeof placeBgVideo === 'function' && placeBgVideo()) return;
   const yb = document.querySelector('.ytbox'), art = document.querySelector('.np-art') || (S.qopen && S.ptab === 'now' ? document.querySelector('.pn-art') : null);
-  if (!S.clip || !art) { yb.classList.remove('clip'); yb.style.cssText = ''; return; }
+  if (!S.clip || !art || isSc(current())) { yb.classList.remove('clip'); yb.style.cssText = ''; return; }
   const r = art.getBoundingClientRect(), h = Math.min(r.height, r.width * 9 / 16);
   yb.classList.add('clip');
   yb.style.left = r.left + 'px'; yb.style.top = (r.top + (r.height - h) / 2) + 'px'; yb.style.width = r.width + 'px'; yb.style.height = h + 'px'; yb.style.right = 'auto'; yb.style.bottom = 'auto';
 }
 function setClip(on){
-  if (S.clip === !!on) return;
+  if (S.clip === !!on || (on && isSc(current()))) return;
   S.clip = !!on; document.documentElement.classList.toggle('clip-on', S.clip); placeClip();
   if (S.view.type === 'now') renderView();
 }

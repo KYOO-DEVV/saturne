@@ -93,7 +93,7 @@ document.addEventListener('drop', e => {
 
 /* ---------- Page Recherche épurée : seulement la barre, au milieu ---------- */
 function searchHomeHtml(){
-  return `<div class="search-hero"><form class="search big" id="bigSearch" role="search"><span>${ic('search')}</span><input id="bigQ" type="search" placeholder="${L('Search for songs, artists, playlists…', 'Rechercher des titres, artistes, playlists…')}" aria-label="${L('Search', 'Recherche')}" autocomplete="off"></form></div>`;
+  return `<div class="search-hero"><form class="search big" id="bigSearch" role="search"><span>${ic('search')}</span><input id="bigQ" type="search" placeholder="${L('Search for songs, artists, playlists…', 'Rechercher des titres, artistes, playlists…')}" aria-label="${L('Search', 'Recherche')}" autocomplete="off"></form>${srcChips()}</div>`;
 }
 $('#view').addEventListener('submit', e => {
   if (e.target.id !== 'bigSearch') return;

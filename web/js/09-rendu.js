@@ -30,7 +30,7 @@ function card(t, i){
   return `<li class="card ${on?'on':''}" data-i="${i}" draggable="true" style="--d:${Math.min(i, 14)}">
     <button class="thumb" data-act="play" aria-label="Lire ${esc(t.title)}"><img src="${esc(t.thumb)}" alt="" loading="lazy"><span class="pb">${ic('play')}</span></button>
     <div class="cacts">${bmBtn(t)}<button class="ib" data-act="queue" aria-label="Ajouter à la file d'attente" title="Ajouter à la file d'attente">${ic('addq')}</button><button class="ib" data-act="menu" aria-label="Ajouter à une playlist" title="Ajouter à une playlist">${ic('plus')}</button></div>
-    <div class="tt" title="${esc(t.title)}">${esc(t.title)}</div><div class="ch">${chLink(t)}</div></li>`;
+    <div class="tt" title="${esc(t.title)}">${srcBadge(t)}${esc(t.title)}</div><div class="ch">${chLink(t)}</div></li>`;
 }
 function row(t, i, n){
   const c = current(), on = c && c.id === t.id, own = S.view.type === 'playlist', plain = own && plPlain();
@@ -65,7 +65,7 @@ function heroHtml(){
   if (!list.length) return `<div class="hero"><div class="hero-empty"><p class="eyebrow">New releases</p><h1 style="margin:0">Let's listen to something amazing today.</h1>${F.error ? `<p class="err" style="margin:0">${esc(F.error)}</p>` : ''}<div class="head-actions" style="margin-top:10px">${S.home.main.tracks.length ? `<button class="btn" data-act="playmain">${ic('play')}Play your mix</button>` : ''}<button class="ghost" data-act="refresh">${ic('refresh')}Actualiser</button></div></div></div>`;
   const idx = Math.min(S.heroIdx, list.length - 1);
   return `<div class="hero" id="hero">${list.map((t, i) => `<div class="slide ${i===idx?'on':''}" data-slide="${i}">
-      <img class="bg" src="https://i.ytimg.com/vi/${esc(t.id)}/maxresdefault.jpg" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='${esc(t.thumb)}'}">
+      <img class="bg" src="${esc(bigArt(t))}" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='${esc(t.thumb)}'}">
       <div class="sl-body"><p class="eyebrow">New release${t.ageMin != null ? ' · ' + ago(t.ageMin) : ''}</p>
         <h2 class="sl-title">${esc(t.title)}</h2>
         <p class="sl-by">${t.channelId ? `<button class="alink" data-artist="${esc(t.channelId)}">${esc(t.channel)}</button>` : esc(t.channel)}${t.duration ? ' · ' + fmt(t.duration) : ''}</p>
@@ -151,7 +151,7 @@ function renderView(){
     const R = S.search;
     if (!v.q) h = searchHomeHtml();
     else {
-      h = `<div class="pagehead"><p class="eyebrow">Search</p><h1>« ${esc(v.q)} »</h1>`;
+      h = `<div class="pagehead"><p class="eyebrow">Search</p><h1>${scUrl(v.q) ? 'SoundCloud' : '« ' + esc(v.q) + ' »'}</h1>${srcChips()}`;
       if (R.loading) h += `<p class="sub" style="margin:0">Recherche en cours…</p></div>${skeleton(8)}`;
       else if (R.error) h += `</div>${retry(R.error, 'retrysearch')}`;
       else h += `<p class="sub">${countText(R.tracks)}</p>${R.tracks.length ? `<div class="head-actions">${playActions()}</div>` : ''}</div>` + (R.tracks.length ? rows(R.tracks, 'search') + moreBtn(R, 'search') : '<p class="empty">Aucun titre trouvé. Essaie d\'autres mots.</p>');

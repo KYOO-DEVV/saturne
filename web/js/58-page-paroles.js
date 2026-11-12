@@ -1,12 +1,12 @@
 /* ---------- Page Paroles : pochette à gauche, paroles à droite, vidéo floue en fond (désactivable) ---------- */
-const lyVideoOn = () => S.settings.lyricsVideo !== false;
+const lyVideoOn = () => S.settings.lyricsVideo !== false && !isSc(current());
 function lyricsPageHtml(){
   const t = current();
   if (!t) return `<div class="pagehead"><p class="eyebrow">${L('Lyrics', 'Paroles')}</p><h1>${L('Nothing playing', 'Rien en lecture')}</h1><p class="sub">${L('Play a song to see its lyrics here.', 'Lance un titre pour voir ses paroles ici.')}</p></div>`;
   return `<div class="lypage ${lyVideoOn() ? '' : 'novid'}" id="lypage"><div class="ly-left">
-      <div class="ly-art"><img src="https://i.ytimg.com/vi/${esc(t.id)}/maxresdefault.jpg" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='${esc(t.thumb)}'}"></div>
+      <div class="ly-art"><img src="${esc(bigArt(t))}" alt="" onerror="if(!this.dataset.f){this.dataset.f=1;this.src='${esc(t.thumb)}'}"></div>
       <div class="ly-meta"><b data-notr>${esc(t.title)}</b><span data-notr>${chLink(t)}</span></div>
-      <div class="ly-tools">${bmBtn(t)}<button class="chipb" data-do="lyvid" aria-pressed="${lyVideoOn()}">${ic('mini')}${L('Video background', 'Fond vidéo')} : ${lyVideoOn() ? L('on', 'oui') : L('off', 'non')}</button><button class="chipb" data-do="lyqueue">${ic('queue')}${L('Queue', 'File d’attente')}</button></div></div>
+      <div class="ly-tools">${bmBtn(t)}${isSc(t) ? '' : `<button class="chipb" data-do="lyvid" aria-pressed="${lyVideoOn()}">${ic('mini')}${L('Video background', 'Fond vidéo')} : ${lyVideoOn() ? L('on', 'oui') : L('off', 'non')}</button>`}<button class="chipb" data-do="lyqueue">${ic('queue')}${L('Queue', 'File d’attente')}</button></div></div>
     <div class="ly-right">${lyricsHtml(t)}</div></div>`;
 }
 /* La vidéo (le lecteur YouTube habituellement caché) est étirée sur la page, floutée et assombrie, derrière le contenu. */
@@ -23,7 +23,7 @@ new ResizeObserver(() => placeBgVideo()).observe(document.querySelector('main'))
 /* Couleur de fond quand la vidéo est désactivée : celle de la pochette. */
 function paintLyrics(){
   const el = $('#lypage'), t = current(); if (!el || !t) return;
-  coverColor(`https://i.ytimg.com/vi/${t.id}/mqdefault.jpg`).then(c => { const e2 = $('#lypage'); if (e2 && c) e2.style.setProperty('--lyc', toneOf(c, 120)); });
+  coverColor(smallArt(t)).then(c => { const e2 = $('#lypage'); if (e2 && c) e2.style.setProperty('--lyc', toneOf(c, 120)); });
 }
 $('#view').addEventListener('click', e => {
   const fav = e.target.closest('.lypage [data-act="fav"]'); if (fav && current()) { toggleFav(current()); return; }

@@ -28,6 +28,7 @@ function giveUp(t, why){
 async function recover(t, why){
   if (!t || recovering === t.id) return;
   clearTimeout(wd);
+  if (isSc(t)) return giveUp(t, why); // pas d'autre version à chercher sur SoundCloud
   const tried = triedAlt.get(t.id) || [];
   if (tried.length >= 2) return giveUp(t, why);
   recovering = t.id; toast('« ' + t.title.slice(0, 40) + ' » ne se lance pas (' + why + '). Je cherche une autre version…');

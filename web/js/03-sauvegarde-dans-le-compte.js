@@ -29,7 +29,7 @@ function applyData(d){
   S.history = Array.isArray(d.history) ? d.history.slice(0, 24) : []; S.cc = COUNTRIES[d.cc] ? d.cc : 'JP'; S.collapsed = !!d.collapsed;
   S.defaultPrivacy = d.defaultPrivacy === 'public' ? 'public' : 'private';
   S.settings = {...DEFAULT_SETTINGS, ...(d.settings && typeof d.settings === 'object' ? d.settings : {})};
-  S.plays = Array.isArray(d.plays) ? d.plays.filter(p => Array.isArray(p) && /^[\w-]{11}$/.test(p[0])).slice(-1000) : [];
+  S.plays = Array.isArray(d.plays) ? d.plays.filter(p => Array.isArray(p) && /^([\w-]{11}|sc:\d{1,14})$/.test(p[0])).slice(-1000) : [];
   S.follows = Array.isArray(d.follows) ? d.follows.filter(a => a && /^UC[\w-]{22}$/.test(a.id)).slice(0, 60) : [];
   S.profile = {banner:typeof (d.profile||{}).banner === 'string' && (d.profile.banner.startsWith('data:image/') || /^\/media\/[\w.]+$/.test(d.profile.banner)) ? d.profile.banner : '', bio:typeof (d.profile||{}).bio === 'string' ? d.profile.bio.slice(0, 160) : ''};
   applyHomePrefs(); setTimeout(migrateMedia, 1500);

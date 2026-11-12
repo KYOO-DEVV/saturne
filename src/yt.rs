@@ -55,6 +55,12 @@ pub fn unix_now() -> u64 {
     std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0)
 }
 
+/// Une réponse « trop de requêtes » reçue ailleurs que dans `get` (API de YouTube Music) déclenche la même pause.
+pub fn mark_blocked() {
+    let n = BLOCK_STRIKES.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    BLOCKED_UNTIL.store(unix_now() + pause_for(n), std::sync::atomic::Ordering::Relaxed);
+}
+
 /// Vrai pendant la pause qui suit un blocage anti-robot de la page de résultats.
 pub fn is_paused() -> bool {
     unix_now() < BLOCKED_UNTIL.load(std::sync::atomic::Ordering::Relaxed)

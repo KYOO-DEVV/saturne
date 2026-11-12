@@ -7,7 +7,7 @@ const ACCENTS = {
   orange:['#c2410c','#fb923c','rgba(249,115,22,.15)','rgba(249,115,22,.2)']
 };
 const ACCENT_NAMES = {violet:'Violet', blue:'Bleu', green:'Vert', pink:'Rose', orange:'Orange'};
-const DEFAULT_SETTINGS = {modsOn:[], modsPrev:{}, modsOpts:{}, customCss:'', seen:'', density:'comfortable', lyricsVideo:true, startMin:false, bgOverlay:80, bgTint:'bg', bgBlur:0, hideLogo:false, sideThumbs:true, bg:'oled', accentCustom:'', bgImage:'', homeGenre:'jpop', homeShelves:['Anime', 'City Pop'], lang:'', mediaKeys:true, tray:false, discord:false, discordId:'', onboarded:false, showPlayer:false, autoplay:true, endless:true, remember:true, toasts:true, accent:'violet', radius:'soft', heroAuto:true, reduceMotion:false, autoUpdate:true};
+const DEFAULT_SETTINGS = {searchSrc:'yt', scClientId:'', modsOn:[], modsPrev:{}, modsOpts:{}, customCss:'', seen:'', density:'comfortable', lyricsVideo:true, startMin:false, bgOverlay:80, bgTint:'bg', bgBlur:0, hideLogo:false, sideThumbs:true, bg:'oled', accentCustom:'', bgImage:'', homeGenre:'jpop', homeShelves:['Anime', 'City Pop'], lang:'', mediaKeys:true, tray:false, discord:false, discordId:'', onboarded:false, showPlayer:false, autoplay:true, endless:true, remember:true, toasts:true, accent:'violet', radius:'soft', heroAuto:true, reduceMotion:false, autoUpdate:true};
 function applyTheme(){
   const a = ACCENTS[S.settings.accent] || ACCENTS.violet, st = document.documentElement.style;
   st.setProperty('--accent', a[0]); st.setProperty('--accent-hi', a[1]); st.setProperty('--accent-soft', a[2]); st.setProperty('--accent-glow', a[3]);
@@ -52,6 +52,7 @@ function settingsHtml(){
   else if (tab === 'general') b = `<h2>General</h2><p class="lead">Région, barre latérale et notifications.</p><div class="setgroup">
       ${langRow()}${homeRows()}
       ${setRow('Région de recherche', 'Change la région des résultats de la recherche et des genres.', dd('region', 'Région de recherche'))}
+      ${scRow()}
       ${setRow('Barre latérale réduite', 'Garde seulement les icônes pour laisser plus de place à la musique.', swc('collapsed', S.collapsed, 'Barre latérale réduite'))}
       ${setRow('Notifications', 'Affiche de petits messages quand tu ajoutes un titre, changes un réglage, etc. Les erreurs restent toujours visibles.', swc('toasts', T.toasts, 'Notifications'))}${desktopRows()}</div>`;
   else if (tab === 'playback') b = `<h2>Playback</h2><p class="lead">Comment la musique se lance et s'enchaîne.</p><div class="setgroup">

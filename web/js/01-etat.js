@@ -19,7 +19,10 @@ const favs = () => S.playlists.find(p => p.id === 'favs');
 const isFav = id => favs().tracks.some(t => t.id === id);
 const curPl = () => S.view.type === 'playlist' ? S.playlists.find(p => p.id === S.view.id) : null;
 const isPublic = p => p.visibility === 'public' && !p.system;
-const slim = t => ({id:t.id, title:t.title, channel:t.channel, channelId:t.channelId || '', thumb:t.thumb || `https://i.ytimg.com/vi/${t.id}/mqdefault.jpg`, duration:t.duration || null});
+const slim = t => ({id:t.id, title:t.title, channel:t.channel, channelId:t.channelId || '', thumb:t.thumb || (t.src === 'sc' ? '' : `https://i.ytimg.com/vi/${t.id}/mqdefault.jpg`), duration:t.duration || null, ...(t.src === 'sc' ? {src:'sc', url:t.url} : {})});
+/* Grande pochette : celle de la source (YouTube Music, SoundCloud) ou, pour YouTube, la vignette HD de la vidéo. */
+const bigArt = t => t.src === 'sc' || /googleusercontent\.com|sndcdn\.com/.test(t.thumb || '') ? (t.thumb || '') : `https://i.ytimg.com/vi/${t.id}/maxresdefault.jpg`;
+const smallArt = t => t.thumb || `https://i.ytimg.com/vi/${t.id}/mqdefault.jpg`;
 
 let toastTimer;
 function toast(msg, opt){

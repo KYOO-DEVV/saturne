@@ -22,7 +22,7 @@ function mergeData(d){
   let pl = 0, tr = 0;
   (Array.isArray(d.playlists) ? d.playlists : []).forEach(p => {
     if (!p || typeof p !== 'object' || !Array.isArray(p.tracks)) return;
-    const tracks = p.tracks.filter(t => t && /^[\w-]{11}$/.test(t.id)).map(slim);
+    const tracks = p.tracks.filter(t => t && /^([\w-]{11}|sc:\d{1,14})$/.test(t.id) && (!String(t.id).startsWith('sc:') || /^https:\/\/soundcloud\.com\//.test(t.url || ''))).map(slim);
     if (p.id === 'favs') { const f = favs(); tracks.forEach(t => { if (!f.tracks.some(x => x.id === t.id)) { f.tracks.push(t); tr++; } }); return; }
     if (!p.id || S.playlists.some(x => x.id === p.id)) return;
     S.playlists.push({...p, id:String(p.id).slice(0, 40), name:String(p.name || 'Playlist').slice(0, 60), tracks, visibility:'private', created:p.created || Date.now()}); pl++; tr += tracks.length;

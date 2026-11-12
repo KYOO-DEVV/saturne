@@ -126,6 +126,26 @@ ok(ctx.__booted === true, 'window.__booted doit être vrai après le chargement'
   ok(run(`decorSize(${m0}, ${m0}.decor[0])`) === 50 && run(`decorSize(${m0}, ${m0}.decor[1])`) === 40, 'taille des décors (fixe ou liée à une option)');
   ok(run(`editable({nodeType:1, closest: s => s.includes('input') ? {} : null})`) === true && run(`editable({nodeType:1, closest: () => null})`) === false, 'la sélection reste permise dans les champs de saisie seulement');
 
+  /* 3c. Sources : SoundCloud et YouTube Music (identifiants, pochettes, lecteur, pages). */
+  run(`globalThis.__sc = {id:'sc:293', src:'sc', url:'https://soundcloud.com/forss/flickermood', title:'Flickermood', channel:'Forss', channelId:'', thumb:'https://i1.sndcdn.com/artworks-x-t500x500.jpg', duration:214};
+       globalThis.__ytm = {id:'m9SMT5ipbxk', title:'Idol', channel:'YOASOBI', channelId:'UC' + 'a'.repeat(22), thumb:'https://yt3.googleusercontent.com/a=w400-h400', duration:214};
+       globalThis.__yt = {id:'ZRtdQ81jPUQ', title:'MV', channel:'YOASOBI', channelId:'', thumb:'https://i.ytimg.com/vi/ZRtdQ81jPUQ/mqdefault.jpg', duration:226};`);
+  ok(run(`JSON.stringify(slim(__sc))`).includes('"src":"sc"') && run(`slim(__sc).url`) === 'https://soundcloud.com/forss/flickermood', 'un titre SoundCloud garde sa source et son lien');
+  ok(run(`'src' in slim(__yt)`) === false, 'un titre YouTube n’a pas de champ src');
+  ok(run(`bigArt(__sc)`) === run(`__sc.thumb`) && run(`bigArt(__ytm)`) === run(`__ytm.thumb`) && run(`bigArt(__yt)`).includes('maxresdefault'), 'grande pochette : celle de la source, ou la vignette HD YouTube');
+  for (const good of ['https://soundcloud.com/forss/flickermood', 'http://m.soundcloud.com/a/b?si=x']) ok(run(`scUrl(${JSON.stringify(good)})`) === true, 'lien SoundCloud reconnu : ' + good);
+  for (const bad of ['https://evil.test/soundcloud.com/a/b', 'yoasobi idol', 'https://youtube.com/watch?v=abcdefghijk']) ok(run(`scUrl(${JSON.stringify(bad)})`) === false, 'pas un lien SoundCloud : ' + bad);
+  ok((run(`srcChips()`).match(/data-srcset/g) || []).length === 3, 'trois sources proposées');
+  ok(run(`srcBadge(__sc)`).includes('SC') && run(`srcBadge(__yt)`) === '', 'pastille SC seulement sur SoundCloud');
+  ok(run(`S.queue = [slim(__sc), slim(__yt)]; S.cur = 0; rebuildOrder(); engine() === scE`) === true && run(`S.cur = 1; engine() === ytE`) === true, 'le lecteur du titre en cours est choisi par sa source');
+  ok(run(`S.cur = 0; scE.st = 2; player.getPlayerState()`) === 2 && run(`S.cur = 0; scE.pos = 12; scE.st = 2; player.getCurrentTime()`) === 12, 'la façade player répond avec l’état de SoundCloud');
+  ok(run(`isSc(current())`) === true && run(`syncReady(), ready`) === false, 'prêt = le lecteur SoundCloud est prêt (pas celui de YouTube)');
+  run(`S.cur = -1; S.queue = []; S.search = {q:'https://soundcloud.com/forss/flickermood', src:'sc', tracks:[slim(__sc), slim(__ytm)], loading:false, error:''}; S.view = {type:'search', q:'https://soundcloud.com/forss/flickermood'}`);
+  for (const [name, expr] of [['page de recherche SoundCloud', `(S.view = {type:'search', q:S.search.q}, rows(S.search.tracks, 'search'))`], ['carte SoundCloud', `card(slim(__sc), 0)`], ['ligne SoundCloud', `trow(slim(__sc), 0, 1)`], ['réglage SoundCloud', `scRow()`], ['page Paroles SoundCloud', `(S.queue = [slim(__sc)], S.cur = 0, lyricsPageHtml())`]]) {
+    try { const r = run(expr); ok(typeof r === 'string' && r.length > 20 && !/undefined|\[object|NaN/.test(r), `${name} : HTML sain`); } catch (e) { ok(false, `${name} : exception ${e && e.message}`); }
+  }
+  run(`S.cur = -1; S.queue = []; S.search = {q:'x', tracks:__T(6), loading:false, error:''}; S.view = {type:'home'}`);
+
   /* 4. Listes : le filtre (clic sur une chaîne) garde exactement les titres de cette chaîne, et ne touche pas aux autres sources. */
   ok(run(`S.plv = {q:'', sort:'manual', sel:null}; tracksOf('search').length`) === 6, 'sans filtre : tous les titres');
   ok(run(`S.plv = {q:'Chaîne A', sort:'manual', sel:null}; tracksOf('search').length`) === 3, 'filtre par chaîne : la moitié des titres');

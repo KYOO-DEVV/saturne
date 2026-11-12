@@ -28,9 +28,17 @@ async function loadList(v){
 }
 let searchSeq = 0;
 async function runSearch(q){
-  const seq = ++searchSeq; S.search = {q, tracks:[], loading:true, error:''}; render();
+  const src = scUrl(q) ? 'sc' : (S.settings.searchSrc || 'yt'), seq = ++searchSeq; S.search = {q, src, tracks:[], loading:true, error:''}; render();
   try {
-    const id = ytId(q), j = id ? {items:[await api('video', {id})], next:null} : await fetchPage(q, S.cc);
+    const id = ytId(q);
+    let j;
+    if (src === 'sc') {
+      if (scUrl(q)) j = {items:(await api('sc/resolve', {url:q.trim()})).items, next:null};
+      else if (!S.settings.scClientId) throw new Error(L('To search SoundCloud, add your Client ID in Settings › General › SoundCloud. You can also paste a track link (https://soundcloud.com/…).', 'Pour chercher sur SoundCloud, ajoute ton Client ID dans Réglages › Général › SoundCloud. Tu peux aussi coller le lien d’un titre (https://soundcloud.com/…).'));
+      else j = {items:(await api('sc/search', {q, cid:S.settings.scClientId})).items, next:null};
+    } else if (id) j = {items:[await api('video', {id})], next:null};
+    else if (src === 'ytm') j = {items:(await api('music/search', {q, gl:S.cc})).items, next:null};
+    else j = await fetchPage(q, S.cc);
     if (seq !== searchSeq) return; S.search.tracks = j.items; S.search.next = j.next;
   } catch (e) { if (seq !== searchSeq) return; S.search.error = errText(e); }
   S.search.loading = false; render();

@@ -116,7 +116,7 @@ function hostHooks(){
   const root = document.documentElement, put = (k, v) => { if (hook[k] === v) return; hook[k] = v; if (k.startsWith('data-')) root.setAttribute(k, v); else root.style.setProperty(k, v); };
   put('data-view', String(S.view.type)); put('data-playing', playing ? '1' : '0');
   const seek = $('#seek'); put('--seek-pct', (seek && +seek.max > 0 ? +seek.value / +seek.max * 100 : 0).toFixed(1) + '%');
-  const t = current(), url = t ? `https://i.ytimg.com/vi/${t.id}/mqdefault.jpg` : '';
+  const t = current(), url = t ? smallArt(t) : '';
   put('--cover-img', url ? `url("${url}")` : 'none');
   if (url !== hook.coverUrl) { hook.coverUrl = url; if (url) coverColor(url).then(c => { if (hook.coverUrl === url) put('--track-color', c ? toneOf(c, 175) : 'transparent'); }); else put('--track-color', 'transparent'); }
 }
